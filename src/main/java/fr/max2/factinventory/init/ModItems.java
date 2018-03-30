@@ -1,6 +1,7 @@
 package fr.max2.factinventory.init;
 
 import fr.max2.factinventory.FactinventoryMod;
+import fr.max2.factinventory.item.InventoryHopperItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -12,19 +13,19 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ModItems
 {
-	//public static Item ;
+	public static InventoryHopperItem INVENTORY_HOPPER = name("inventory_hopper", new InventoryHopperItem());
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event)
 	{
-		event.getRegistry().registerAll();
+		event.getRegistry().registerAll(INVENTORY_HOPPER);
 	}
 	
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public static void registerRenders(ModelRegistryEvent event)
 	{
-		//registerRender();
+		registerRender(INVENTORY_HOPPER);
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -33,7 +34,7 @@ public class ModItems
 		ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(FactinventoryMod.MOD_ID + ":" + item.getUnlocalizedName().substring(5), "inventory"));
 	}
 
-	private static <I extends Item> I name(I item, String name)
+	private static <I extends Item> I name(String name, I item)
 	{
 		item.setRegistryName(FactinventoryMod.MOD_ID, name).setUnlocalizedName(name);
 	    return item;
