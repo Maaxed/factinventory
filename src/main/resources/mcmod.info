@@ -1,0 +1,16 @@
+[
+{
+  "modid": "factinventory",
+  "name": "Factinventory Mod",
+  "description": " mod made during the modjam 2018.1.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["LeBossMax2"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
