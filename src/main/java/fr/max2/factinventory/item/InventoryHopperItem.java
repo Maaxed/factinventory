@@ -1,8 +1,12 @@
 package fr.max2.factinventory.item;
 
+import fr.max2.factinventory.FactinventoryMod;
+import fr.max2.factinventory.utils.InventoryUtils;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -10,6 +14,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -18,10 +23,19 @@ import net.minecraftforge.items.IItemHandler;
 public class InventoryHopperItem extends Item
 {
 	
+	private static final IItemPropertyGetter FACING_GETTER = new IItemPropertyGetter()
+	{
+		@Override
+		public float apply(ItemStack stack, World worldIn, EntityLivingBase entityIn)
+		{
+			return getFacing(stack).getHorizontalIndex() * 0.25f;
+		}
+	};
 	
 	public InventoryHopperItem()
 	{
 		this.maxStackSize = 1;
+		this.addPropertyOverride(new ResourceLocation(FactinventoryMod.MOD_ID, "facing"), FACING_GETTER);
 	}
 	
 	@Override
@@ -42,6 +56,8 @@ public class InventoryHopperItem extends Item
 		{
 			InventoryPlayer inv = ((EntityPlayer)entity).inventory;
 			
+			if (inv.getStackInSlot(itemSlot) != stack) return;
+			
 			EnumFacing face = getFacing(stack);
 			
 			int width = inv.getHotbarSize(),
@@ -54,9 +70,13 @@ public class InventoryHopperItem extends Item
 				insertY = y - face.getFrontOffsetZ();
 			
 			if (extractY == 0 && y != 0) extractY = height;
+			else if (y == 0 && extractY == 1) extractY = -1;
+			else if (y == 0 && extractY == -1) extractY = height - 1;
 			else if (extractY == height) extractY = 0;
 
 			if (insertY == 0 && y != 0) insertY = height;
+			else if (y == 0 && insertY == 1) insertY = -1;
+			else if (y == 0 && insertY == -1) insertY = height - 1;
 			else if (insertY == height) insertY = 0;
 			
 			if (extractX >= 0 && extractX < width &&
@@ -82,14 +102,17 @@ public class InventoryHopperItem extends Item
 						for (int extractIndex = 0; extractIndex < extractSlots; extractIndex++)
 						{
 							ItemStack extractedStack = extractCapa.extractItem(extractIndex, 1, true);
-							for (int insertIndex = 0; insertIndex < insertSlots; insertIndex++)
+							if(!extractedStack.isEmpty())
 							{
-								ItemStack remainder = insertCapa.insertItem(insertIndex, extractedStack, false);
-								if (remainder.isEmpty())
+								for (int insertIndex = 0; insertIndex < insertSlots; insertIndex++)
 								{
-									extractCapa.extractItem(extractIndex, 1, false);
-									
-									return;											//   <-- Here is a return !
+									ItemStack remainder = insertCapa.insertItem(insertIndex, extractedStack, false);
+									if (remainder.isEmpty())
+									{
+										extractCapa.extractItem(extractIndex, 1, false);
+										
+										return;											//   <-- Here is a return !
+									}
 								}
 							}
 						}
@@ -118,7 +141,7 @@ public class InventoryHopperItem extends Item
 						}
 					}
 				}
-				else if (!insertStack.isEmpty() && insertStack.getCount() < insertStack.getMaxStackSize() && insertStack.getCount() < inv.getInventoryStackLimit())
+				else if (insertStack.isEmpty() || (insertStack.getCount() < insertStack.getMaxStackSize() && insertStack.getCount() < inv.getInventoryStackLimit()))
 				{
 					if (extractStack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face.getOpposite()))
 					{
@@ -128,9 +151,14 @@ public class InventoryHopperItem extends Item
 						for (int extractIndex = 0; extractIndex < extractSlots; extractIndex++)
 						{
 							ItemStack extractedStack = extractCapa.extractItem(extractIndex, 1, true);
-							if (canCombine(insertStack, extractedStack))
+							if (!extractedStack.isEmpty() && (insertStack.isEmpty() || InventoryUtils.canCombine(insertStack, extractedStack)))
 							{
-								insertStack.grow(1);
+								if (insertStack.isEmpty())
+								{
+									inv.setInventorySlotContents(insertSlot, extractedStack);
+								}
+								else insertStack.grow(1);
+								
 								extractCapa.extractItem(extractIndex, 1, false);
 								
 								return;											//   <-- Here is a return !
@@ -140,9 +168,15 @@ public class InventoryHopperItem extends Item
 					}
 					else if (!extractStack.isEmpty())
 					{
-						if (canCombine(insertStack, extractStack))
+						if (insertStack.isEmpty() || InventoryUtils.canCombine(insertStack, extractStack))
 						{
-							insertStack.grow(1);
+							if (insertStack.isEmpty())
+							{
+								ItemStack extractedStack = extractStack.copy();
+								extractedStack.setCount(1);
+								inv.setInventorySlotContents(insertSlot, extractedStack);
+							}
+							else insertStack.grow(1);
 							
 							extractStack.shrink(1);
 							if (extractStack.isEmpty())
@@ -181,10 +215,5 @@ public class InventoryHopperItem extends Item
 		
 		tag.setByte(NBT_FACING, (byte)face.getHorizontalIndex());
 	}
-	
-	private static boolean canCombine(ItemStack stack1, ItemStack stack2)
-    {
-        return stack1.getItem() == stack2.getItem() && (stack1.getMetadata() == stack2.getMetadata() && ItemStack.areItemStackTagsEqual(stack1, stack2));
-    }
 	
 }
