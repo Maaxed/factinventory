@@ -1,0 +1,14 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factinventory:items/inventory_furnace"
+    },
+	"overrides": [
+        {
+            "predicate": {
+				"factinventory:burn_time": 0.5
+            },
+            "model": "factinventory:item/inventory_furnace_lit"
+        }
+	]
+}

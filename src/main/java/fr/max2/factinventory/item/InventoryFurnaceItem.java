@@ -1,10 +1,18 @@
 package fr.max2.factinventory.item;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import fr.max2.factinventory.FactinventoryMod;
+import fr.max2.factinventory.client.gui.GuiRenderHandler.Icon;
 import fr.max2.factinventory.utils.InventoryUtils;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityXPOrb;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.Slot;
 import net.minecraft.inventory.SlotFurnaceFuel;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
@@ -14,8 +22,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
@@ -36,7 +46,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	public InventoryFurnaceItem()
 	{
 		super();
-		this.addPropertyOverride(new ResourceLocation(FactinventoryMod.MOD_ID, "burnTime"), BURN_TIME_GETTER);
+		this.addPropertyOverride(new ResourceLocation(FactinventoryMod.MOD_ID, "burn_time"), BURN_TIME_GETTER);
 	}
 	
 	@Override
@@ -58,7 +68,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	}
 	
 	@Override
-	protected void update(ItemStack stack, InventoryPlayer inv, int itemSlot)
+	protected void update(ItemStack stack, InventoryPlayer inv, EntityPlayer player, int itemSlot)
 	{
 		int width = inv.getHotbarSize(),
 			height = inv.mainInventory.size() / width,
@@ -83,15 +93,15 @@ public class InventoryFurnaceItem extends InventoryItem
 			int inputX = x, inputY = y - 1;
 			int outputX = x, outputY = y + 1;
 
-			if (inputX == 0 && y != 0) inputX = height;
-			else if (y == 0 && inputX == 1) inputX = -1;
-			else if (y == 0 && inputX == -1) inputX = height - 1;
-			else if (inputX == height) inputX = 0;
+			if (inputY == 0 && y != 0) inputY = height;
+			else if (y == 0 && inputY == 1) inputY = -1;
+			else if (y == 0 && inputY == -1) inputY = height - 1;
+			else if (inputY == height) inputY = 0;
 
-			if (outputX == 0 && y != 0) outputX = height;
-			else if (y == 0 && outputX == 1) outputX = -1;
-			else if (y == 0 && outputX == -1) outputX = height - 1;
-			else if (outputX == height) outputX = 0;
+			if (outputY == 0 && y != 0) outputY = height;
+			else if (y == 0 && outputY == 1) outputY = -1;
+			else if (y == 0 && outputY == -1) outputY = height - 1;
+			else if (outputY == height) outputY = 0;
 			
 			if (inputY >= 0 && inputY < height && outputY >= 0 && outputY < height)
 			{
@@ -106,7 +116,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	            	{
 	            		IItemHandler inputCapa = newInputStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.SOUTH);
 	            		int slots = inputCapa.getSlots();
-	            		for (int i = 0; i < slots; i++)
+	            		for (int i = 0; i < slots && inputStack.isEmpty(); i++)
 	            		{
 	            			ItemStack currentSlot = inputCapa.extractItem(i, 1, true);
 	            			ItemStack result = FurnaceRecipes.instance().getSmeltingResult(currentSlot);
@@ -116,13 +126,17 @@ public class InventoryFurnaceItem extends InventoryItem
 	            			}
 	            		}
 	            	}
-	            	else if (canPush(FurnaceRecipes.instance().getSmeltingResult(newInputStack), outputStack, EnumFacing.NORTH))
+	            	else
 	            	{
-	            		inputStack = newInputStack.copy();
-	            		inputStack.setCount(1);
-	            		
-	            		newInputStack.shrink(1);
-	            		if (newInputStack.isEmpty()) inv.setInventorySlotContents(inputSlot, ItemStack.EMPTY);
+	            		ItemStack result = FurnaceRecipes.instance().getSmeltingResult(newInputStack);
+	        			if(!result.isEmpty() && canPush(result, outputStack, EnumFacing.NORTH))
+		            	{
+		            		inputStack = newInputStack.copy();
+		            		inputStack.setCount(1);
+		            		
+		            		newInputStack.shrink(1);
+		            		if (newInputStack.isEmpty()) inv.setInventorySlotContents(inputSlot, ItemStack.EMPTY);
+		            	}
 	            	}
 	            	
 		            if (!inputStack.isEmpty()) setActualInput(stack, inputStack);
@@ -147,7 +161,7 @@ public class InventoryFurnaceItem extends InventoryItem
 						IItemHandler fuelCapa = fuelItem.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side);
 						
 						int slots = fuelCapa.getSlots();
-						for (int i = 0; i < slots; i++)
+						for (int i = 0; i < slots && burnTime == 0; i++)
 						{
 							ItemStack testStack = fuelCapa.extractItem(i, 1, true);
 							
@@ -159,15 +173,16 @@ public class InventoryFurnaceItem extends InventoryItem
 								{
 									Item item = fuelCapa.extractItem(i, 1, false).getItem();
 									
-									if (fuelCapa.getStackInSlot(fuelSlot).isEmpty())
+									if (fuelCapa.getStackInSlot(i).isEmpty())
 									{
-										fuelCapa.insertItem(fuelSlot, item.getContainerItem(testStack), false);
+										fuelCapa.insertItem(i, item.getContainerItem(testStack), false);
 									}
 									
 									setBurnTime(stack, burnTime);
 								}
 							}
 						}
+						if (burnTime != 0) break;
 					}
 					else if (TileEntityFurnace.isItemFuel(fuelItem) || SlotFurnaceFuel.isBucket(fuelItem) && fuelItem.getItem() != Items.BUCKET)
 					{
@@ -206,24 +221,26 @@ public class InventoryFurnaceItem extends InventoryItem
                     
                 	int outputX = x, outputY = y + 1;
 
-        			if (outputX == 0 && y != 0) outputX = height;
-        			else if (y == 0 && outputX == 1) outputX = -1;
-        			else if (y == 0 && outputX == -1) outputX = height - 1;
-        			else if (outputX == height) outputX = 0;
+        			if (outputY == 0 && y != 0) outputY = height;
+        			else if (y == 0 && outputY == 1) outputY = -1;
+        			else if (y == 0 && outputY == -1) outputY = height - 1;
+        			else if (outputY == height) outputY = 0;
         			
         			if (outputY >= 0 && outputY < height)
         			{
     					int outputSlot = outputX + width * outputY;
     	            	ItemStack outputStack = inv.getStackInSlot(outputSlot);
     	            	
-	            		ItemStack result = FurnaceRecipes.instance().getSmeltingResult(inputStack);
+	            		ItemStack result = FurnaceRecipes.instance().getSmeltingResult(inputStack).copy();
     	            	
     	            	if (outputStack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.SOUTH))
     	        		{
     	            		IItemHandler outputHandler = outputStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.SOUTH);
     	            		if (canPush(result, outputHandler))
     	            		{
-    	            			push(result.copy(), outputHandler);
+    	            			result.onCrafting(player.world, player, result.getCount());
+        		                FMLCommonHandler.instance().firePlayerSmeltedEvent(player, result);
+    	            			push(result, outputHandler);
     	            			inputStack = ItemStack.EMPTY;
     	            		}
     	        		}
@@ -237,12 +254,43 @@ public class InventoryFurnaceItem extends InventoryItem
     	        			else if (InventoryUtils.canCombine(result, outputStack) && outputStack.getCount() + result.getCount() <= outputStack.getMaxStackSize() && outputStack.getCount() + result.getCount() <= inv.getInventoryStackLimit())
     	        			{
     	        				outputStack.grow(result.getCount());
+    	        				outputStack.onCrafting(player.world, player, result.getCount());
+    	        				FMLCommonHandler.instance().firePlayerSmeltedEvent(player, outputStack);
     	            			inputStack = ItemStack.EMPTY;
     	        			}
     	        		}
     	            	
     		            if (inputStack.isEmpty())
     		            {
+    		            	if (!player.world.isRemote)
+    		                {
+    		                    int i = result.getCount();
+    		                    float f = FurnaceRecipes.instance().getSmeltingExperience(stack);
+
+    		                    if (f == 0.0F)
+    		                    {
+    		                        i = 0;
+    		                    }
+    		                    else if (f < 1.0F)
+    		                    {
+    		                        int j = MathHelper.floor((float)i * f);
+
+    		                        if (j < MathHelper.ceil((float)i * f) && Math.random() < (double)((float)i * f - (float)j))
+    		                        {
+    		                            ++j;
+    		                        }
+
+    		                        i = j;
+    		                    }
+    		                    
+    		                    while (i > 0)
+    		                    {
+    		                        int k = EntityXPOrb.getXPSplit(i);
+    		                        i -= k;
+    		                        player.world.spawnEntity(new EntityXPOrb(player.world, player.posX, player.posY + 0.5D, player.posZ + 0.5D, k));
+    		                    }
+    		                }
+    		            	
     	                	setCookTime(stack, 0);
     		            	setActualInput(stack, ItemStack.EMPTY);
     		            }
@@ -267,6 +315,75 @@ public class InventoryFurnaceItem extends InventoryItem
 	private int getInventoryStackLimit()
 	{
 		return 64;
+	}
+
+	@Override
+	public List<Icon> getRenderIcons(ItemStack stack, GuiContainer gui, Slot slot, InventoryPlayer inv)
+	{
+		List<Icon> icons = new ArrayList<>();
+		
+		int itemSlot = slot.getSlotIndex(),
+			width = inv.getHotbarSize(),
+			height = inv.mainInventory.size() / width;
+		
+		if (itemSlot >= width * height) return icons;
+		
+		int x = itemSlot % width,
+			y = itemSlot / width,
+			pullY = y - 1,
+			pushY = y + 1;
+		
+		if (pullY == 0 && y != 0)
+			pullY = height;
+		else if (y == 0 && pullY == 1)
+			pullY = -1;
+		else if (y == 0 && pullY == -1)
+			pullY = height - 1;
+		else if (pullY == height)
+			pullY = 0;
+		
+		if (pushY == 0 && y != 0)
+			pushY = height;
+		else if (y == 0 && pushY == 1)
+			pushY = -1;
+		else if (y == 0 && pushY == -1)
+			pushY = height - 1;
+		else if (pushY == height)
+			pushY = 0;
+		
+		if (pullY >= 0 && pullY < height)
+		{
+			Slot extractSlot = gui.inventorySlots.getSlotFromInventory(inv, x + width * pullY);
+			icons.add(new Icon(extractSlot, EnumFacing.NORTH, 0x4995FF, true, false));
+		}
+		else icons.add(new Icon(null, EnumFacing.NORTH, 0x4995FF, true, true));
+		
+		if (pushY >= 0 && pushY < height)
+		{
+			Slot fillSlot = gui.inventorySlots.getSlotFromInventory(inv, x + width * pushY);
+			icons.add(new Icon(fillSlot, EnumFacing.SOUTH, 0xFF7716, false, false));
+		}
+		else icons.add(new Icon(null, EnumFacing.SOUTH, 0xFF7716, false, true));
+		
+		int fuelX1 = x - 1,
+			fuelX2 = x + 1;
+		
+		if (fuelX1 >= 0 && fuelX1 < width)
+		{
+			Slot fuelSlot = gui.inventorySlots.getSlotFromInventory(inv, fuelX1 + width * y);
+			icons.add(new Icon(fuelSlot, EnumFacing.WEST, 0xAA00FF, true, false));
+		}
+		else icons.add(new Icon(null, EnumFacing.WEST, 0xAA00FF, true, true));
+		
+		if (fuelX2 >= 0 && fuelX2 < width)
+		{
+			Slot fuelSlot = gui.inventorySlots.getSlotFromInventory(inv, fuelX2 + width * y);
+			icons.add(new Icon(fuelSlot, EnumFacing.EAST, 0xAA00FF, true, false));
+		}
+		else icons.add(new Icon(null, EnumFacing.EAST, 0xAA00FF, true, true));
+		
+		
+		return icons;
 	}
 	
 	private static final EnumFacing[] FUEL_SIDE = { EnumFacing.EAST, EnumFacing.WEST };
