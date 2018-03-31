@@ -166,7 +166,11 @@ public class ItemTileEntityWrapperHandler implements IItemHandlerModifiable, ICa
 			int index = item.getByte("Slot");
 			if (index == slot)
 			{
-				items.set(i, newItemTag);
+				if (stack.isEmpty())
+				{
+					items.removeTag(i);
+				}
+				else items.set(i, newItemTag);
 				return;
 			}
 		}

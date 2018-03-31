@@ -56,12 +56,6 @@ public class GuiRenderHandler
 				else if (y == 0 && insertY == -1) insertY = height - 1;
 				else if (insertY == height) insertY = 0;
 				
-				
-				//1
-				//2
-				//3
-				//0
-				
 				GlStateManager.color(1.0F, 1.0F, 1.0F);
 				
 				if (extractX >= 0 && extractX < width &&

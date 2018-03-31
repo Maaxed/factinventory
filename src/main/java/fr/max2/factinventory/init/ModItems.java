@@ -1,6 +1,7 @@
 package fr.max2.factinventory.init;
 
 import fr.max2.factinventory.FactinventoryMod;
+import fr.max2.factinventory.item.InventoryFurnaceItem;
 import fr.max2.factinventory.item.InventoryHopperItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
@@ -16,18 +17,29 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ModItems
 {
 	public static InventoryHopperItem INVENTORY_HOPPER = name("inventory_hopper", new InventoryHopperItem());
+	public static InventoryFurnaceItem INVENTORY_FURNACE = name("inventory_furnace", new InventoryFurnaceItem());
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event)
 	{
-		event.getRegistry().registerAll(INVENTORY_HOPPER.setCreativeTab(ModCreativeTabs.ITEMS_TAB));
+		event.getRegistry().registerAll(INVENTORY_HOPPER.setCreativeTab(ModCreativeTabs.ITEMS_TAB),
+										INVENTORY_FURNACE.setCreativeTab(ModCreativeTabs.ITEMS_TAB));
 	}
 	
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public static void registerRenders(ModelRegistryEvent event)
 	{
-		registerRender(INVENTORY_HOPPER);
+		registerRenderAll(INVENTORY_HOPPER, INVENTORY_FURNACE);
+	}
+
+	@SideOnly(Side.CLIENT)
+	protected static void registerRenderAll(Item... items)
+	{
+		for (Item item : items)
+		{
+			registerRender(item);
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
