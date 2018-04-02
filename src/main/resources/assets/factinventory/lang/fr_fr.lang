@@ -1,0 +1,9 @@
+item.interaction_module.name=Module d'interaction avec l'inventaire
+item.inventory_hopper.name=Entonnoir d'inventaire
+item.inventory_furnace.name=Fourneau d'inventaire
+
+tooltip.smelting_info_on_ctrl.desc=Maintenir §e§lCTRL§r pour afficher les détails
+tooltip.not_smelting.desc=Vide
+tooltip.smelting_item.desc=En train de cuire : %s
+tooltip.not_burning.desc=Ne chauffe pas
+tooltip.burning_time.desc=Brûle pendant : %d ticks

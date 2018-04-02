@@ -6,7 +6,10 @@ import java.util.List;
 import fr.max2.factinventory.FactinventoryMod;
 import fr.max2.factinventory.client.gui.GuiRenderHandler.Icon;
 import fr.max2.factinventory.utils.InventoryUtils;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,6 +29,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
@@ -68,6 +73,38 @@ public class InventoryFurnaceItem extends InventoryItem
 	}
 	
 	@Override
+    @SideOnly(Side.CLIENT)
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn)
+	{
+		if (GuiScreen.isCtrlKeyDown())
+		{
+			ItemStack smeltingItem = getSmeltingStack(stack);
+			if (smeltingItem.isEmpty())
+			{
+				tooltip.add(I18n.format("tooltip.not_smelting.desc"));
+			}
+			else
+			{
+				tooltip.add(I18n.format("tooltip.smelting_item.desc", smeltingItem.getDisplayName()));
+			}
+			
+			int burnTime = getBurnTime(stack);
+			if (burnTime > 0)
+			{
+				tooltip.add(I18n.format("tooltip.burning_time.desc", burnTime));
+			}
+			else
+			{
+				tooltip.add(I18n.format("tooltip.not_burning.desc"));
+			}
+		}
+		else
+		{
+			tooltip.add(I18n.format("tooltip.smelting_info_on_ctrl.desc"));
+		}
+	}
+	
+	@Override
 	protected void update(ItemStack stack, InventoryPlayer inv, EntityPlayer player, int itemSlot)
 	{
 		int width = inv.getHotbarSize(),
@@ -78,7 +115,7 @@ public class InventoryFurnaceItem extends InventoryItem
 		int burnTime = getBurnTime(stack);
 		int cookTime = getCookTime(stack);
 		
-    	ItemStack inputStack = getActualInput(stack);
+    	ItemStack smeltingStack = getSmeltingStack(stack);
 		
 		if (burnTime > 0)
 		{
@@ -86,7 +123,7 @@ public class InventoryFurnaceItem extends InventoryItem
 			setBurnTime(stack, burnTime);
 		}
         
-		if (inputStack.isEmpty())
+		if (smeltingStack.isEmpty())
         {
 			// Try pull a new item
 			
@@ -116,13 +153,13 @@ public class InventoryFurnaceItem extends InventoryItem
 	            	{
 	            		IItemHandler inputCapa = newInputStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.SOUTH);
 	            		int slots = inputCapa.getSlots();
-	            		for (int i = 0; i < slots && inputStack.isEmpty(); i++)
+	            		for (int i = 0; i < slots && smeltingStack.isEmpty(); i++)
 	            		{
 	            			ItemStack currentSlot = inputCapa.extractItem(i, 1, true);
 	            			ItemStack result = FurnaceRecipes.instance().getSmeltingResult(currentSlot);
 	            			if(!result.isEmpty() && canPush(result, outputStack, EnumFacing.NORTH))
 	            			{
-	            				inputStack = inputCapa.extractItem(i, 1, false);
+	            				smeltingStack = inputCapa.extractItem(i, 1, false);
 	            			}
 	            		}
 	            	}
@@ -131,20 +168,20 @@ public class InventoryFurnaceItem extends InventoryItem
 	            		ItemStack result = FurnaceRecipes.instance().getSmeltingResult(newInputStack);
 	        			if(!result.isEmpty() && canPush(result, outputStack, EnumFacing.NORTH))
 		            	{
-		            		inputStack = newInputStack.copy();
-		            		inputStack.setCount(1);
+		            		smeltingStack = newInputStack.copy();
+		            		smeltingStack.setCount(1);
 		            		
 		            		newInputStack.shrink(1);
 		            		if (newInputStack.isEmpty()) inv.setInventorySlotContents(inputSlot, ItemStack.EMPTY);
 		            	}
 	            	}
 	            	
-		            if (!inputStack.isEmpty()) setActualInput(stack, inputStack);
+		            if (!smeltingStack.isEmpty()) setSmeltingStack(stack, smeltingStack);
 	            }
 			}
         }
 		
-		if (burnTime == 0 && !inputStack.isEmpty())
+		if (burnTime == 0 && !smeltingStack.isEmpty())
         {
 			// Try fill with fuel
 			for (EnumFacing side : FUEL_SIDE)
@@ -206,9 +243,9 @@ public class InventoryFurnaceItem extends InventoryItem
         
         if (burnTime > 0)
         {
-        	if (!inputStack.isEmpty())
+        	if (!smeltingStack.isEmpty())
             {
-        		// Cook
+        		// Smelt
 
                 if (cookTime < this.totalCookTime)
                 {
@@ -231,7 +268,7 @@ public class InventoryFurnaceItem extends InventoryItem
     					int outputSlot = outputX + width * outputY;
     	            	ItemStack outputStack = inv.getStackInSlot(outputSlot);
     	            	
-	            		ItemStack result = FurnaceRecipes.instance().getSmeltingResult(inputStack).copy();
+	            		ItemStack result = FurnaceRecipes.instance().getSmeltingResult(smeltingStack).copy();
     	            	
     	            	if (outputStack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.SOUTH))
     	        		{
@@ -241,7 +278,7 @@ public class InventoryFurnaceItem extends InventoryItem
     	            			result.onCrafting(player.world, player, result.getCount());
         		                FMLCommonHandler.instance().firePlayerSmeltedEvent(player, result);
     	            			push(result, outputHandler);
-    	            			inputStack = ItemStack.EMPTY;
+    	            			smeltingStack = ItemStack.EMPTY;
     	            		}
     	        		}
     	        		else
@@ -249,23 +286,23 @@ public class InventoryFurnaceItem extends InventoryItem
     	        			if (outputStack.isEmpty())
     	        			{
     	        				inv.setInventorySlotContents(outputSlot, result.copy());
-    	            			inputStack = ItemStack.EMPTY;
+    	            			smeltingStack = ItemStack.EMPTY;
     	        			}
     	        			else if (InventoryUtils.canCombine(result, outputStack) && outputStack.getCount() + result.getCount() <= outputStack.getMaxStackSize() && outputStack.getCount() + result.getCount() <= inv.getInventoryStackLimit())
     	        			{
     	        				outputStack.grow(result.getCount());
     	        				outputStack.onCrafting(player.world, player, result.getCount());
     	        				FMLCommonHandler.instance().firePlayerSmeltedEvent(player, outputStack);
-    	            			inputStack = ItemStack.EMPTY;
+    	            			smeltingStack = ItemStack.EMPTY;
     	        			}
     	        		}
     	            	
-    		            if (inputStack.isEmpty())
+    		            if (smeltingStack.isEmpty())
     		            {
     		            	if (!player.world.isRemote)
     		                {
     		                    int i = result.getCount();
-    		                    float f = FurnaceRecipes.instance().getSmeltingExperience(stack);
+    		                    float f = FurnaceRecipes.instance().getSmeltingExperience(result);
 
     		                    if (f == 0.0F)
     		                    {
@@ -292,7 +329,7 @@ public class InventoryFurnaceItem extends InventoryItem
     		                }
     		            	
     	                	setCookTime(stack, 0);
-    		            	setActualInput(stack, ItemStack.EMPTY);
+    		            	setSmeltingStack(stack, ItemStack.EMPTY);
     		            }
     	            }
                 	
@@ -430,7 +467,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	
 	private static final String NBT_ACTUAL_INPUT = "actual_input";
 	
-	public static ItemStack getActualInput(ItemStack stack)
+	public static ItemStack getSmeltingStack(ItemStack stack)
 	{
 		if (stack.hasTagCompound())
 		{
@@ -440,11 +477,11 @@ public class InventoryFurnaceItem extends InventoryItem
 		return ItemStack.EMPTY;
 	}
 	
-	public static void setActualInput(ItemStack stack, ItemStack actualInput)
+	public static void setSmeltingStack(ItemStack stack, ItemStack smeltingStck)
 	{
 		if (!stack.hasTagCompound()) stack.setTagCompound(new NBTTagCompound());
 		
-		stack.getTagCompound().setTag(NBT_ACTUAL_INPUT, actualInput.serializeNBT());
+		stack.getTagCompound().setTag(NBT_ACTUAL_INPUT, smeltingStck.serializeNBT());
 	}
 	
 }

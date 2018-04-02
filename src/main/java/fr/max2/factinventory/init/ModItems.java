@@ -18,19 +18,21 @@ public class ModItems
 {
 	public static InventoryHopperItem INVENTORY_HOPPER = name("inventory_hopper", new InventoryHopperItem());
 	public static InventoryFurnaceItem INVENTORY_FURNACE = name("inventory_furnace", new InventoryFurnaceItem());
+	public static Item INTERACTION_MODULE = name("interaction_module", new Item().setCreativeTab(ModCreativeTabs.ITEMS_TAB));
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event)
 	{
 		event.getRegistry().registerAll(INVENTORY_HOPPER.setCreativeTab(ModCreativeTabs.ITEMS_TAB),
-										INVENTORY_FURNACE.setCreativeTab(ModCreativeTabs.ITEMS_TAB));
+										INVENTORY_FURNACE.setCreativeTab(ModCreativeTabs.ITEMS_TAB),
+										INTERACTION_MODULE);
 	}
 	
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public static void registerRenders(ModelRegistryEvent event)
 	{
-		registerRenderAll(INVENTORY_HOPPER, INVENTORY_FURNACE);
+		registerRenderAll(INVENTORY_HOPPER, INVENTORY_FURNACE, INTERACTION_MODULE);
 	}
 
 	@SideOnly(Side.CLIENT)

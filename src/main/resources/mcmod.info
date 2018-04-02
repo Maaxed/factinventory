@@ -1,15 +1,15 @@
 [
 {
   "modid": "factinventory",
-  "name": "Factinventory Mod",
-  "description": " mod made during the modjam 2018.1.",
+  "name": "FactInventory Mod",
+  "description": "A mod made during the modjam 2018.1.",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "",
+  "url": "https://github.com/LeBossMax2/factinventory",
   "updateUrl": "",
   "authorList": ["LeBossMax2"],
   "credits": "",
-  "logoFile": "",
+  "logoFile": "logo.png",
   "screenshots": [],
   "dependencies": []
 }
