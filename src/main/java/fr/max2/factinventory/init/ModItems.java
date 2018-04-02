@@ -2,7 +2,8 @@ package fr.max2.factinventory.init;
 
 import fr.max2.factinventory.FactinventoryMod;
 import fr.max2.factinventory.item.InventoryFurnaceItem;
-import fr.max2.factinventory.item.InventoryHopperItem;
+import fr.max2.factinventory.item.SlowInventoryHopperItem;
+import fr.max2.factinventory.item.FastInventoryHopperItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -16,14 +17,16 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @EventBusSubscriber
 public class ModItems
 {
-	public static InventoryHopperItem INVENTORY_HOPPER = name("inventory_hopper", new InventoryHopperItem());
+	public static SlowInventoryHopperItem SLOW_INVENTORY_HOPPER = name("slow_inventory_hopper", new SlowInventoryHopperItem());
+	public static FastInventoryHopperItem FAST_INVENTORY_HOPPER = name("fast_inventory_hopper", new FastInventoryHopperItem());
 	public static InventoryFurnaceItem INVENTORY_FURNACE = name("inventory_furnace", new InventoryFurnaceItem());
 	public static Item INTERACTION_MODULE = name("interaction_module", new Item().setCreativeTab(ModCreativeTabs.ITEMS_TAB));
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event)
 	{
-		event.getRegistry().registerAll(INVENTORY_HOPPER.setCreativeTab(ModCreativeTabs.ITEMS_TAB),
+		event.getRegistry().registerAll(SLOW_INVENTORY_HOPPER.setCreativeTab(ModCreativeTabs.ITEMS_TAB),
+										FAST_INVENTORY_HOPPER.setCreativeTab(ModCreativeTabs.ITEMS_TAB),
 										INVENTORY_FURNACE.setCreativeTab(ModCreativeTabs.ITEMS_TAB),
 										INTERACTION_MODULE);
 	}
@@ -32,7 +35,7 @@ public class ModItems
 	@SubscribeEvent
 	public static void registerRenders(ModelRegistryEvent event)
 	{
-		registerRenderAll(INVENTORY_HOPPER, INVENTORY_FURNACE, INTERACTION_MODULE);
+		registerRenderAll(SLOW_INVENTORY_HOPPER, FAST_INVENTORY_HOPPER, INVENTORY_FURNACE, INTERACTION_MODULE);
 	}
 
 	@SideOnly(Side.CLIENT)

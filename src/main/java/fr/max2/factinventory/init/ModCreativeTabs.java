@@ -15,7 +15,7 @@ public class ModCreativeTabs
 		@SideOnly(Side.CLIENT)
 		public ItemStack getTabIconItem()
 		{
-			ItemStack iStack = new ItemStack(ModItems.INVENTORY_HOPPER);
+			ItemStack iStack = new ItemStack(ModItems.SLOW_INVENTORY_HOPPER);
 			return iStack;
 		}
 		

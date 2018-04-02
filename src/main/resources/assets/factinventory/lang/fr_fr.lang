@@ -1,6 +1,6 @@
 item.interaction_module.name=Module d'interaction avec l'inventaire
-item.inventory_hopper.name=Entonnoir d'inventaire
-item.inventory_furnace.name=Fourneau d'inventaire
+item.slow_inventory_hopper.name=Entonnoir d'inventaire
+item.fast_inventory_furnace.name=Fourneau d'inventaire rapide
 
 tooltip.interaction_info_on_shift.desc=Maintenir §e§lSHIFT§r pour afficher les détails d'entrée/surtie
 tooltip.input.desc=Entrée
@@ -14,3 +14,8 @@ tooltip.not_smelting.desc=Vide
 tooltip.smelting_item.desc=En train de cuire : %s
 tooltip.not_burning.desc=Ne chauffe pas
 tooltip.burning_time.desc=Brûle pendant : %d ticks
+
+tooltip.transfer_info_on_ctrl.desc=Maintenir §e§lCTRL§r pour afficher les détails de transfert
+tooltip.not_transferring.desc=Vide
+tooltip.transferring_item.desc=En train de transférer : %s
+tooltip.transfer_time.desc=Durée de transfert restante : %d ticks

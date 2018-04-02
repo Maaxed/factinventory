@@ -437,7 +437,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	
 	private static final EnumFacing[] FUEL_SIDE = { EnumFacing.EAST, EnumFacing.WEST };
 
-	private static final String NBT_BURN_TIME = "burn_time";
+	private static final String NBT_BURN_TIME = "BurnTime";
 	
 	public static int getBurnTime(ItemStack stack)
 	{
@@ -457,7 +457,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	}
 	
 	
-	private static final String NBT_COOK_TIME = "cook_time";
+	private static final String NBT_COOK_TIME = "CookTime";
 	
 	public static int getCookTime(ItemStack stack)
 	{
@@ -477,7 +477,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	}
 	
 	
-	private static final String NBT_ACTUAL_INPUT = "actual_input";
+	private static final String NBT_ACTUAL_INPUT = "SmeltingItem";
 	
 	public static ItemStack getSmeltingStack(ItemStack stack)
 	{

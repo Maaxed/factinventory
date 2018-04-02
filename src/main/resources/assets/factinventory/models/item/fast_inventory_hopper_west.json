@@ -1,7 +1,7 @@
 {
     "parent": "item/generated",
     "textures": {
-        "layer0": "factinventory:items/inventory_hopper"
+        "layer0": "factinventory:items/fast_inventory_hopper"
     },
 	"display": {
         "firstperson_righthand": {

@@ -1,7 +1,7 @@
 {
     "parent": "item/generated",
     "textures": {
-        "layer0": "factinventory:items/inventory_hopper"
+        "layer0": "factinventory:items/slow_inventory_hopper"
     },
 	"display": {
         "firstperson_righthand": {
@@ -20,19 +20,19 @@
             "predicate": {
 				"factinventory:facing": 0.24
             },
-            "model": "factinventory:item/inventory_hopper_west"
+            "model": "factinventory:item/slow_inventory_hopper_west"
         },
         {
             "predicate": {
 				"factinventory:facing": 0.49
             },
-            "model": "factinventory:item/inventory_hopper_north"
+            "model": "factinventory:item/slow_inventory_hopper_north"
         },
         {
             "predicate": {
 				"factinventory:facing": 0.74
             },
-            "model": "factinventory:item/inventory_hopper_east"
+            "model": "factinventory:item/slow_inventory_hopper_east"
         }
 	]
 }

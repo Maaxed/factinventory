@@ -1,5 +1,6 @@
 item.interaction_module.name=Inventory Interaction Module
-item.inventory_hopper.name=Inventory Hopper
+item.slow_inventory_hopper.name=Inventory Hopper
+item.fast_inventory_hopper.name=Fast Inventory Hopper
 item.inventory_furnace.name=Inventory Furnace
 
 tooltip.interaction_info_on_shift.desc=Hold §e§lSHIFT§r for input/output details
@@ -14,3 +15,8 @@ tooltip.not_smelting.desc=Empty
 tooltip.smelting_item.desc=Smelting : %s
 tooltip.not_burning.desc=Not burning
 tooltip.burning_time.desc=Burn time remaining : %d ticks
+
+tooltip.transfer_info_on_ctrl.desc=Hold §e§lCTRL§r for transfer details
+tooltip.not_transferring.desc=Empty
+tooltip.transferring_item.desc=Transferring : %s
+tooltip.transfer_time.desc=Transfer time remaining : %d ticks

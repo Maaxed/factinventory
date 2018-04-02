@@ -3,7 +3,7 @@ package fr.max2.factinventory.client.gui;
 import java.util.List;
 
 import fr.max2.factinventory.FactinventoryMod;
-import fr.max2.factinventory.item.InventoryHopperItem;
+import fr.max2.factinventory.item.FastInventoryHopperItem;
 import fr.max2.factinventory.item.InventoryItem;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;

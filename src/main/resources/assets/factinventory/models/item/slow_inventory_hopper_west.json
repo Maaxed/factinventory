@@ -1,16 +1,16 @@
 {
     "parent": "item/generated",
     "textures": {
-        "layer0": "factinventory:items/inventory_hopper"
+        "layer0": "factinventory:items/slow_inventory_hopper"
     },
 	"display": {
         "firstperson_righthand": {
-            "rotation": [ 0, -90, -65 ],
+            "rotation": [ 0, -90, 115 ],
             "translation": [ 1.13, 3.2, 1.13],
             "scale": [ 0.68, 0.68, 0.68 ]
         },
 		"gui": {
-			"rotation": [ 0, 0, -90 ],
+			"rotation": [ 0, 0, 90 ],
             "translation": [ 0, 0, 0],
             "scale": [ 1.0, 1.0, 1.0 ]
 		}
