@@ -2,7 +2,14 @@ item.interaction_module.name=Module d'interaction avec l'inventaire
 item.inventory_hopper.name=Entonnoir d'inventaire
 item.inventory_furnace.name=Fourneau d'inventaire
 
-tooltip.smelting_info_on_ctrl.desc=Maintenir §e§lCTRL§r pour afficher les détails
+tooltip.interaction_info_on_shift.desc=Maintenir §e§lSHIFT§r pour afficher les détails d'entrée/surtie
+tooltip.input.desc=Entrée
+tooltip.output.desc=Sortie
+tooltip.ingredient_input.desc=Entrée des ingrédients
+tooltip.fuel_input.desc=Entrées de combustible
+tooltip.product_output.desc=Sortie des produits
+
+tooltip.smelting_info_on_ctrl.desc=Maintenir §e§lCTRL§r pour afficher les détails de cuisson
 tooltip.not_smelting.desc=Vide
 tooltip.smelting_item.desc=En train de cuire : %s
 tooltip.not_burning.desc=Ne chauffe pas

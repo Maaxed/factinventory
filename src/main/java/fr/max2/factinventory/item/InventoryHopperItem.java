@@ -6,7 +6,10 @@ import java.util.List;
 import fr.max2.factinventory.FactinventoryMod;
 import fr.max2.factinventory.client.gui.GuiRenderHandler.Icon;
 import fr.max2.factinventory.utils.InventoryUtils;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -21,6 +24,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -32,6 +36,20 @@ public class InventoryHopperItem extends RotatableInventoryItem
 	public InventoryHopperItem()
 	{
 		super();
+	}
+	
+	@Override
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn)
+	{
+		if (GuiScreen.isShiftKeyDown())
+		{
+			tooltip.add(TextFormatting.BLUE + I18n.format("tooltip.input.desc"));
+			tooltip.add(TextFormatting.GOLD + I18n.format("tooltip.output.desc"));
+		}
+		else
+		{
+			tooltip.add(I18n.format("tooltip.interaction_info_on_shift.desc"));
+		}
 	}
 	
 	@Override

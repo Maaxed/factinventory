@@ -26,6 +26,7 @@ import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -76,6 +77,17 @@ public class InventoryFurnaceItem extends InventoryItem
     @SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn)
 	{
+		if (GuiScreen.isShiftKeyDown())
+		{
+			tooltip.add(TextFormatting.BLUE + I18n.format("tooltip.ingredient_input.desc"));
+			tooltip.add(TextFormatting.DARK_PURPLE + I18n.format("tooltip.fuel_input.desc"));
+			tooltip.add(TextFormatting.GOLD + I18n.format("tooltip.product_output.desc"));
+		}
+		else
+		{
+			tooltip.add(I18n.format("tooltip.interaction_info_on_shift.desc"));
+		}
+		
 		if (GuiScreen.isCtrlKeyDown())
 		{
 			ItemStack smeltingItem = getSmeltingStack(stack);
