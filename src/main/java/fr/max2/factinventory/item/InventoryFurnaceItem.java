@@ -311,34 +311,31 @@ public class InventoryFurnaceItem extends InventoryItem
     	            	
     		            if (smeltingStack.isEmpty())
     		            {
-    		            	if (!player.world.isRemote)
-    		                {
-    		                    int i = result.getCount();
-    		                    float f = FurnaceRecipes.instance().getSmeltingExperience(result);
+		                    int i = result.getCount();
+		                    float f = FurnaceRecipes.instance().getSmeltingExperience(result);
 
-    		                    if (f == 0.0F)
-    		                    {
-    		                        i = 0;
-    		                    }
-    		                    else if (f < 1.0F)
-    		                    {
-    		                        int j = MathHelper.floor((float)i * f);
+		                    if (f == 0.0F)
+		                    {
+		                        i = 0;
+		                    }
+		                    else if (f < 1.0F)
+		                    {
+		                        int j = MathHelper.floor((float)i * f);
 
-    		                        if (j < MathHelper.ceil((float)i * f) && Math.random() < (double)((float)i * f - (float)j))
-    		                        {
-    		                            ++j;
-    		                        }
+		                        if (j < MathHelper.ceil((float)i * f) && Math.random() < (double)((float)i * f - (float)j))
+		                        {
+		                            ++j;
+		                        }
 
-    		                        i = j;
-    		                    }
-    		                    
-    		                    while (i > 0)
-    		                    {
-    		                        int k = EntityXPOrb.getXPSplit(i);
-    		                        i -= k;
-    		                        player.world.spawnEntity(new EntityXPOrb(player.world, player.posX, player.posY + 0.5D, player.posZ + 0.5D, k));
-    		                    }
-    		                }
+		                        i = j;
+		                    }
+		                    
+		                    while (i > 0)
+		                    {
+		                        int k = EntityXPOrb.getXPSplit(i);
+		                        i -= k;
+		                        player.world.spawnEntity(new EntityXPOrb(player.world, player.posX, player.posY + 0.5D, player.posZ + 0.5D, k));
+		                    }
     		            	
     	                	setCookTime(stack, 0);
     		            	setSmeltingStack(stack, ItemStack.EMPTY);
