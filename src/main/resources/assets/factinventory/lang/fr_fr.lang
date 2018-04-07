@@ -1,6 +1,8 @@
 item.interaction_module.name=Module d'interaction avec l'inventaire
 item.slow_inventory_hopper.name=Entonnoir d'inventaire
-item.fast_inventory_furnace.name=Fourneau d'inventaire rapide
+item.fast_inventory_hopper.name=Entonnoir d'inventaire rapide
+item.inventory_furnace.name=Fourneau d'inventaire
+item.inventory_dropper.name=Dropper d'inventaire
 
 tooltip.interaction_info_on_shift.desc=Maintenir §e§lSHIFT§r pour afficher les détails d'entrée/surtie
 tooltip.input.desc=Entrée

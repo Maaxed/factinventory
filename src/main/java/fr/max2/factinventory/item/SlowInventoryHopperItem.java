@@ -1,21 +1,16 @@
 package fr.max2.factinventory.item;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import fr.max2.factinventory.client.gui.GuiRenderHandler.Icon;
 import fr.max2.factinventory.utils.InventoryUtils;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -86,22 +81,22 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 			x = itemSlot % width,
 			y = itemSlot / width;
 		
-		if (!contentStack.isEmpty())
-		{
-			int insertX  = x - face.getFrontOffsetX(),
+		int insertX  = x - face.getFrontOffsetX(),
 				insertY  = y - face.getFrontOffsetZ();
-
-			if (insertY == 0 && y != 0) insertY = height;
-			else if (y == 0 && insertY == 1) insertY = -1;
-			else if (y == 0 && insertY == -1) insertY = height - 1;
-			else if (insertY == height) insertY = 0;
-			
-			if (insertX >= 0 && insertX < width &&
+		
+		if (insertY == 0 && y != 0) insertY = height;
+		else if (y == 0 && insertY == 1) insertY = -1;
+		else if (y == 0 && insertY == -1) insertY = height - 1;
+		else if (insertY == height) insertY = 0;
+		
+		if (insertX >= 0 && insertX < width &&
 				insertY >= 0 && insertY < height)
+		{
+			int insertSlot = insertX + width * insertY;
+			
+			ItemStack insertStack = inv.getStackInSlot(insertSlot);
+			if (!contentStack.isEmpty())
 			{
-				int insertSlot = insertX + width * insertY;
-				
-				ItemStack insertStack = inv.getStackInSlot(insertSlot);
 				
 				if (!insertStack.isEmpty() && insertStack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face))
 				{
@@ -127,61 +122,61 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 					}
 				}
 			}
-		}
-		
-		if (contentStack.isEmpty())
-		{
-			int extractX = x + face.getFrontOffsetX(),
-				extractY = y + face.getFrontOffsetZ();
 			
-			if (extractY == 0 && y != 0) extractY = height;
-			else if (y == 0 && extractY == 1) extractY = -1;
-			else if (y == 0 && extractY == -1) extractY = height - 1;
-			else if (extractY == height) extractY = 0;
-			
-			if (extractX >= 0 && extractX < width &&
-				extractY >= 0 && extractY < height)
+			if (contentStack.isEmpty())
 			{
-				int extractSlot = extractX + width * extractY;
-
-				ItemStack extractStack = inv.getStackInSlot(extractSlot);
+				int extractX = x + face.getFrontOffsetX(),
+						extractY = y + face.getFrontOffsetZ();
 				
-				if (!extractStack.isEmpty())
+				if (extractY == 0 && y != 0) extractY = height;
+				else if (y == 0 && extractY == 1) extractY = -1;
+				else if (y == 0 && extractY == -1) extractY = height - 1;
+				else if (extractY == height) extractY = 0;
+				
+				if (extractX >= 0 && extractX < width &&
+						extractY >= 0 && extractY < height)
 				{
-					if (extractStack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face.getOpposite()))
+					int extractSlot = extractX + width * extractY;
+					
+					ItemStack extractStack = inv.getStackInSlot(extractSlot);
+					
+					if (!extractStack.isEmpty())
 					{
-						IItemHandler extractCapa = extractStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face.getOpposite());
-						
-						int extractSlots = extractCapa.getSlots();
-						for (int extractIndex = 0; extractIndex < extractSlots && contentStack.isEmpty(); extractIndex++)
+						if (extractStack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face.getOpposite()))
 						{
-							ItemStack extractedStack = extractCapa.extractItem(extractIndex, 1, true);
-							if (!extractedStack.isEmpty() && InventoryUtils.canCombine(contentStack, extractedStack))
+							IItemHandler extractCapa = extractStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face.getOpposite());
+							
+							int extractSlots = extractCapa.getSlots();
+							for (int extractIndex = 0; extractIndex < extractSlots && contentStack.isEmpty(); extractIndex++)
 							{
-								contentStack = extractedStack;
-								
-								extractCapa.extractItem(extractIndex, 1, false);
+								ItemStack extractedStack = extractCapa.extractItem(extractIndex, 1, true);
+								if (!extractedStack.isEmpty() && canPush(extractedStack, insertStack, EnumFacing.NORTH))
+								{
+									contentStack = extractedStack;
+									
+									extractCapa.extractItem(extractIndex, 1, false);
+								}
 							}
 						}
-					}
-					else 
-					{
-						contentStack = extractStack.copy();
-						contentStack.setCount(1);
-						
-						extractStack.shrink(1);
-						if (extractStack.isEmpty())
+						else if (canPush(extractStack, insertStack, EnumFacing.NORTH))
 						{
-							inv.setInventorySlotContents(extractSlot, ItemStack.EMPTY);
+							contentStack = extractStack.copy();
+							contentStack.setCount(1);
+							
+							extractStack.shrink(1);
+							if (extractStack.isEmpty())
+							{
+								inv.setInventorySlotContents(extractSlot, ItemStack.EMPTY);
+							}
 						}
 					}
 				}
 			}
-		}
-		
-		if (contentStack != originalContent)
-		{
-			setTransferringStack(stack, contentStack);
+			
+			if (contentStack != originalContent)
+			{
+				setTransferringStack(stack, contentStack);
+			}
 		}
 	}
 	

@@ -1,10 +1,10 @@
 package fr.max2.factinventory.init;
 
 import fr.max2.factinventory.FactinventoryMod;
-import fr.max2.factinventory.item.InventoryFurnaceItem;
-import fr.max2.factinventory.item.SlowInventoryHopperItem;
 import fr.max2.factinventory.item.FastInventoryHopperItem;
 import fr.max2.factinventory.item.InventoryDropperItem;
+import fr.max2.factinventory.item.InventoryFurnaceItem;
+import fr.max2.factinventory.item.SlowInventoryHopperItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelRegistryEvent;

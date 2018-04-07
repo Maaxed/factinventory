@@ -2,6 +2,7 @@ item.interaction_module.name=Inventory Interaction Module
 item.slow_inventory_hopper.name=Inventory Hopper
 item.fast_inventory_hopper.name=Fast Inventory Hopper
 item.inventory_furnace.name=Inventory Furnace
+item.inventory_dropper.name=Inventory dropper
 
 tooltip.interaction_info_on_shift.desc=Hold §e§lSHIFT§r for input/output details
 tooltip.input.desc=Input

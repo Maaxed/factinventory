@@ -4,7 +4,6 @@ import fr.max2.factinventory.FactinventoryMod;
 import fr.max2.factinventory.capability.ItemTileEntityWrapperHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockShulkerBox;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
