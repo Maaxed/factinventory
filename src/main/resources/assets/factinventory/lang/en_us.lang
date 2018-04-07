@@ -20,3 +20,8 @@ tooltip.transfer_info_on_ctrl.desc=Hold §e§lCTRL§r for transfer details
 tooltip.not_transferring.desc=Empty
 tooltip.transferring_item.desc=Transferring : %s
 tooltip.transfer_time.desc=Transfer time remaining : %d ticks
+
+tooltip.drop_info_on_ctrl.desc=Hold §e§lCTRL§r for inventory details
+tooltip.not_dropping.desc=Empty
+tooltip.dropping_item.desc=Inventory : %s
+tooltip.drop_time.desc=Drop time remaining : %d ticks

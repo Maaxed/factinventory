@@ -13,14 +13,16 @@ import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
-public class ItemStackItemHandler implements IItemHandlerModifiable, ICapabilityProvider
+public class SingleStackItemHandler implements IItemHandlerModifiable, ICapabilityProvider
 {
 	
 	private final ItemStack stack;
+	private final String inventoryTag;
 	
-	public ItemStackItemHandler(ItemStack stack)
+	public SingleStackItemHandler(ItemStack stack, String inventoryTag)
 	{
 		this.stack = stack;
+		this.inventoryTag = inventoryTag;
 	}
 
 	private ItemStack getItem()
@@ -29,9 +31,9 @@ public class ItemStackItemHandler implements IItemHandlerModifiable, ICapability
 		{
 			NBTTagCompound tag = this.stack.getTagCompound();
 			
-			if (tag.hasKey("Item", NBT.TAG_COMPOUND))
+			if (tag.hasKey(this.inventoryTag, NBT.TAG_COMPOUND))
 			{
-				return new ItemStack(tag.getCompoundTag("Item"));
+				return new ItemStack(tag.getCompoundTag(this.inventoryTag));
 			}
 		}
 		return ItemStack.EMPTY;
@@ -53,14 +55,14 @@ public class ItemStackItemHandler implements IItemHandlerModifiable, ICapability
 			this.stack.setTagCompound(tag);
 		}
 		
-		if (tag.hasKey("Item", NBT.TAG_COMPOUND))
+		if (tag.hasKey(this.inventoryTag, NBT.TAG_COMPOUND))
 		{
-			return tag.getCompoundTag("Item");
+			return tag.getCompoundTag(this.inventoryTag);
 		}
 		else
 		{
 			NBTTagCompound item = new NBTTagCompound();
-			tag.setTag("Item", item);
+			tag.setTag(this.inventoryTag, item);
 			return item;
 		}
 	}

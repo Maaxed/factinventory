@@ -55,6 +55,12 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 	}
 	
 	@Override
+	public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged)
+	{
+		return super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged) && (slotChanged || newStack.getItem() != oldStack.getItem() || newStack.getMetadata() != oldStack.getMetadata() || newStack.getCount() != oldStack.getCount() || !ItemStack.areItemStacksEqual(getTransferringStack(newStack), getTransferringStack(oldStack)));
+	}
+	
+	@Override
 	protected void update(ItemStack stack, InventoryPlayer inv, EntityPlayer player, int itemSlot)
 	{
 		int transferTime = getTransferTime(stack);
