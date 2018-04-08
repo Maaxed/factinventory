@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
-@Mod(modid = MOD_ID, name = MOD_NAME, version = "1.0")
+@Mod(modid = MOD_ID, name = MOD_NAME, version = "1.1")
 public class FactinventoryMod
 {
 	public static final String MOD_ID = "factinventory", MOD_NAME = "Factinventory";

@@ -8,7 +8,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ModCreativeTabs
 {
 	
-	public static final CreativeTabs ITEMS_TAB = new CreativeTabs("inventity_item_tab")
+	public static final CreativeTabs ITEMS_TAB = new CreativeTabs("inventory_item_tab")
 	{
 		
 		@Override

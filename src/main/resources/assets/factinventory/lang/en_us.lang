@@ -4,6 +4,8 @@ item.fast_inventory_hopper.name=Fast Inventory Hopper
 item.inventory_furnace.name=Inventory Furnace
 item.inventory_dropper.name=Inventory dropper
 
+itemGroup.inventory_item_tab=Inventory Items
+
 tooltip.interaction_info_on_shift.desc=Hold §e§lSHIFT§r for input/output details
 tooltip.input.desc=Input
 tooltip.output.desc=Output
