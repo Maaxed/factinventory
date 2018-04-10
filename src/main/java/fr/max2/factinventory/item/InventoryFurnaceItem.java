@@ -400,16 +400,16 @@ public class InventoryFurnaceItem extends InventoryItem
 		if (pullY >= 0 && pullY < height)
 		{
 			Slot extractSlot = gui.inventorySlots.getSlotFromInventory(inv, x + width * pullY);
-			icons.add(new Icon(extractSlot, EnumFacing.NORTH, 0x4995FF, true, false));
+			icons.add(new Icon(extractSlot, EnumFacing.NORTH, 0x0099FF, true, false));
 		}
-		else icons.add(new Icon(null, EnumFacing.NORTH, 0x4995FF, true, true));
+		else icons.add(new Icon(null, EnumFacing.NORTH, 0x0099FF, true, true));
 		
 		if (pushY >= 0 && pushY < height)
 		{
 			Slot fillSlot = gui.inventorySlots.getSlotFromInventory(inv, x + width * pushY);
-			icons.add(new Icon(fillSlot, EnumFacing.SOUTH, 0xFF7716, false, false));
+			icons.add(new Icon(fillSlot, EnumFacing.SOUTH, 0xFF7700, false, false));
 		}
-		else icons.add(new Icon(null, EnumFacing.SOUTH, 0xFF7716, false, true));
+		else icons.add(new Icon(null, EnumFacing.SOUTH, 0xFF7700, false, true));
 		
 		int fuelX1 = x - 1,
 			fuelX2 = x + 1;

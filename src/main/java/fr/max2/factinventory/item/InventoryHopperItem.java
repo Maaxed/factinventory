@@ -78,16 +78,16 @@ public abstract class InventoryHopperItem extends RotatableInventoryItem
 		if (extractX >= 0 && extractX < width && extractY >= 0 && extractY < height)
 		{
 			Slot extractSlot = gui.inventorySlots.getSlotFromInventory(inv, extractX + width * extractY);
-			icons.add(new Icon(extractSlot, face, 0x4995FF, true, false));
+			icons.add(new Icon(extractSlot, face, 0x0099FF, true, false));
 		}
-		else icons.add(new Icon(null, face, 0x4995FF, true, true));
+		else icons.add(new Icon(null, face, 0x0099FF, true, true));
 		
 		if (insertX >= 0 && insertX < width && insertY >= 0 && insertY < height)
 		{
 			Slot fillSlot = gui.inventorySlots.getSlotFromInventory(inv, insertX + width * insertY);
-			icons.add(new Icon(fillSlot, face.getOpposite(), 0xFF7716, false, false));
+			icons.add(new Icon(fillSlot, face.getOpposite(), 0xFF7700, false, false));
 		}
-		else icons.add(new Icon(null, face.getOpposite(), 0xFF7716, false, true));
+		else icons.add(new Icon(null, face.getOpposite(), 0xFF7700, false, true));
 		
 		return icons;
 	}

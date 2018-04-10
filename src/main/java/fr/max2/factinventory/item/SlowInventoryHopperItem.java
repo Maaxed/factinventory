@@ -82,15 +82,15 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 			y = itemSlot / width;
 		
 		int insertX  = x - face.getFrontOffsetX(),
-				insertY  = y - face.getFrontOffsetZ();
+			insertY  = y - face.getFrontOffsetZ();
 		
 		if (insertY == 0 && y != 0) insertY = height;
-		else if (y == 0 && insertY == 1) insertY = -1;
+		else if (y == 0 && insertY ==  1) insertY = -1;
 		else if (y == 0 && insertY == -1) insertY = height - 1;
 		else if (insertY == height) insertY = 0;
 		
 		if (insertX >= 0 && insertX < width &&
-				insertY >= 0 && insertY < height)
+			insertY >= 0 && insertY < height)
 		{
 			int insertSlot = insertX + width * insertY;
 			
