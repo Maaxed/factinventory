@@ -1,0 +1,7 @@
+{
+    "parent": "factinventory:item/dyn_fluid",
+    "textures": {
+        "base": "factinventory:items/inventory_pump",
+		"fluid": "factinventory:items/inventory_pump_fluid"
+    }
+}

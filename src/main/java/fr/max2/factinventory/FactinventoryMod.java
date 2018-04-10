@@ -2,13 +2,11 @@ package fr.max2.factinventory;
 
 import static fr.max2.factinventory.FactinventoryMod.*;
 
-import fr.max2.factinventory.proxy.CommonProxy;
+import fr.max2.factinventory.client.model.item.ModelFluidItem;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.Mod.Instance;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(modid = MOD_ID, name = MOD_NAME, version = "1.1")
@@ -16,26 +14,15 @@ public class FactinventoryMod
 {
 	public static final String MOD_ID = "factinventory", MOD_NAME = "Factinventory";
 	
-	@SidedProxy(clientSide = "fr.max2.factinventory.proxy.ClientProxy", serverSide = "fr.max2.factinventory.proxy.ServerProxy")
-	public static CommonProxy proxy;
-	
-	@Instance(MOD_ID)
-	public static FactinventoryMod instance;
-	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
-		proxy.preInit();
+		ModelLoaderRegistry.registerLoader(ModelFluidItem.LoaderDynBucket.INSTANCE);
 	}
 	
-	@EventHandler
-	public void init(FMLInitializationEvent event)
+	public static ResourceLocation loc(String path)
 	{
-		proxy.init();
+		return new ResourceLocation(MOD_ID, path);
 	}
-	
-	@EventHandler
-	public void postInit(FMLPostInitializationEvent event)
-	{ }
 	
 }

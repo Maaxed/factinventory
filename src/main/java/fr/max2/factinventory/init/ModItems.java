@@ -6,8 +6,11 @@ import fr.max2.factinventory.item.InventoryDropperItem;
 import fr.max2.factinventory.item.InventoryFurnaceItem;
 import fr.max2.factinventory.item.InventoryPumpItem;
 import fr.max2.factinventory.item.SlowInventoryHopperItem;
+import fr.max2.factinventory.item.mesh.IVarientMesh;
+import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
@@ -49,7 +52,8 @@ public class ModItems
 	@SubscribeEvent
 	public static void registerRenders(ModelRegistryEvent event)
 	{
-		registerRenderAll(SLOW_INVENTORY_HOPPER, FAST_INVENTORY_HOPPER, INVENTORY_FURNACE, INVENTORY_DROPPER, INVENTORY_PUMP, INTERACTION_MODULE);
+		registerRenderAll(SLOW_INVENTORY_HOPPER, FAST_INVENTORY_HOPPER, INVENTORY_FURNACE, INVENTORY_DROPPER, INTERACTION_MODULE);
+		registerCustomRender(INVENTORY_PUMP, InventoryPumpItem.MESH);
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -64,7 +68,17 @@ public class ModItems
 	@SideOnly(Side.CLIENT)
 	protected static void registerRender(Item item)
 	{
-		ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(FactinventoryMod.MOD_ID + ":" + item.getUnlocalizedName().substring(5), "inventory"));
+		ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
+	}
+	
+	private static void registerCustomRender(Item item, IVarientMesh state)
+	{
+		ResourceLocation loc = item.getRegistryName();
+		ModelLoader.setCustomMeshDefinition(item, stack -> new ModelResourceLocation(loc, state.getVarient(stack)));
+		for (String varient : state.varients())
+		{
+			ModelBakery.registerItemVariants(item, new ModelResourceLocation(loc, varient));
+		}
 	}
 
 	private static <I extends Item> I name(String name, I item)

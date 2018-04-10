@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.max2.factinventory.client.gui.GuiRenderHandler.Icon;
+import fr.max2.factinventory.item.mesh.IStateMesh;
+import fr.max2.factinventory.item.mesh.IStateMesh.Property;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
@@ -19,9 +21,24 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class InventoryPumpItem extends RotatableInventoryItem
 {
+	@SideOnly(Side.CLIENT)
+	private static final Property[] PROPERTIES = {
+			new Property("facing", "north", "south", "west", "east")
+			{
+				@Override
+				protected String getValue(ItemStack stack)
+				{
+					return getFacing(stack).getName2();
+				}
+			}
+		};
+	@SideOnly(Side.CLIENT)
+	public static final IStateMesh MESH = new IStateMesh(PROPERTIES);
 	
 	public InventoryPumpItem()
 	{

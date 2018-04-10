@@ -1,0 +1,85 @@
+{
+	"forge_marker": 1,
+	"defaults": {
+		"textures": {
+			"base": "factinventory:items/inventory_pump",
+			"fluid": "factinventory:items/inventory_pump_fluid"
+		},
+		"model": "factinventory:item/dyn_fluid",
+		"transform": "forge:default-item"
+	},
+	"variants": {
+		"facing": {
+			"north": { },
+			"south": {
+				"transform": {
+					"ground": { "translation": [ 0, 0.125, 0 ], "scale": 0.5f },
+					"fixed" : { "rotation": [ { "y": 180 } ] },
+					"thirdperson_righthand": { "translation": [ 0, 0.1875, 0.0625 ], "scale": 0.55 },
+					"thirdperson_lefthand": { "translation": [ 0, 0.1875, 0.0625 ], "scale": 0.55 },
+					"firstperson_righthand": {
+						"rotation": [ { "y": 90 }, { "z": -205 } ],
+						"translation": [ 0.070625, 0.2, 0.070625 ],
+						"scale": 0.68
+					},
+					"firstperson_lefthand": {
+						"rotation": [ { "y": -90 }, { "z": 205 } ],
+						"translation": [ 0.070625, 0.2, 0.070625 ],
+						"scale": 0.68
+					},
+					"gui": {
+						"rotation": [ { "z": 180 } ],
+						"translation": [ 0, 0, 0 ],
+						"scale": 1.0
+					}
+				}
+			},
+			"west": {
+				"transform": {
+					"ground": { "translation": [ 0, 0.125, 0 ], "scale": 0.5f },
+					"fixed" : { "rotation": [ { "y": 180 } ] },
+					"thirdperson_righthand": { "translation": [ 0, 0.1875, 0.0625 ], "scale": 0.55 },
+					"thirdperson_lefthand": { "translation": [ 0, 0.1875, 0.0625 ], "scale": 0.55 },
+					"firstperson_righthand": {
+						"rotation": [ { "y": 90 }, { "z": -115 } ],
+						"translation": [ 0.070625, 0.2, 0.070625 ],
+						"scale": 0.68
+					},
+					"firstperson_lefthand": {
+						"rotation": [ { "y": -90 }, { "z": -65 } ],
+						"translation": [ 0.070625, 0.2, 0.070625 ],
+						"scale": 0.68
+					},
+					"gui": {
+						"rotation": [ { "z": 90 } ],
+						"translation": [ 0, 0, 0 ],
+						"scale": 1.0
+					}
+				}
+			},
+			"east": {
+				"transform": {
+					"ground": { "translation": [ 0, 0.125, 0 ], "scale": 0.5f },
+					"fixed" : { "rotation": [ { "y": 180 } ] },
+					"thirdperson_righthand": { "translation": [ 0, 0.1875, 0.0625 ], "scale": 0.55 },
+					"thirdperson_lefthand": { "translation": [ 0, 0.1875, 0.0625 ], "scale": 0.55 },
+					"firstperson_righthand": {
+						"rotation": [ { "y": 90 }, { "z": 65 } ],
+						"translation": [ 0.070625, 0.2, 0.070625 ],
+						"scale": 0.68
+					},
+					"firstperson_lefthand": {
+						"rotation": [ { "y": -90 }, { "z": 115 } ],
+						"translation": [ 0.070625, 0.2, 0.070625 ],
+						"scale": 0.68
+					},
+					"gui": {
+						"rotation": [ { "z": -90 } ],
+						"translation": [ 0, 0, 0 ],
+						"scale": 1.0
+					}
+				}
+			}
+		}
+	}
+}
