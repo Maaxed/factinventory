@@ -72,8 +72,6 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 	
 	private void updateHopper(ItemStack stack, InventoryPlayer inv, int itemSlot)
 	{
-		ItemStack contentStack = getTransferringStack(stack);
-		ItemStack originalContent = contentStack;
 		EnumFacing face = getFacing(stack);
 		
 		int width = inv.getHotbarSize(),
@@ -94,7 +92,10 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 		{
 			int insertSlot = insertX + width * insertY;
 			
+			ItemStack contentStack = getTransferringStack(stack);
+			ItemStack originalContent = contentStack;
 			ItemStack insertStack = inv.getStackInSlot(insertSlot);
+			
 			if (!contentStack.isEmpty())
 			{
 				
@@ -126,7 +127,7 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 			if (contentStack.isEmpty())
 			{
 				int extractX = x + face.getFrontOffsetX(),
-						extractY = y + face.getFrontOffsetZ();
+					extractY = y + face.getFrontOffsetZ();
 				
 				if (extractY == 0 && y != 0) extractY = height;
 				else if (y == 0 && extractY == 1) extractY = -1;
@@ -134,7 +135,7 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 				else if (extractY == height) extractY = 0;
 				
 				if (extractX >= 0 && extractX < width &&
-						extractY >= 0 && extractY < height)
+					extractY >= 0 && extractY < height)
 				{
 					int extractSlot = extractX + width * extractY;
 					
@@ -193,11 +194,11 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 		return ItemStack.EMPTY;
 	}
 	
-	public static void setTransferringStack(ItemStack stack, ItemStack transferringStck)
+	public static void setTransferringStack(ItemStack stack, ItemStack transferringStack)
 	{
 		if (!stack.hasTagCompound()) stack.setTagCompound(new NBTTagCompound());
 		
-		stack.getTagCompound().setTag(NBT_TRANSFERRING_ITEM, transferringStck.serializeNBT());
+		stack.getTagCompound().setTag(NBT_TRANSFERRING_ITEM, transferringStack.serializeNBT());
 	}
 	
 	

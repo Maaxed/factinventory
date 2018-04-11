@@ -124,14 +124,13 @@ public class ModelFluidItem implements IModel
             particleSprite = model.getParticleTexture();
         }
         
-        if (liquidLocation != null)
+        if (liquidLocation != null && fluid != null)
         {
             TextureAtlasSprite liquid = bakedTextureGetter.apply(liquidLocation);
-            
-            TextureAtlasSprite fluidSprite = fluid == null ? liquid : bakedTextureGetter.apply(fluid.getStill());
-            
-            builder.addAll(ItemTextureQuadConverter.convertTexture(format, transform, liquid, fluidSprite, NORTH_Z_FLUID, EnumFacing.NORTH, 0xFFFFFFFF));
-            builder.addAll(ItemTextureQuadConverter.convertTexture(format, transform, liquid, fluidSprite, SOUTH_Z_FLUID, EnumFacing.SOUTH, 0xFFFFFFFF));
+            TextureAtlasSprite fluidSprite = bakedTextureGetter.apply(fluid.getStill());
+            int color = fluid.getColor();
+            builder.addAll(ItemTextureQuadConverter.convertTextureVertical(format, transform, liquid, fluidSprite, NORTH_Z_FLUID, EnumFacing.NORTH, color));
+            builder.addAll(ItemTextureQuadConverter.convertTextureVertical(format, transform, liquid, fluidSprite, SOUTH_Z_FLUID, EnumFacing.SOUTH, color));
         }
 
         return new BakedModelFluidItem(this, builder.build(), particleSprite, format, Maps.immutableEnumMap(transformMap), Maps.newHashMap());

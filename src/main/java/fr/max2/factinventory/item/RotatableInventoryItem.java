@@ -1,6 +1,7 @@
 package fr.max2.factinventory.item;
 
 import fr.max2.factinventory.FactinventoryMod;
+import fr.max2.factinventory.item.mesh.IStateMesh.MeshProperty;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.IItemPropertyGetter;
@@ -13,9 +14,21 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public abstract class RotatableInventoryItem extends InventoryItem
 {
+	
+	@SideOnly(Side.CLIENT)
+	protected static final MeshProperty PROPERTIE_ROTATION = new MeshProperty("facing", "north", "south", "west", "east")
+	{
+		@Override
+		protected String getValue(ItemStack stack)
+		{
+			return getFacing(stack).getName2();
+		}
+	};
 	
 	private static final IItemPropertyGetter FACING_GETTER = new IItemPropertyGetter()
 	{

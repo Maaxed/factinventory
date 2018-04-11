@@ -2,7 +2,8 @@ item.interaction_module.name=Inventory Interaction Module
 item.slow_inventory_hopper.name=Inventory Hopper
 item.fast_inventory_hopper.name=Fast Inventory Hopper
 item.inventory_furnace.name=Inventory Furnace
-item.inventory_dropper.name=Inventory dropper
+item.inventory_dropper.name=Inventory Dropper
+item.inventory_pump.name=Inventory Pump
 
 itemGroup.inventory_item_tab=Inventory Items
 

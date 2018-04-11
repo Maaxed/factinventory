@@ -17,9 +17,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class IStateMesh implements IVarientMesh
 {
 	
-	private final Property[] properties;
+	private final MeshProperty[] properties;
 	
-	public IStateMesh(Property... properties)
+	public IStateMesh(MeshProperty... properties)
 	{
 		this.properties = properties;
 	}
@@ -39,12 +39,12 @@ public class IStateMesh implements IVarientMesh
 	}
 
 	@SideOnly(Side.CLIENT)
-	public static abstract class Property implements Iterable<String>
+	public static abstract class MeshProperty implements Iterable<String>
 	{
 		public final String name;
 		public final String[] values;
 		
-		public Property(String name, String... values)
+		public MeshProperty(String name, String... values)
 		{
 			this.name = name;
 			this.values = values;

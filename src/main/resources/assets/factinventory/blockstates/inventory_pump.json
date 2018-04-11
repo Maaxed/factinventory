@@ -2,8 +2,8 @@
 	"forge_marker": 1,
 	"defaults": {
 		"textures": {
-			"base": "factinventory:items/inventory_pump",
-			"fluid": "factinventory:items/inventory_pump_fluid"
+			"base": "factinventory:items/inventory_pump/pump_0",
+			"fluid": "factinventory:items/inventory_pump/fluid_0"
 		},
 		"model": "factinventory:item/dyn_fluid",
 		"transform": "forge:default-item"
@@ -78,6 +78,38 @@
 						"translation": [ 0, 0, 0 ],
 						"scale": 1.0
 					}
+				}
+			}
+		},
+		"filled" : {
+			0: {
+				"textures": {
+					"base": "factinventory:items/inventory_pump/pump_0",
+					"fluid": "factinventory:items/inventory_pump/fluid_0"
+				}
+			},
+			1: {
+				"textures": {
+					"base": "factinventory:items/inventory_pump/pump_1",
+					"fluid": "factinventory:items/inventory_pump/fluid_1"
+				}
+			},
+			2: {
+				"textures": {
+					"base": "factinventory:items/inventory_pump/pump_2",
+					"fluid": "factinventory:items/inventory_pump/fluid_2"
+				}
+			},
+			3: {
+				"textures": {
+					"base": "factinventory:items/inventory_pump/pump_3",
+					"fluid": "factinventory:items/inventory_pump/fluid_3"
+				}
+			},
+			4: {
+				"textures": {
+					"base": "factinventory:items/inventory_pump/pump_4",
+					"fluid": "factinventory:items/inventory_pump/fluid_4"
 				}
 			}
 		}
