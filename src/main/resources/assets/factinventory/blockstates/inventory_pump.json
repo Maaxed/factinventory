@@ -90,26 +90,50 @@
 			},
 			1: {
 				"textures": {
-					"base": "factinventory:items/inventory_pump/pump_1",
-					"fluid": "factinventory:items/inventory_pump/fluid_1"
+					"base": "factinventory:items/inventory_pump/pump_0",
+					"fluid": "factinventory:items/inventory_pump/fluid_0_f"
 				}
 			},
 			2: {
 				"textures": {
-					"base": "factinventory:items/inventory_pump/pump_2",
-					"fluid": "factinventory:items/inventory_pump/fluid_2"
+					"base": "factinventory:items/inventory_pump/pump_1",
+					"fluid": "factinventory:items/inventory_pump/fluid_1_f"
 				}
 			},
 			3: {
+				"textures": {
+					"base": "factinventory:items/inventory_pump/pump_2",
+					"fluid": "factinventory:items/inventory_pump/fluid_2_f"
+				}
+			},
+			4: {
+				"textures": {
+					"base": "factinventory:items/inventory_pump/pump_3",
+					"fluid": "factinventory:items/inventory_pump/fluid_3_f"
+				}
+			},
+			5: {
+				"textures": {
+					"base": "factinventory:items/inventory_pump/pump_4",
+					"fluid": "factinventory:items/inventory_pump/fluid_4"
+				}
+			},
+			6: {
 				"textures": {
 					"base": "factinventory:items/inventory_pump/pump_3",
 					"fluid": "factinventory:items/inventory_pump/fluid_3"
 				}
 			},
-			4: {
+			7: {
 				"textures": {
-					"base": "factinventory:items/inventory_pump/pump_4",
-					"fluid": "factinventory:items/inventory_pump/fluid_4"
+					"base": "factinventory:items/inventory_pump/pump_2",
+					"fluid": "factinventory:items/inventory_pump/fluid_2"
+				}
+			},
+			8: {
+				"textures": {
+					"base": "factinventory:items/inventory_pump/pump_1",
+					"fluid": "factinventory:items/inventory_pump/fluid_1"
 				}
 			}
 		}

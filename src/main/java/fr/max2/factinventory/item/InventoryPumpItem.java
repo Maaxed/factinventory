@@ -32,7 +32,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class InventoryPumpItem extends RotatableInventoryItem
 {
 	@SideOnly(Side.CLIENT)
-	private static final MeshProperty[] PROPERTIES = { PROPERTIE_ROTATION , new MeshProperty("filled", "0", "1", "2", "3", "4")
+	private static final MeshProperty[] PROPERTIES = { PROPERTIE_ROTATION , new MeshProperty("filled", "0", "1", "2", "3", "4", "5", "6", "7", "8")
 	{
 		@Override
 		protected String getValue(ItemStack stack)
@@ -42,7 +42,7 @@ public class InventoryPumpItem extends RotatableInventoryItem
 			if (fluid == null || fluid.amount <= 0) return "0";
 			
 			int value = getTransferTime(stack);
-			if (value > 4) value = 8 - value;
+			if (value > 8) value = 8;
 			if (value < 0) value = 0;
 			return Integer.toString(value);
 		}
