@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.max2.factinventory.client.gui.GuiRenderHandler.Icon;
-import fr.max2.factinventory.item.mesh.IStateMesh;
-import fr.max2.factinventory.item.mesh.IStateMesh.MeshProperty;
+import fr.max2.factinventory.item.mesh.StateMesh;
+import fr.max2.factinventory.item.mesh.StateMesh.MeshProperty;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
@@ -49,7 +49,7 @@ public class InventoryPumpItem extends RotatableInventoryItem
 	}};
 	
 	@SideOnly(Side.CLIENT)
-	public static final IStateMesh MESH = new IStateMesh(PROPERTIES);
+	public static final StateMesh MESH = new StateMesh(PROPERTIES);
 	
 	public InventoryPumpItem()
 	{
@@ -98,20 +98,6 @@ public class InventoryPumpItem extends RotatableInventoryItem
 	@Override
 	protected void update(ItemStack stack, InventoryPlayer inv, EntityPlayer player, int itemSlot)
 	{
-		int transferTime = getTransferTime(stack);
-		
-		transferTime--;
-		if (transferTime <= 0)
-		{
-			transferTime = 8;
-			
-			updatePump(stack, inv, itemSlot);
-		}
-		setTransferTime(stack, transferTime);
-	}
-
-	private void updatePump(ItemStack stack, InventoryPlayer inv, int itemSlot)
-	{
 		EnumFacing face = getFacing(stack);
 		
 		int width = inv.getHotbarSize(),
@@ -126,6 +112,7 @@ public class InventoryPumpItem extends RotatableInventoryItem
 		else if (y == 0 && fillY == -1) fillY = height - 1;
 		else if (fillY == height) fillY = 0;
 		
+		
 		if (fillX >= 0 && fillX < width &&
 			fillY >= 0 && fillY < height)
 		{
@@ -136,58 +123,85 @@ public class InventoryPumpItem extends RotatableInventoryItem
 			
 			if (fillStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, face))
 			{
+				int transferTime = getTransferTime(stack);
+				
 				IFluidHandlerItem fillCapa = fillStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, face);
 				
 				FluidStack fillFluid = contentCapa.drain(Fluid.BUCKET_VOLUME, false);
-				if (fillFluid != null)
+				boolean canTransfer = fillFluid == null || transferTime > 4;
+				
+				if (!canTransfer)
 				{
-					int val = fillCapa.fill(fillFluid, true);
+					int val = fillCapa.fill(fillFluid, false);
 					if (val > 0)
 					{
-						fillFluid.amount = val;
-						contentCapa.drain(fillFluid, true);
-						
-						inv.setInventorySlotContents(fillSlot, fillCapa.getContainer());
+						canTransfer = true;
 					}
 				}
 				
-				int drainX = x + face.getFrontOffsetX(),
-					drainY = y + face.getFrontOffsetZ();
-				
-				if (drainY == 0 && y != 0) drainY = height;
-				else if (y == 0 && drainY == 1) drainY = -1;
-				else if (y == 0 && drainY == -1) drainY = height - 1;
-				else if (drainY == height) drainY = 0;
-				
-				if (drainX >= 0 && drainX < width &&
-					drainY >= 0 && drainY < height)
+				if (canTransfer)
 				{
-					int drainSlot = drainX + width * drainY;
 					
-					ItemStack drainStack = inv.getStackInSlot(drainSlot);
-					
-					if (drainStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, face.getOpposite()))
+					transferTime--;
+					if (transferTime <= 0)
 					{
-						IFluidHandlerItem drainCapa = drainStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, face.getOpposite());
+						transferTime = 8;
 						
-						FluidStack drainFluid = drainCapa.drain(Fluid.BUCKET_VOLUME, false);
-						if (drainFluid != null)
+						//updatePump(stack, inv, itemSlot);
+						
+						
+						if (fillFluid != null)
 						{
-							drainFluid.amount = contentCapa.fill(drainFluid, false);
-							if (drainFluid.amount > 0)
+							int val = fillCapa.fill(fillFluid, true);
+							if (val > 0)
 							{
-								drainFluid.amount = fillCapa.fill(drainFluid, false);
-								if (drainFluid.amount > 0)
+								fillFluid.amount = val;
+								contentCapa.drain(fillFluid, true);
+								
+								inv.setInventorySlotContents(fillSlot, fillCapa.getContainer());
+							}
+						}
+						
+						int drainX = x + face.getFrontOffsetX(),
+							drainY = y + face.getFrontOffsetZ();
+						
+						if (drainY == 0 && y != 0) drainY = height;
+						else if (y == 0 && drainY == 1) drainY = -1;
+						else if (y == 0 && drainY == -1) drainY = height - 1;
+						else if (drainY == height) drainY = 0;
+						
+						if (drainX >= 0 && drainX < width &&
+							drainY >= 0 && drainY < height)
+						{
+							int drainSlot = drainX + width * drainY;
+							
+							ItemStack drainStack = inv.getStackInSlot(drainSlot);
+							
+							if (drainStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, face.getOpposite()))
+							{
+								IFluidHandlerItem drainCapa = drainStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, face.getOpposite());
+								
+								FluidStack drainFluid = drainCapa.drain(Fluid.BUCKET_VOLUME, false);
+								if (drainFluid != null)
 								{
-									drainCapa.drain(drainFluid, true);
-									contentCapa.fill(drainFluid, true);
-									
-									inv.setInventorySlotContents(drainSlot, drainCapa.getContainer());
-									inv.setInventorySlotContents(fillSlot, fillCapa.getContainer());
+									drainFluid.amount = contentCapa.fill(drainFluid, false);
+									if (drainFluid.amount > 0)
+									{
+										drainFluid.amount = fillCapa.fill(drainFluid, false);
+										if (drainFluid.amount > 0)
+										{
+											drainCapa.drain(drainFluid, true);
+											contentCapa.fill(drainFluid, true);
+											
+											inv.setInventorySlotContents(drainSlot, drainCapa.getContainer());
+											inv.setInventorySlotContents(fillSlot, fillCapa.getContainer());
+										}
+									}
 								}
 							}
 						}
 					}
+					setTransferTime(stack, transferTime);
 				}
 			}
 		}

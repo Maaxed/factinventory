@@ -14,12 +14,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class IStateMesh implements IVarientMesh
+public class StateMesh implements IVarientMesh
 {
 	
 	private final MeshProperty[] properties;
 	
-	public IStateMesh(MeshProperty... properties)
+	public StateMesh(MeshProperty... properties)
 	{
 		this.properties = properties;
 	}

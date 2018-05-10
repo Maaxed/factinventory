@@ -57,7 +57,7 @@ public class ModItems
 	}
 
 	@SideOnly(Side.CLIENT)
-	protected static void registerRenderAll(Item... items)
+	private static void registerRenderAll(Item... items)
 	{
 		for (Item item : items)
 		{
@@ -66,11 +66,12 @@ public class ModItems
 	}
 
 	@SideOnly(Side.CLIENT)
-	protected static void registerRender(Item item)
+	private static void registerRender(Item item)
 	{
 		ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
 	}
-	
+
+	@SideOnly(Side.CLIENT)
 	private static void registerCustomRender(Item item, IVarientMesh state)
 	{
 		ResourceLocation loc = item.getRegistryName();

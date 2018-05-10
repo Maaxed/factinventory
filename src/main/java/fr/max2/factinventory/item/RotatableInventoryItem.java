@@ -1,7 +1,7 @@
 package fr.max2.factinventory.item;
 
 import fr.max2.factinventory.FactinventoryMod;
-import fr.max2.factinventory.item.mesh.IStateMesh.MeshProperty;
+import fr.max2.factinventory.item.mesh.StateMesh.MeshProperty;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.IItemPropertyGetter;
