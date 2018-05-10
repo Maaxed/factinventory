@@ -20,8 +20,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public abstract class RotatableInventoryItem extends InventoryItem
 {
 	
-	@SideOnly(Side.CLIENT)
-	protected static final MeshProperty PROPERTIE_ROTATION = new MeshProperty("facing", "north", "south", "west", "east")
+	protected static final MeshProperty PROPERTIE_ROTATION =  new MeshProperty("facing", "north", "south", "west", "east") 
 	{
 		@Override
 		protected String getValue(ItemStack stack)

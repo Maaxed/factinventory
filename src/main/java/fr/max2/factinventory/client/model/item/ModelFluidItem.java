@@ -30,7 +30,10 @@ import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class ModelFluidItem implements IModel
 {
     public static final ModelResourceLocation LOCATION = new ModelResourceLocation(FactinventoryMod.loc("item/dyn_fluid"), "inventory");
@@ -135,8 +138,9 @@ public class ModelFluidItem implements IModel
 
         return new BakedModelFluidItem(this, builder.build(), particleSprite, format, Maps.immutableEnumMap(transformMap), Maps.newHashMap());
 	}
-
-    public enum LoaderDynBucket implements ICustomModelLoader
+	
+	@SideOnly(Side.CLIENT)
+    public enum LoaderDynFluid implements ICustomModelLoader
     {
         INSTANCE;
 
@@ -155,7 +159,7 @@ public class ModelFluidItem implements IModel
         @Override
         public void onResourceManagerReload(IResourceManager resourceManager)
         {
-            // no need to clear cache since we create a new model instance
+            // No need to clear cache since we create a new model instance
         }
     }
 	

@@ -13,7 +13,6 @@ import net.minecraft.util.math.Cartesian;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-@SideOnly(Side.CLIENT)
 public class StateMesh implements IVarientMesh
 {
 	
@@ -37,8 +36,7 @@ public class StateMesh implements IVarientMesh
 	{
 		return Arrays.stream(properties).map(p -> p.name + "=" + p.getValue(stack)).collect(Collectors.joining(","));
 	}
-
-	@SideOnly(Side.CLIENT)
+	
 	public static abstract class MeshProperty implements Iterable<String>
 	{
 		public final String name;

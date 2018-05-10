@@ -23,7 +23,10 @@ import net.minecraftforge.client.model.SimpleModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class BakedModelFluidItem extends BakedItemModel
 {
 	
@@ -40,7 +43,7 @@ public class BakedModelFluidItem extends BakedItemModel
         this.cache = cache;
     }
     
-    
+    @SideOnly(Side.CLIENT)
     private static final class FluidItemOverrideHandler extends ItemOverrideList
     {
         public static final FluidItemOverrideHandler INSTANCE = new FluidItemOverrideHandler();
