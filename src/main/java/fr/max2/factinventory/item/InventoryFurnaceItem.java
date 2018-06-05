@@ -258,10 +258,10 @@ public class InventoryFurnaceItem extends InventoryItem
         	if (!smeltingStack.isEmpty())
             {
         		// Smelt
-
+        		
+                cookTime++;
                 if (cookTime < this.totalCookTime)
                 {
-                    cookTime++;
                 	setCookTime(stack, cookTime);
                 }
                 else
@@ -347,7 +347,6 @@ public class InventoryFurnaceItem extends InventoryItem
         }
         else
         {
-        	setCookTime(stack, 0);
         	if (cookTime > 0)
 	        {
 	        	if (cookTime > this.totalCookTime) cookTime = this.totalCookTime;
