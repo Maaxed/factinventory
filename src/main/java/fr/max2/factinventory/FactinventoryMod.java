@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
-@Mod(modid = MOD_ID, name = MOD_NAME, version = "1.2", acceptedMinecraftVersions = "[1.12.2]", dependencies = "required:forge@[14.23.0.2523,);")
+@Mod(modid = MOD_ID, name = MOD_NAME, version = "1.2.1", acceptedMinecraftVersions = "[1.12.2]", dependencies = "required-after:forge@[14.23.0.2523,);")
 public class FactinventoryMod
 {
 	public static final String MOD_ID = "factinventory", MOD_NAME = "Factinventory";

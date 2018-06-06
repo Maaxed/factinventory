@@ -6,6 +6,7 @@ import fr.max2.factinventory.FactinventoryMod;
 import fr.max2.factinventory.item.InventoryItem;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -31,6 +32,10 @@ public class GuiRenderHandler
 			
 			if (slot != null && slot.inventory instanceof InventoryPlayer && slot.getStack().getItem() instanceof InventoryItem)
 			{
+		        RenderHelper.disableStandardItemLighting();
+		        GlStateManager.disableDepth();
+		        GlStateManager.disableLighting();
+				
 				ItemStack stack = slot.getStack();
 				InventoryPlayer inv = (InventoryPlayer) slot.inventory;
 				
@@ -46,6 +51,9 @@ public class GuiRenderHandler
 				}
 				
 				GlStateManager.color(1.0f, 1.0f, 1.0f);
+		        GlStateManager.enableLighting();
+		        GlStateManager.enableDepth();
+		        RenderHelper.enableStandardItemLighting();
 			}
 		}
 	}
