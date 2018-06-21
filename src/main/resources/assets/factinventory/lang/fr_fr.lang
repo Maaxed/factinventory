@@ -4,6 +4,7 @@ item.fast_inventory_hopper.name=Entonnoir d'inventaire rapide
 item.inventory_furnace.name=Fourneau d'inventaire
 item.inventory_dropper.name=Dropper d'inventaire
 item.inventory_pump.name=Pompe d'inventaire
+item.inventory_linker.name=Connecteur d'inventaire
 
 itemGroup.inventory_item_tab=Items d'inventaire
 
@@ -29,3 +30,9 @@ tooltip.drop_info_on_ctrl.desc=Maintenir §e§lCTRL§r pour afficher les détail
 tooltip.not_dropping.desc=Vide
 tooltip.dropping_item.desc=Inventaire : %s
 tooltip.drop_time.desc=Durée de drop restante : %d ticks
+
+tooltip.linked_tile.desc=Lié à : %s
+tooltip.linked_other_dimension.desc=Lié à : une autre dimension
+tooltip.linked_unloaded.desc=Lié à : bloc non chargé
+tooltip.linked_missing.desc=Non lié : bloc manquant
+tooltip.not_linked.desc=Non lié

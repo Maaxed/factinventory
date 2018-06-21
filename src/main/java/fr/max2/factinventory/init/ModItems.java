@@ -4,11 +4,13 @@ import fr.max2.factinventory.FactinventoryMod;
 import fr.max2.factinventory.item.FastInventoryHopperItem;
 import fr.max2.factinventory.item.InventoryDropperItem;
 import fr.max2.factinventory.item.InventoryFurnaceItem;
+import fr.max2.factinventory.item.InventoryLinkerItem;
 import fr.max2.factinventory.item.InventoryPumpItem;
 import fr.max2.factinventory.item.SlowInventoryHopperItem;
 import fr.max2.factinventory.item.mesh.IVarientMesh;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -29,30 +31,34 @@ public class ModItems
 	public static final InventoryFurnaceItem INVENTORY_FURNACE = null;
 	public static final InventoryDropperItem INVENTORY_DROPPER = null;
 	public static final InventoryPumpItem INVENTORY_PUMP = null;
+	public static final InventoryLinkerItem INVENTORY_LINKER = null;
 	public static final Item INTERACTION_MODULE = null;
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event)
 	{
-		Item SLOW_INVENTORY_HOPPER = name("slow_inventory_hopper", new SlowInventoryHopperItem()),
-			FAST_INVENTORY_HOPPER = name("fast_inventory_hopper", new FastInventoryHopperItem()),
-			INVENTORY_FURNACE = name("inventory_furnace", new InventoryFurnaceItem()),
-			INVENTORY_DROPPER = name("inventory_dropper", new InventoryDropperItem()),
-			INVENTORY_PUMP = name("inventory_pump", new InventoryPumpItem()),
-			INTERACTION_MODULE = name("interaction_module", new Item().setCreativeTab(ModCreativeTabs.ITEMS_TAB));
-		event.getRegistry().registerAll(SLOW_INVENTORY_HOPPER.setCreativeTab(ModCreativeTabs.ITEMS_TAB),
-										FAST_INVENTORY_HOPPER.setCreativeTab(ModCreativeTabs.ITEMS_TAB),
-										INVENTORY_FURNACE.setCreativeTab(ModCreativeTabs.ITEMS_TAB),
-										INVENTORY_DROPPER.setCreativeTab(ModCreativeTabs.ITEMS_TAB),
-										INVENTORY_PUMP.setCreativeTab(ModCreativeTabs.ITEMS_TAB),
-										INTERACTION_MODULE);
+		Item slowInventoryHopper = name("slow_inventory_hopper", new SlowInventoryHopperItem()),
+			fastInventoryHopper = name("fast_inventory_hopper", new FastInventoryHopperItem()),
+			inventoryFurnace = name("inventory_furnace", new InventoryFurnaceItem()),
+			inventoryDropper = name("inventory_dropper", new InventoryDropperItem()),
+			inventoryPump = name("inventory_pump", new InventoryPumpItem()),
+			inventoryLinker = name("inventory_linker", new InventoryLinkerItem()),
+			interactionModule = name("interaction_module", new Item());
+		event.getRegistry().registerAll(slowInventoryHopper, fastInventoryHopper,
+										inventoryFurnace, inventoryDropper,
+										inventoryPump,
+										inventoryLinker,
+										interactionModule);
 	}
 	
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public static void registerRenders(ModelRegistryEvent event)
 	{
-		registerRenderAll(SLOW_INVENTORY_HOPPER, FAST_INVENTORY_HOPPER, INVENTORY_FURNACE, INVENTORY_DROPPER, INTERACTION_MODULE);
+		registerRenderAll(SLOW_INVENTORY_HOPPER, FAST_INVENTORY_HOPPER,
+						  INVENTORY_FURNACE, INVENTORY_DROPPER,
+						  INVENTORY_LINKER,
+						  INTERACTION_MODULE);
 		registerCustomRender(INVENTORY_PUMP, InventoryPumpItem.MESH);
 	}
 
@@ -84,7 +90,12 @@ public class ModItems
 
 	private static <I extends Item> I name(String name, I item)
 	{
-		item.setRegistryName(FactinventoryMod.MOD_ID, name).setUnlocalizedName(name);
+		return name(name, item, ModCreativeTabs.ITEMS_TAB);
+	}
+
+	private static <I extends Item> I name(String name, I item, CreativeTabs tab)
+	{
+		item.setRegistryName(FactinventoryMod.MOD_ID, name).setUnlocalizedName(name).setCreativeTab(tab);
 	    return item;
 	}
 }
