@@ -28,7 +28,7 @@ tooltip.transfer_time.desc=Durée de transfert restante : %d ticks
 
 tooltip.drop_info_on_ctrl.desc=Maintenir §e§lCTRL§r pour afficher les détails de l'inventaire
 tooltip.not_dropping.desc=Vide
-tooltip.dropping_item.desc=Inventaire : %s
+tooltip.dropping_item.desc=Inventaire : %s x%d
 tooltip.drop_time.desc=Durée de drop restante : %d ticks
 
 tooltip.linked_tile.desc=Lié à : %s

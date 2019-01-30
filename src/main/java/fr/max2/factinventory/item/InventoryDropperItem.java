@@ -2,7 +2,7 @@ package fr.max2.factinventory.item;
 
 import java.util.List;
 
-import fr.max2.factinventory.capability.SingleStackItemHandler;
+import fr.max2.factinventory.capability.StackItemHandlerProvider;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -17,6 +17,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
 public class InventoryDropperItem extends Item
 {
@@ -32,14 +34,14 @@ public class InventoryDropperItem extends Item
 	{
 		if (GuiScreen.isCtrlKeyDown())
 		{
-			ItemStack droppingItem = getDroppingStack(stack);
+			ItemStack droppingItem = getContentStack(stack);
 			if (droppingItem.isEmpty())
 			{
 				tooltip.add(I18n.format("tooltip.not_dropping.desc"));
 			}
 			else
 			{
-				tooltip.add(I18n.format("tooltip.dropping_item.desc", droppingItem.getDisplayName()));
+				tooltip.add(I18n.format("tooltip.dropping_item.desc", droppingItem.getDisplayName(), droppingItem.getCount()));
 			}
 			
 			tooltip.add(I18n.format("tooltip.drop_time.desc", getDropTime(stack)));
@@ -53,13 +55,13 @@ public class InventoryDropperItem extends Item
 	@Override
 	public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged)
 	{
-		return super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged) && (slotChanged || newStack.getItem() != oldStack.getItem() || newStack.getMetadata() != oldStack.getMetadata() || newStack.getCount() != oldStack.getCount() || !ItemStack.areItemStacksEqual(getDroppingStack(newStack), getDroppingStack(oldStack)));
+		return super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged) && (slotChanged || newStack.getItem() != oldStack.getItem() || newStack.getMetadata() != oldStack.getMetadata() || newStack.getCount() != oldStack.getCount() || !ItemStack.areItemStacksEqual(getContentStack(newStack), getContentStack(oldStack)));
 	}
 	
 	@Override
 	public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected)
 	{
-		if (!world.isRemote)
+		if (!world.isRemote && stack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null))
 		{
 			int dropTime = getDropTime(stack);
 			
@@ -67,16 +69,14 @@ public class InventoryDropperItem extends Item
 			
 			if (dropTime >= 8)
 			{
-				ItemStack inventory = getDroppingStack(stack);
+				IItemHandler inventory = stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+				ItemStack dropping = inventory.extractItem(0, 1, true);
 				
-				if (!inventory.isEmpty())
+				if (!dropping.isEmpty())
 				{
-					ItemStack dropping = inventory.copy();
-					dropping.setCount(1);
-					if (this.doDispense(world, dropping, entity))
+					if (doDispense(world, dropping, entity))
 					{
-						inventory.shrink(1);
-						setDroppingStack(stack, inventory);
+						inventory.extractItem(0, 1, false);
 					}
 			        playDispenseSound(world, entity);
 				}
@@ -91,28 +91,17 @@ public class InventoryDropperItem extends Item
 	@Override
 	public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound nbt)
 	{
-		return new SingleStackItemHandler(stack, NBT_DROPPING_ITEM);
+		return new StackItemHandlerProvider();
 	}
 	
-	private static final String NBT_DROPPING_ITEM = "DroppingItem";
-	
-	public static ItemStack getDroppingStack(ItemStack stack)
+	public static ItemStack getContentStack(ItemStack stack)
 	{
-		if (stack.hasTagCompound())
+		if (stack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null))
 		{
-			NBTTagCompound tag = stack.getTagCompound();
-			if (tag.hasKey(NBT_DROPPING_ITEM, NBT.TAG_COMPOUND)) return new ItemStack(tag.getCompoundTag(NBT_DROPPING_ITEM));
+			IItemHandler handler = stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+			return handler.getStackInSlot(0);
 		}
 		return ItemStack.EMPTY;
-	}
-	
-	public static void setDroppingStack(ItemStack stack, ItemStack transferringStck)
-	{
-		if (!stack.hasTagCompound()) stack.setTagCompound(new NBTTagCompound());
-		
-		if (transferringStck.isEmpty()) transferringStck = ItemStack.EMPTY;
-		
-		stack.getTagCompound().setTag(NBT_DROPPING_ITEM, transferringStck.serializeNBT());
 	}
 	
 	
@@ -136,12 +125,13 @@ public class InventoryDropperItem extends Item
 	}
 
     /**
-     * Play the dispense sound from the specified block.
+     * Play the dispense sound from the specified entity.
      */
     protected static void playDispenseSound(World worldIn, Entity entity)
     {
     	worldIn.playEvent(1000, entity.getPosition(), 0);
     }
+    
     protected static boolean doDispense(World worldIn, ItemStack stack, Entity entity)
     {
     	if (entity instanceof EntityPlayer)
@@ -156,10 +146,10 @@ public class InventoryDropperItem extends Item
     		EntityItem entityitem = new EntityItem(worldIn, pos.x, pos.y, pos.z, stack);
             entityitem.setDefaultPickupDelay();
             
-            float f = worldIn.rand.nextFloat() * 0.5F;
-            float f1 = worldIn.rand.nextFloat() * ((float)Math.PI * 2F);
-            entityitem.motionX = (double)(-MathHelper.sin(f1) * f);
-            entityitem.motionZ = (double)(MathHelper.cos(f1) * f);
+            float speed = worldIn.rand.nextFloat() * 0.5F;
+            float angle = worldIn.rand.nextFloat() * ((float)Math.PI * 2F);
+            entityitem.motionX = -MathHelper.sin(angle) * speed;
+            entityitem.motionZ = MathHelper.cos(angle) * speed;
             entityitem.motionY = 0.20000000298023224D;
             
             return worldIn.spawnEntity(entityitem);
