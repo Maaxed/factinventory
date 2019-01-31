@@ -14,6 +14,8 @@ tooltip.output.desc=Sortie
 tooltip.ingredient_input.desc=Entrée des ingrédients
 tooltip.fuel_input.desc=Entrées de combustible
 tooltip.product_output.desc=Sortie des produits
+tooltip.progress_bar.full=§2█§r
+tooltip.progress_bar.empty=§8█§r
 
 tooltip.smelting_info_on_ctrl.desc=Maintenir §e§lCTRL§r pour afficher les détails de cuisson
 tooltip.not_smelting.desc=Vide
@@ -24,7 +26,7 @@ tooltip.burning_time.desc=Brûle pendant : %d ticks
 tooltip.transfer_info_on_ctrl.desc=Maintenir §e§lCTRL§r pour afficher les détails de transfert
 tooltip.not_transferring.desc=Vide
 tooltip.transferring_item.desc=En train de transférer : %s
-tooltip.transfer_time.desc=Durée de transfert restante : %d ticks
+tooltip.transfer_progress.desc=Progrès du transfert : [%s]
 
 tooltip.drop_info_on_ctrl.desc=Maintenir §e§lCTRL§r pour afficher les détails de l'inventaire
 tooltip.not_dropping.desc=Inventaire : Vide

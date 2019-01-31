@@ -6,6 +6,7 @@ import java.util.List;
 import fr.max2.factinventory.client.gui.GuiRenderHandler.Icon;
 import fr.max2.factinventory.item.mesh.StateMesh;
 import fr.max2.factinventory.item.mesh.StateMesh.MeshProperty;
+import fr.max2.factinventory.utils.StringUtils;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
@@ -77,7 +78,8 @@ public class InventoryPumpItem extends RotatableInventoryItem
 				tooltip.add(I18n.format("tooltip.transferring_item.desc", transferringItem.getLocalizedName()));
 			}
 			
-			tooltip.add(I18n.format("tooltip.transfer_time.desc", getTransferTime(stack))); // TODO use the '█' char as a progess bar
+			
+			tooltip.add(I18n.format("tooltip.transfer_progress.desc", StringUtils.progress(8 - getTransferTime(stack), 8)));
 		}
 		else
 		{

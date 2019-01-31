@@ -3,6 +3,7 @@ package fr.max2.factinventory.item;
 import java.util.List;
 
 import fr.max2.factinventory.utils.InventoryUtils;
+import fr.max2.factinventory.utils.StringUtils;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -41,7 +42,7 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 				tooltip.add(I18n.format("tooltip.transferring_item.desc", transferringItem.getDisplayName()));
 			}
 			
-			tooltip.add(I18n.format("tooltip.transfer_time.desc", getTransferTime(stack)));
+			tooltip.add(I18n.format("tooltip.transfer_progress.desc", StringUtils.progress(8 - getTransferTime(stack), 8)));
 		}
 		else
 		{

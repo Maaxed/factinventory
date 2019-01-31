@@ -14,6 +14,8 @@ tooltip.output.desc=Output
 tooltip.ingredient_input.desc=Ingredients input
 tooltip.fuel_input.desc=Fuel inputs
 tooltip.product_output.desc=Products output
+tooltip.progress_bar.full=§a█§r
+tooltip.progress_bar.empty=§8█§r
 
 tooltip.smelting_info_on_ctrl.desc=Hold §e§lCTRL§r for smelting details
 tooltip.not_smelting.desc=Empty
@@ -24,7 +26,7 @@ tooltip.burning_time.desc=Burn time remaining: %d ticks
 tooltip.transfer_info_on_ctrl.desc=Hold §e§lCTRL§r for transfer details
 tooltip.not_transferring.desc=Empty
 tooltip.transferring_item.desc=Transferring: %s
-tooltip.transfer_time.desc=Transfer time remaining: %d ticks
+tooltip.transfer_progress.desc=Transfer progress:  [%s]
 
 tooltip.drop_info_on_ctrl.desc=Hold §e§lCTRL§r for inventory details
 tooltip.not_dropping.desc=Inventory: Empty
