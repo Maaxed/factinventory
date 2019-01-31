@@ -17,22 +17,22 @@ tooltip.product_output.desc=Products output
 
 tooltip.smelting_info_on_ctrl.desc=Hold §e§lCTRL§r for smelting details
 tooltip.not_smelting.desc=Empty
-tooltip.smelting_item.desc=Smelting : %s
+tooltip.smelting_item.desc=Smelting: %s
 tooltip.not_burning.desc=Not burning
-tooltip.burning_time.desc=Burn time remaining : %d ticks
+tooltip.burning_time.desc=Burn time remaining: %d ticks
 
 tooltip.transfer_info_on_ctrl.desc=Hold §e§lCTRL§r for transfer details
 tooltip.not_transferring.desc=Empty
-tooltip.transferring_item.desc=Transferring : %s
-tooltip.transfer_time.desc=Transfer time remaining : %d ticks
+tooltip.transferring_item.desc=Transferring: %s
+tooltip.transfer_time.desc=Transfer time remaining: %d ticks
 
 tooltip.drop_info_on_ctrl.desc=Hold §e§lCTRL§r for inventory details
-tooltip.not_dropping.desc=Empty
-tooltip.dropping_item.desc=Inventory : %s x%d
-tooltip.drop_time.desc=Drop time remaining : %d ticks
+tooltip.not_dropping.desc=Inventory: Empty
+tooltip.dropping_item.desc=Inventory: %s x%d
+tooltip.drop_time.desc=Drop time remaining: %d ticks
 
-tooltip.linked_tile.desc=Linked to : %s
-tooltip.linked_other_dimension.desc=Linked to : another dimension
-tooltip.linked_unloaded.desc=Linked to : unloaded block
-tooltip.linked_missing.desc=Not linked : missing block
+tooltip.linked_tile.desc=Linked to: %s
+tooltip.linked_other_dimension.desc=Linked to: another dimension
+tooltip.linked_unloaded.desc=Linked to: unloaded block
+tooltip.linked_missing.desc=Not linked: missing block
 tooltip.not_linked.desc=Not linked

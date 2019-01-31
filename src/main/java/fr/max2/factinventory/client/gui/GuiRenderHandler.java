@@ -64,10 +64,9 @@ public class GuiRenderHandler
 	{
 		gui.mc.getTextureManager().bindTexture(new ResourceLocation(FactinventoryMod.MOD_ID, "textures/gui/io_icons.png"));
 		
-	//	float a = (float) (color >> 24 & 255) / 255.0F;
-		float r = (float) (color >> 16 & 255) / 255.0F;
-		float g = (float) (color >> 8 & 255) / 255.0F;
-		float b = (float) (color & 255) / 255.0F;
+		float r = (color >> 16 & 255) / 255.0F;
+		float g = (color >> 8 & 255) / 255.0F;
+		float b = (color & 255) / 255.0F;
 		GlStateManager.color(r, g, b);
 		
 		CustomGuiUtils.drawRectWithSizedTexture(x + gui.getGuiLeft(), y + gui.getGuiTop(), 400.0D, 16 * ((1 - face.getHorizontalIndex()) % 3),

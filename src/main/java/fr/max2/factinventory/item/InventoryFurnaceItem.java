@@ -119,7 +119,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	@Override
 	protected void update(ItemStack stack, InventoryPlayer inv, EntityPlayer player, int itemSlot)
 	{
-		int width = inv.getHotbarSize(),
+		int width = InventoryPlayer.getHotbarSize(),
 			height = inv.mainInventory.size() / width,
 			x = itemSlot % width,
 			y = itemSlot / width;
@@ -320,9 +320,9 @@ public class InventoryFurnaceItem extends InventoryItem
 		                    }
 		                    else if (f < 1.0F)
 		                    {
-		                        int j = MathHelper.floor((float)i * f);
+		                        int j = MathHelper.floor(i * f);
 
-		                        if (j < MathHelper.ceil((float)i * f) && Math.random() < (double)((float)i * f - (float)j))
+		                        if (j < MathHelper.ceil(i * f) && Math.random() < i * f - j)
 		                        {
 		                            ++j;
 		                        }
@@ -357,18 +357,13 @@ public class InventoryFurnaceItem extends InventoryItem
         
 	}
 
-	private int getInventoryStackLimit()
-	{
-		return 64;
-	}
-
 	@Override
 	public List<Icon> getRenderIcons(ItemStack stack, GuiContainer gui, Slot slot, InventoryPlayer inv)
 	{
 		List<Icon> icons = new ArrayList<>();
 		
 		int itemSlot = slot.getSlotIndex(),
-			width = inv.getHotbarSize(),
+			width = InventoryPlayer.getHotbarSize(),
 			height = inv.mainInventory.size() / width;
 		
 		if (itemSlot >= width * height) return icons;

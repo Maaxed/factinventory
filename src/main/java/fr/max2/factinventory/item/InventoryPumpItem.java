@@ -26,8 +26,6 @@ import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class InventoryPumpItem extends RotatableInventoryItem
 {
@@ -98,7 +96,7 @@ public class InventoryPumpItem extends RotatableInventoryItem
 	{
 		EnumFacing face = getFacing(stack);
 		
-		int width = inv.getHotbarSize(),
+		int width = InventoryPlayer.getHotbarSize(),
 			height = inv.mainInventory.size() / width,
 			x = itemSlot % width,
 			y = itemSlot / width,
@@ -213,7 +211,7 @@ public class InventoryPumpItem extends RotatableInventoryItem
 		EnumFacing face = getFacing(stack);
 		
 		int itemSlot = slot.getSlotIndex(),
-			width = inv.getHotbarSize(),
+			width = InventoryPlayer.getHotbarSize(),
 			height = inv.mainInventory.size() / width;
 		
 		if (itemSlot >= width * height) return icons;

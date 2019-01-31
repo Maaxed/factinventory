@@ -70,11 +70,11 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 		setTransferTime(stack, transferTime);
 	}
 	
-	private void updateHopper(ItemStack stack, InventoryPlayer inv, int itemSlot)
+	protected void updateHopper(ItemStack stack, InventoryPlayer inv, int itemSlot)
 	{
 		EnumFacing face = getFacing(stack);
 		
-		int width = inv.getHotbarSize(),
+		int width = InventoryPlayer.getHotbarSize(),
 			height = inv.mainInventory.size() / width,
 			x = itemSlot % width,
 			y = itemSlot / width;

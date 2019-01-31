@@ -45,7 +45,7 @@ public abstract class InventoryHopperItem extends RotatableInventoryItem
 		EnumFacing face = getFacing(stack);
 		
 		int itemSlot = slot.getSlotIndex(),
-			width = inv.getHotbarSize(),
+			width = InventoryPlayer.getHotbarSize(),
 			height = inv.mainInventory.size() / width;
 		
 		if (itemSlot >= width * height) return icons;

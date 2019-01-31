@@ -21,7 +21,7 @@ public class FastInventoryHopperItem extends InventoryHopperItem
 	{
 		EnumFacing face = getFacing(stack);
 		
-		int width = inv.getHotbarSize(),
+		int width = InventoryPlayer.getHotbarSize(),
 			height = inv.mainInventory.size() / width,
 			x = itemSlot % width,
 			y = itemSlot / width,

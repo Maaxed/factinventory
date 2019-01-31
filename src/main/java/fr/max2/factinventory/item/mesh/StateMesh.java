@@ -10,8 +10,6 @@ import com.google.common.collect.Streams;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Cartesian;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class StateMesh implements IVarientMesh
 {

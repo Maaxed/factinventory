@@ -8,7 +8,7 @@ item.inventory_linker.name=Connecteur d'inventaire
 
 itemGroup.inventory_item_tab=Items d'inventaire
 
-tooltip.interaction_info_on_shift.desc=Maintenir §e§lSHIFT§r pour afficher les détails d'entrée/surtie
+tooltip.interaction_info_on_shift.desc=Maintenir §e§lMaj§r pour afficher les détails d'entrée/surtie
 tooltip.input.desc=Entrée
 tooltip.output.desc=Sortie
 tooltip.ingredient_input.desc=Entrée des ingrédients
@@ -27,7 +27,7 @@ tooltip.transferring_item.desc=En train de transférer : %s
 tooltip.transfer_time.desc=Durée de transfert restante : %d ticks
 
 tooltip.drop_info_on_ctrl.desc=Maintenir §e§lCTRL§r pour afficher les détails de l'inventaire
-tooltip.not_dropping.desc=Vide
+tooltip.not_dropping.desc=Inventaire : Vide
 tooltip.dropping_item.desc=Inventaire : %s x%d
 tooltip.drop_time.desc=Durée de drop restante : %d ticks
 
