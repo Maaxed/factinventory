@@ -2,89 +2,90 @@ package fr.max2.factinventory.item;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import fr.max2.factinventory.capability.CapabilityTileEntityHandler;
 import fr.max2.factinventory.capability.ITileEntityHandler;
 import fr.max2.factinventory.capability.InventoryLinkerHandler;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 
 public class InventoryLinkerItem extends Item
 {
 	
-	public InventoryLinkerItem()
+	public InventoryLinkerItem(Properties properties)
 	{
-		super();
-		this.maxStackSize = 1;
+		super(properties.maxStackSize(1));
 	}
 	
 	@Override
-    @SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn)
+    @OnlyIn(Dist.CLIENT)
+	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
 	{
-		ITileEntityHandler handler = stack.getCapability(CapabilityTileEntityHandler.CAPABILITY_TILE, null);
-		if (handler.hasTileData())
+		ITileEntityHandler handler = stack.getCapability(CapabilityTileEntityHandler.CAPABILITY_TILE, null).orElse(null);
+		if (handler != null && handler.hasTileData())
 		{
 			TileEntity te = handler.getTile();
 			
 			if (te == null)
 			{
-				if (worldIn.provider.getDimension() == handler.getTileDim())
+				if (worldIn == null || worldIn.getDimension().getType() == handler.getTileDim())
 				{
-					if (worldIn.isBlockLoaded(handler.getTilePos(), false))
+					if (worldIn != null && worldIn.isBlockLoaded(handler.getTilePos()))
 					{
-						tooltip.add(I18n.format("tooltip.linked_missing.desc"));
+						tooltip.add(new TranslationTextComponent("tooltip.linked_missing.desc"));
 					}
-					else tooltip.add(I18n.format("tooltip.linked_unloaded.desc"));
+					else tooltip.add(new TranslationTextComponent("tooltip.linked_unloaded.desc"));
 				}
-				else tooltip.add(I18n.format("tooltip.linked_other_dimension.desc"));
+				else tooltip.add(new TranslationTextComponent("tooltip.linked_other_dimension.desc"));
 			}
 			else
 			{
-				ITextComponent name = te.getDisplayName();
-				String displayName = name == null ? te.getBlockType().getLocalizedName() : name.getFormattedText();
-				tooltip.add(I18n.format("tooltip.linked_tile.desc", displayName));
+				ITextComponent name = null;
+				if (te instanceof INamedContainerProvider) name = ((INamedContainerProvider)te).getDisplayName();
+				if (name == null) name = te.getBlockState().getBlock().getNameTextComponent();
+				tooltip.add(new TranslationTextComponent("tooltip.linked_tile.desc", name));
 			}
 		}
-		else tooltip.add(I18n.format("tooltip.not_linked.desc"));
+		else tooltip.add(new TranslationTextComponent("tooltip.not_linked.desc"));
 	}
 	
 	@Override
-	public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand)
+	public ActionResultType onItemUse(ItemUseContext context)
 	{
-		if (player.isSneaking())
+		PlayerEntity player = context.getPlayer();
+		if (player == null || player.isSneaking())
 		{
-			TileEntity te = world.getTileEntity(pos);
-			if (te != null && (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side) || te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side)))
+			TileEntity te = context.getWorld().getTileEntity(context.getPos());
+			if (te != null && (te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, context.getFace()).isPresent() || te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, context.getFace()).isPresent()))
 			{
-				ITileEntityHandler handler = player.getHeldItem(hand).getCapability(CapabilityTileEntityHandler.CAPABILITY_TILE, null);
-				handler.setTile(te, side);
+				context.getItem().getCapability(CapabilityTileEntityHandler.CAPABILITY_TILE, null).ifPresent(handler -> handler.setTile(te, context.getFace()));
 				
-				return EnumActionResult.SUCCESS;
+				return ActionResultType.SUCCESS;
 			}
 			
-			return EnumActionResult.FAIL;
+			return ActionResultType.FAIL;
 		}
-		return super.onItemUseFirst(player, world, pos, side, hitX, hitY, hitZ, hand);
+		return super.onItemUse(context);
 	}
 	
 	@Override
-	public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound nbt)
+	public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt)
 	{
 		return new InventoryLinkerHandler(stack);
 	}

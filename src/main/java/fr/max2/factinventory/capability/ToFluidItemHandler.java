@@ -1,16 +1,17 @@
 package fr.max2.factinventory.capability;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.fluids.capability.IFluidTankProperties;
 
 public class ToFluidItemHandler implements IFluidHandlerItem
 {
 	private final ItemStack container;
 	private final IFluidHandler baseHandler;
-	
+
 	public ToFluidItemHandler(ItemStack container, IFluidHandler baseHandler)
 	{
 		this.container = container;
@@ -18,31 +19,49 @@ public class ToFluidItemHandler implements IFluidHandlerItem
 	}
 
 	@Override
-	public IFluidTankProperties[] getTankProperties()
+	public int getTanks()
 	{
-		return this.baseHandler.getTankProperties();
+		return this.baseHandler.getTanks();
 	}
 
 	@Override
-	public int fill(FluidStack resource, boolean doFill)
+	public @Nonnull FluidStack getFluidInTank(int tank)
 	{
-		return this.baseHandler.fill(resource, doFill);
+		return this.baseHandler.getFluidInTank(tank);
 	}
 
 	@Override
-	public FluidStack drain(FluidStack resource, boolean doDrain)
+	public int getTankCapacity(int tank)
 	{
-		return this.baseHandler.drain(resource, doDrain);
+		return this.baseHandler.getTankCapacity(tank);
+	}
+	
+	@Override
+	public boolean isFluidValid(int tank, @Nonnull FluidStack stack)
+	{
+		return this.baseHandler.isFluidValid(tank, stack);
 	}
 
 	@Override
-	public FluidStack drain(int maxDrain, boolean doDrain)
+	public int fill(FluidStack resource, FluidAction action)
 	{
-		return this.baseHandler.drain(maxDrain, doDrain);
+		return this.baseHandler.fill(resource, action);
 	}
 
 	@Override
-	public ItemStack getContainer()
+	public @Nonnull FluidStack drain(FluidStack resource, FluidAction action)
+	{
+		return this.baseHandler.drain(resource, action);
+	}
+
+	@Override
+	public @Nonnull FluidStack drain(int maxDrain, FluidAction action)
+	{
+		return this.baseHandler.drain(maxDrain, action);
+	}
+
+	@Override
+	public @Nonnull ItemStack getContainer()
 	{
 		return this.container;
 	}

@@ -1,19 +1,20 @@
 package fr.max2.factinventory.init;
 
-import net.minecraft.creativetab.CreativeTabs;
+import fr.max2.factinventory.FactinventoryMod;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ModCreativeTabs
 {
 	
-	public static final CreativeTabs ITEMS_TAB = new CreativeTabs("inventory_item_tab")
+	public static final ItemGroup ITEMS_TAB = new ItemGroup(FactinventoryMod.MOD_ID + ".inventory_item_tab")
 	{
 		
 		@Override
-		@SideOnly(Side.CLIENT)
-		public ItemStack getTabIconItem()
+		@OnlyIn(Dist.CLIENT)
+		public ItemStack createIcon()
 		{
 			ItemStack iStack = new ItemStack(ModItems.SLOW_INVENTORY_HOPPER);
 			return iStack;

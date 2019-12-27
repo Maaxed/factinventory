@@ -1,14 +1,18 @@
 package fr.max2.factinventory.capability;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import fr.max2.factinventory.utils.InventoryUtils;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockShulkerBox;
+import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -25,51 +29,51 @@ public class ItemTileEntityWrapperHandler implements IItemHandlerModifiable, ICa
 		this.slots = slots;
 	}
 
-	private NBTTagList getItems()
+	private ListNBT getItems()
 	{
-		if (this.stack.hasTagCompound())
+		if (this.stack.hasTag())
 		{
-			NBTTagCompound tag = this.stack.getTagCompound();
+			CompoundNBT tag = this.stack.getTag();
 			
-			if (tag.hasKey("BlockEntityTag", NBT.TAG_COMPOUND))
+			if (tag.contains("BlockEntityTag", NBT.TAG_COMPOUND))
 			{
-				NBTTagCompound data = tag.getCompoundTag("BlockEntityTag");
-				if (data.hasKey("Items", NBT.TAG_LIST))
+				CompoundNBT data = tag.getCompound("BlockEntityTag");
+				if (data.contains("Items", NBT.TAG_LIST))
 				{
-					return data.getTagList("Items", NBT.TAG_COMPOUND);
+					return data.getList("Items", NBT.TAG_COMPOUND);
 				}
 			}
 		}
-		return new NBTTagList();
+		return new ListNBT();
 	}
 	
-	private NBTTagList getOrCreateItems()
+	private ListNBT getOrCreateItems()
 	{
-		NBTTagCompound tag = this.stack.getTagCompound();
+		CompoundNBT tag = this.stack.getTag();
 		
 		if (tag == null)
 		{
-			tag = new NBTTagCompound();
-			this.stack.setTagCompound(tag);
+			tag = new CompoundNBT();
+			this.stack.setTag(tag);
 		}
 		
 		
-		if (!tag.hasKey("BlockEntityTag", NBT.TAG_COMPOUND))
+		if (!tag.contains("BlockEntityTag", NBT.TAG_COMPOUND))
 		{
-			NBTTagCompound data = new NBTTagCompound();
-			tag.setTag("BlockEntityTag", data);
+			CompoundNBT data = new CompoundNBT();
+			tag.put("BlockEntityTag", data);
 		}
 		
-		NBTTagCompound data = tag.getCompoundTag("BlockEntityTag");
+		CompoundNBT data = tag.getCompound("BlockEntityTag");
 		
-		if (data.hasKey("Items", NBT.TAG_LIST))
+		if (data.contains("Items", NBT.TAG_LIST))
 		{
-			return data.getTagList("Items", NBT.TAG_COMPOUND);
+			return data.getList("Items", NBT.TAG_COMPOUND);
 		}
 		else
 		{
-			NBTTagList items = new NBTTagList();
-			data.setTag("Items", items);
+			ListNBT items = new ListNBT();
+			data.put("Items", items);
 			return items;
 		}
 	}
@@ -81,16 +85,16 @@ public class ItemTileEntityWrapperHandler implements IItemHandlerModifiable, ICa
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int slot)
+	public @Nonnull ItemStack getStackInSlot(int slot)
 	{
-		NBTTagList items = this.getItems();
-		for (int i = 0, count = items.tagCount(); i < count; i++)
+		ListNBT items = this.getItems();
+		for (int i = 0, count = items.size(); i < count; i++)
 		{
-			NBTTagCompound item = items.getCompoundTagAt(i);
+			CompoundNBT item = items.getCompound(i);
 			int index = item.getByte("Slot");
 			if (index == slot)
 			{
-				return new ItemStack(item);
+				return ItemStack.read(item);
 			}
 		}
 		
@@ -98,9 +102,9 @@ public class ItemTileEntityWrapperHandler implements IItemHandlerModifiable, ICa
 	}
 
 	@Override
-	public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
+	public @Nonnull ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate)
 	{
-		if (!this.accepts(stack)) return stack;
+		if (!this.isItemValid(slot, stack)) return stack;
 		
 		ItemStack actualStack = this.getStackInSlot(slot);
 		
@@ -129,7 +133,7 @@ public class ItemTileEntityWrapperHandler implements IItemHandlerModifiable, ICa
 	}
 
 	@Override
-	public ItemStack extractItem(int slot, int amount, boolean simulate)
+	public @Nonnull ItemStack extractItem(int slot, int amount, boolean simulate)
 	{
 		ItemStack actualStack = this.getStackInSlot(slot);
 		int removed = Math.min(actualStack.getCount(), amount);
@@ -152,47 +156,43 @@ public class ItemTileEntityWrapperHandler implements IItemHandlerModifiable, ICa
 	}
 
 	@Override
-	public void setStackInSlot(int slot, ItemStack stack)
+	public void setStackInSlot(int slot, @Nonnull ItemStack stack)
 	{
-		NBTTagList items = this.getOrCreateItems();
+		ListNBT items = this.getOrCreateItems();
 		
-		NBTTagCompound newItemTag = new NBTTagCompound();
-		newItemTag.setByte("Slot", (byte)slot);
-		stack.writeToNBT(newItemTag);
+		CompoundNBT newItemTag = new CompoundNBT();
+		newItemTag.putByte("Slot", (byte)slot);
+		stack.write(newItemTag);
 		
-		for (int i = 0, count = items.tagCount(); i < count; i++)
+		for (int i = 0, count = items.size(); i < count; i++)
 		{
-			NBTTagCompound item = items.getCompoundTagAt(i);
+			CompoundNBT item = items.getCompound(i);
 			int index = item.getByte("Slot");
 			if (index == slot)
 			{
 				if (stack.isEmpty())
 				{
-					items.removeTag(i);
+					items.remove(i);
 				}
 				else items.set(i, newItemTag);
 				return;
 			}
 		}
 		// if not found
-		items.appendTag(newItemTag);
+		items.add(newItemTag);
 	}
 	
-	protected boolean accepts(ItemStack stack)
+	@Override
+	public boolean isItemValid(int slot, @Nonnull ItemStack stack)
 	{
 		return true;
 	}
 
 	@Override
-	public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+	@Nonnull
+	public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side)
 	{
-		return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
-	}
-
-	@Override
-	public <T> T getCapability(Capability<T> capability, EnumFacing facing)
-	{
-		return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY ? CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this) : null;
+		return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.orEmpty(cap, LazyOptional.of(() -> this));
 	}
 	
 	public static class ShulkerBox extends ItemTileEntityWrapperHandler
@@ -202,11 +202,11 @@ public class ItemTileEntityWrapperHandler implements IItemHandlerModifiable, ICa
 		{
 			super(stack, slots);
 		}
-		
+
 		@Override
-		protected boolean accepts(ItemStack stack)
+		public boolean isItemValid(int slot, @Nonnull ItemStack stack)
 		{
-			return !(Block.getBlockFromItem(stack.getItem()) instanceof BlockShulkerBox);
+			return !(Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock);
 		}
 		
 	}

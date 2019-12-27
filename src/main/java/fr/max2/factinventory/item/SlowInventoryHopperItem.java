@@ -2,17 +2,22 @@ package fr.max2.factinventory.item;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import fr.max2.factinventory.utils.InventoryUtils;
 import fr.max2.factinventory.utils.StringUtils;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.IntNBT;
+import net.minecraft.util.Direction;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -20,44 +25,44 @@ import net.minecraftforge.items.IItemHandler;
 public class SlowInventoryHopperItem extends InventoryHopperItem
 {
 	
-	public SlowInventoryHopperItem()
+	public SlowInventoryHopperItem(Properties properties)
 	{
-		super(); //1 item = 8 ticks
+		super(properties); //1 item = 8 ticks
 	}
 	
 	@Override
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn)
+	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
 	{
 		super.addInformation(stack, worldIn, tooltip, flagIn);
 		
-		if (GuiScreen.isCtrlKeyDown())
+		if (Screen.hasControlDown())
 		{
 			ItemStack transferringItem = getTransferringStack(stack);
 			if (transferringItem.isEmpty())
 			{
-				tooltip.add(I18n.format("tooltip.not_transferring.desc"));
+				tooltip.add(new TranslationTextComponent("tooltip.not_transferring.desc"));
 			}
 			else
 			{
-				tooltip.add(I18n.format("tooltip.transferring_item.desc", transferringItem.getDisplayName()));
+				tooltip.add(new TranslationTextComponent("tooltip.transferring_item.desc", transferringItem.getDisplayName()));
 			}
 			
-			tooltip.add(I18n.format("tooltip.transfer_progress.desc", StringUtils.progress(8 - getTransferTime(stack), 8)));
+			tooltip.add(new TranslationTextComponent("tooltip.transfer_progress.desc", StringUtils.progress(8 - getTransferTime(stack), 8)));
 		}
 		else
 		{
-			tooltip.add(I18n.format("tooltip.transfer_info_on_ctrl.desc"));
+			tooltip.add(new TranslationTextComponent("tooltip.transfer_info_on_ctrl.desc"));
 		}
 	}
 	
 	@Override
 	public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged)
 	{
-		return super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged) && (slotChanged || newStack.getItem() != oldStack.getItem() || newStack.getMetadata() != oldStack.getMetadata() || newStack.getCount() != oldStack.getCount() || !ItemStack.areItemStacksEqual(getTransferringStack(newStack), getTransferringStack(oldStack)));
+		return super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged) && (slotChanged || newStack.getItem() != oldStack.getItem() || newStack.getCount() != oldStack.getCount() || !ItemStack.areItemStacksEqual(getTransferringStack(newStack), getTransferringStack(oldStack)));
 	}
 	
 	@Override
-	protected void update(ItemStack stack, InventoryPlayer inv, EntityPlayer player, int itemSlot)
+	protected void update(ItemStack stack, PlayerInventory inv, PlayerEntity player, int itemSlot)
 	{
 		int transferTime = getTransferTime(stack);
 		
@@ -71,17 +76,17 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 		setTransferTime(stack, transferTime);
 	}
 	
-	protected void updateHopper(ItemStack stack, InventoryPlayer inv, int itemSlot)
+	protected void updateHopper(ItemStack stack, PlayerInventory inv, int itemSlot)
 	{
-		EnumFacing face = getFacing(stack);
+		Direction face = getFacing(stack);
 		
-		int width = InventoryPlayer.getHotbarSize(),
+		int width = PlayerInventory.getHotbarSize(),
 			height = inv.mainInventory.size() / width,
 			x = itemSlot % width,
 			y = itemSlot / width;
 		
-		int insertX  = x - face.getFrontOffsetX(),
-			insertY  = y - face.getFrontOffsetZ();
+		int insertX  = x - face.getXOffset(),
+			insertY  = y - face.getZOffset();
 		
 		if (insertY == 0 && y != 0) insertY = height;
 		else if (y == 0 && insertY ==  1) insertY = -1;
@@ -99,10 +104,10 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 			
 			if (!contentStack.isEmpty())
 			{
-				
-				if (!insertStack.isEmpty() && insertStack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face))
+				LazyOptional<IItemHandler> insertCapaOptional = insertStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face);
+				if (!insertStack.isEmpty() && insertCapaOptional.isPresent())
 				{
-					IItemHandler insertCapa = insertStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face);
+					IItemHandler insertCapa = insertCapaOptional.orElse(null);
 					
 					int insertSlots = insertCapa.getSlots();
 					for (int insertIndex = 0; insertIndex < insertSlots && !contentStack.isEmpty(); insertIndex++)
@@ -127,8 +132,8 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 			
 			if (contentStack.isEmpty())
 			{
-				int extractX = x + face.getFrontOffsetX(),
-					extractY = y + face.getFrontOffsetZ();
+				int extractX = x + face.getXOffset(),
+					extractY = y + face.getZOffset();
 				
 				if (extractY == 0 && y != 0) extractY = height;
 				else if (y == 0 && extractY == 1) extractY = -1;
@@ -144,15 +149,16 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 					
 					if (!extractStack.isEmpty())
 					{
-						if (extractStack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face.getOpposite()))
+						LazyOptional<IItemHandler> extractCapaOptional = extractStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face.getOpposite());
+						if (extractCapaOptional.isPresent())
 						{
-							IItemHandler extractCapa = extractStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face.getOpposite());
+							IItemHandler extractCapa = extractCapaOptional.orElse(null);
 							
 							int extractSlots = extractCapa.getSlots();
 							for (int extractIndex = 0; extractIndex < extractSlots && contentStack.isEmpty(); extractIndex++)
 							{
 								ItemStack extractedStack = extractCapa.extractItem(extractIndex, 1, true);
-								if (!extractedStack.isEmpty() && canPush(extractedStack, insertStack, EnumFacing.NORTH))
+								if (!extractedStack.isEmpty() && canPush(extractedStack, insertStack, Direction.NORTH))
 								{
 									contentStack = extractedStack;
 									
@@ -160,7 +166,7 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 								}
 							}
 						}
-						else if (canPush(extractStack, insertStack, EnumFacing.NORTH))
+						else if (canPush(extractStack, insertStack, Direction.NORTH))
 						{
 							contentStack = extractStack.copy();
 							contentStack.setCount(1);
@@ -187,19 +193,17 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 	
 	public static ItemStack getTransferringStack(ItemStack stack)
 	{
-		if (stack.hasTagCompound())
+		if (stack.hasTag())
 		{
-			NBTTagCompound tag = stack.getTagCompound();
-			if (tag.hasKey(NBT_TRANSFERRING_ITEM, NBT.TAG_COMPOUND)) return new ItemStack(tag.getCompoundTag(NBT_TRANSFERRING_ITEM));
+			CompoundNBT tag = stack.getTag();
+			if (tag.contains(NBT_TRANSFERRING_ITEM, NBT.TAG_COMPOUND)) return ItemStack.read(tag.getCompound(NBT_TRANSFERRING_ITEM));
 		}
 		return ItemStack.EMPTY;
 	}
 	
 	public static void setTransferringStack(ItemStack stack, ItemStack transferringStack)
 	{
-		if (!stack.hasTagCompound()) stack.setTagCompound(new NBTTagCompound());
-		
-		stack.getTagCompound().setTag(NBT_TRANSFERRING_ITEM, transferringStack.serializeNBT());
+		stack.setTagInfo(NBT_TRANSFERRING_ITEM, transferringStack.serializeNBT());
 	}
 	
 	
@@ -207,19 +211,17 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 	
 	public static int getTransferTime(ItemStack stack)
 	{
-		if (stack.hasTagCompound())
+		if (stack.hasTag())
 		{
-			NBTTagCompound tag = stack.getTagCompound();
-			if (tag.hasKey(NBT_TRANSFER_TIME, NBT.TAG_INT)) return tag.getInteger(NBT_TRANSFER_TIME);
+			CompoundNBT tag = stack.getTag();
+			if (tag.contains(NBT_TRANSFER_TIME, NBT.TAG_INT)) return tag.getInt(NBT_TRANSFER_TIME);
 		}
 		return 0;
 	}
 	
 	public static void setTransferTime(ItemStack stack, int transferTime)
 	{
-		if (!stack.hasTagCompound()) stack.setTagCompound(new NBTTagCompound());
-		
-		stack.getTagCompound().setInteger(NBT_TRANSFER_TIME, transferTime);
+		stack.setTagInfo(NBT_TRANSFER_TIME, new IntNBT(transferTime));
 	}
 	
 }

@@ -3,10 +3,10 @@ package fr.max2.factinventory.client.gui;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class CustomGuiUtils
 {
 	public static void drawRectWithSizedTexture(int x, int y, double z, int u, int v, int width, int height, int textureWidth, int textureHeight)

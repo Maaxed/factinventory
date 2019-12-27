@@ -1,0 +1,42 @@
+{
+	"item.factinventory.interaction_module": "Module d'interaction avec l'inventaire",
+	"item.factinventory.slow_inventory_hopper": "Entonnoir d'inventaire",
+	"item.factinventory.fast_inventory_hopper": "Entonnoir d'inventaire rapide",
+	"item.factinventory.inventory_furnace": "Fourneau d'inventaire",
+	"item.factinventory.inventory_dropper": "Dropper d'inventaire",
+	"item.factinventory.inventory_pump": "Pompe d'inventaire",
+	"item.factinventory.inventory_linker": "Connecteur d'inventaire",
+	
+	"itemGroup.factinventory.inventory_item_tab": "Items d'inventaire",
+	
+	"tooltip.interaction_info_on_shift.desc": "Maintenir §e§lMaj§r pour afficher les détails d'entrée/surtie",
+	"tooltip.input.desc": "Entrée",
+	"tooltip.output.desc": "Sortie",
+	"tooltip.ingredient_input.desc": "Entrée des ingrédients",
+	"tooltip.fuel_input.desc": "Entrées de combustible",
+	"tooltip.product_output.desc": "Sortie des produits",
+	"tooltip.progress_bar.full": "§2█§r",
+	"tooltip.progress_bar.empty": "§8█§r",
+	
+	"tooltip.smelting_info_on_ctrl.desc": "Maintenir §e§lCTRL§r pour afficher les détails de cuisson",
+	"tooltip.not_smelting.desc": "Vide",
+	"tooltip.smelting_item.desc": "En train de cuire : %s",
+	"tooltip.not_burning.desc": "Ne chauffe pas",
+	"tooltip.burning_time.desc": "Brûle pendant : %d ticks",
+	
+	"tooltip.transfer_info_on_ctrl.desc": "Maintenir §e§lCTRL§r pour afficher les détails de transfert",
+	"tooltip.not_transferring.desc": "Vide",
+	"tooltip.transferring_item.desc": "En train de transférer : %s",
+	"tooltip.transfer_progress.desc": "Progrès du transfert : [%s]",
+	
+	"tooltip.drop_info_on_ctrl.desc": "Maintenir §e§lCTRL§r pour afficher les détails de l'inventaire",
+	"tooltip.not_dropping.desc": "Inventaire : Vide",
+	"tooltip.dropping_item.desc": "Inventaire : %s x%d",
+	"tooltip.drop_time.desc": "Durée de drop restante : %d ticks",
+	
+	"tooltip.linked_tile.desc": "Lié à : %s",
+	"tooltip.linked_other_dimension.desc": "Lié à : une autre dimension",
+	"tooltip.linked_unloaded.desc": "Lié à : bloc non chargé",
+	"tooltip.linked_missing.desc": "Non lié : bloc manquant",
+	"tooltip.not_linked.desc": "Non lié"
+}

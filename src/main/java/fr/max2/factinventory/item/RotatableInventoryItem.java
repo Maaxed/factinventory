@@ -1,80 +1,64 @@
 package fr.max2.factinventory.item;
 
 import fr.max2.factinventory.FactinventoryMod;
-import fr.max2.factinventory.item.mesh.StateMesh.MeshProperty;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public abstract class RotatableInventoryItem extends InventoryItem
 {
+	public static final Direction[] ITEM_DIRECTIONS = new Direction[]{Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST};
+
+	public static final ResourceLocation FACING_GETTER_LOC = new ResourceLocation(FactinventoryMod.MOD_ID, "facing");
+	private static final IItemPropertyGetter FACING_GETTER = (stack, worldIn, entityIn) -> getFacing(stack).getHorizontalIndex();
 	
-	protected static final MeshProperty PROPERTIE_ROTATION =  new MeshProperty("facing", "north", "south", "west", "east") 
+	public RotatableInventoryItem(Properties properties)
 	{
-		@Override
-		protected String getValue(ItemStack stack)
-		{
-			return getFacing(stack).getName2();
-		}
-	};
-	
-	private static final IItemPropertyGetter FACING_GETTER = new IItemPropertyGetter()
-	{
-		@Override
-		public float apply(ItemStack stack, World worldIn, EntityLivingBase entityIn)
-		{
-			return getFacing(stack).getHorizontalIndex() * 0.25f;
-		}
-	};
-	
-	public RotatableInventoryItem()
-	{
-		super();
+		super(properties);
 		this.addPropertyOverride(new ResourceLocation(FactinventoryMod.MOD_ID, "facing"), FACING_GETTER);
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand)
+	public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand)
 	{
 		ItemStack stack = player.getHeldItem(hand);
 		
 		rotate(stack);
 		
-		return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+		return new ActionResult<>(ActionResultType.SUCCESS, stack);
 	}
 	
 	
 	private static final String NBT_FACING = "facing";
 	
-	public static EnumFacing getFacing(ItemStack stack)
+	public static Direction getFacing(ItemStack stack)
 	{
-		if (stack.hasTagCompound())
+		if (stack.hasTag())
 		{
-			NBTTagCompound tag = stack.getTagCompound();
-			if (tag.hasKey(NBT_FACING, NBT.TAG_BYTE)) return EnumFacing.getHorizontal(tag.getByte(NBT_FACING));
+			CompoundNBT tag = stack.getTag();
+			if (tag.contains(NBT_FACING, NBT.TAG_BYTE)) return Direction.byHorizontalIndex(tag.getByte(NBT_FACING));
 		}
-		return EnumFacing.NORTH;
+		return Direction.NORTH;
 	}
 	
 	public static void rotate(ItemStack stack)
 	{
-		if (!stack.hasTagCompound()) stack.setTagCompound(new NBTTagCompound());
+		if (!stack.hasTag()) stack.setTag(new CompoundNBT());
 		
-		NBTTagCompound tag = stack.getTagCompound();
+		CompoundNBT tag = stack.getTag();
 		
-		EnumFacing face = tag.hasKey(NBT_FACING, NBT.TAG_BYTE) ? EnumFacing.getHorizontal(tag.getByte(NBT_FACING)) : EnumFacing.NORTH;
+		Direction face = tag.contains(NBT_FACING, NBT.TAG_BYTE) ? Direction.byHorizontalIndex(tag.getByte(NBT_FACING)) : Direction.NORTH;
 		face = face.rotateY();
 		
-		tag.setByte(NBT_FACING, (byte)face.getHorizontalIndex());
+		tag.putByte(NBT_FACING, (byte)face.getHorizontalIndex());
 	}
 	
 }

@@ -18,19 +18,19 @@
 	"overrides": [
         {
             "predicate": {
-				"factinventory:facing": 0.24
+				"factinventory:facing": 0.99
             },
             "model": "factinventory:item/fast_inventory_hopper_west"
         },
         {
             "predicate": {
-				"factinventory:facing": 0.49
+				"factinventory:facing": 1.99
             },
             "model": "factinventory:item/fast_inventory_hopper_north"
         },
         {
             "predicate": {
-				"factinventory:facing": 0.74
+				"factinventory:facing": 2.99
             },
             "model": "factinventory:item/fast_inventory_hopper_east"
         }

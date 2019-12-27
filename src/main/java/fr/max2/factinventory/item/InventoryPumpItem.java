@@ -3,107 +3,111 @@ package fr.max2.factinventory.item;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
+import fr.max2.factinventory.FactinventoryMod;
 import fr.max2.factinventory.client.gui.GuiRenderHandler.Icon;
-import fr.max2.factinventory.item.mesh.StateMesh;
-import fr.max2.factinventory.item.mesh.StateMesh.MeshProperty;
 import fr.max2.factinventory.utils.StringUtils;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Slot;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.IntNBT;
+import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
 
 public class InventoryPumpItem extends RotatableInventoryItem
 {
-	private static final MeshProperty[] PROPERTIES = { PROPERTIE_ROTATION , new MeshProperty("filled", "0", "1", "2", "3", "4", "5", "6", "7", "8")
+	public static final ResourceLocation FILL_GETTER_LOC = new ResourceLocation(FactinventoryMod.MOD_ID, "filled");
+	private static final IItemPropertyGetter FILL_GETTER = (stack, world, entity) ->
 	{
-		@Override
-		protected String getValue(ItemStack stack)
-		{
-			IFluidHandlerItem contentCapa = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null);
-			FluidStack fluid = contentCapa.drain(Fluid.BUCKET_VOLUME, false);
-			if (fluid == null || fluid.amount <= 0) return "0";
-			
-			int value = getTransferTime(stack);
-			if (value > 8) value = 8;
-			if (value < 0) value = 0;
-			return Integer.toString(value);
-		}
-	}};
+		IFluidHandlerItem contentCapa = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).orElse(null);
+		if (contentCapa == null) return 0;
+		
+		FluidStack fluid = contentCapa.drain(FluidAttributes.BUCKET_VOLUME, FluidAction.SIMULATE);
+		if (fluid.isEmpty()) return 0;
+		
+		int value = getTransferTime(stack);
+		if (value > 8) value = 8;
+		if (value < 0) value = 0;
+		return value;
+	};
 	
-	public static final StateMesh MESH = new StateMesh(PROPERTIES);
-	
-	public InventoryPumpItem()
+	public InventoryPumpItem(Properties properties)
 	{
-		super();
+		super(properties);
+		this.addPropertyOverride(FILL_GETTER_LOC, FILL_GETTER);
 	}
 	
 	@Override
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn)
+	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
 	{
-		if (GuiScreen.isShiftKeyDown())
+		if (Screen.hasShiftDown())
 		{
-			tooltip.add(TextFormatting.BLUE + I18n.format("tooltip.input.desc"));
-			tooltip.add(TextFormatting.GOLD + I18n.format("tooltip.output.desc"));
+			tooltip.add(new TranslationTextComponent("tooltip.input.desc").applyTextStyle(TextFormatting.BLUE));
+			tooltip.add(new TranslationTextComponent("tooltip.output.desc").applyTextStyle(TextFormatting.GOLD));
 		}
 		else
 		{
-			tooltip.add(I18n.format("tooltip.interaction_info_on_shift.desc"));
+			tooltip.add(new TranslationTextComponent("tooltip.interaction_info_on_shift.desc"));
 		}
 		
-		if (GuiScreen.isCtrlKeyDown())
+		if (Screen.hasControlDown())
 		{
-			FluidStack transferringItem = FluidUtil.getFluidContained(stack);
-			if (transferringItem == null)
+			FluidStack transferringItem = FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY);
+			if (transferringItem.isEmpty())
 			{
-				tooltip.add(I18n.format("tooltip.not_transferring.desc"));
+				tooltip.add(new TranslationTextComponent("tooltip.not_transferring.desc"));
 			}
 			else
 			{
-				tooltip.add(I18n.format("tooltip.transferring_item.desc", transferringItem.getLocalizedName()));
+				tooltip.add(new TranslationTextComponent("tooltip.transferring_item.desc", transferringItem.getDisplayName()));
 			}
 			
 			
-			tooltip.add(I18n.format("tooltip.transfer_progress.desc", StringUtils.progress(8 - getTransferTime(stack), 8)));
+			tooltip.add(new TranslationTextComponent("tooltip.transfer_progress.desc", StringUtils.progress(8 - getTransferTime(stack), 8)));
 		}
 		else
 		{
-			tooltip.add(I18n.format("tooltip.transfer_info_on_ctrl.desc"));
+			tooltip.add(new TranslationTextComponent("tooltip.transfer_info_on_ctrl.desc"));
 		}
 	}
 	
 	@Override
 	public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged)
 	{
-		return super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged) && (slotChanged || newStack.getItem() != oldStack.getItem() || newStack.getMetadata() != oldStack.getMetadata() || newStack.getCount() != oldStack.getCount());
+		return super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged) && (slotChanged || newStack.getItem() != oldStack.getItem() || newStack.getCount() != oldStack.getCount());
 	}
 	
 	@Override
-	protected void update(ItemStack stack, InventoryPlayer inv, EntityPlayer player, int itemSlot)
+	protected void update(ItemStack stack, PlayerInventory inv, PlayerEntity player, int itemSlot)
 	{
-		EnumFacing face = getFacing(stack);
+		Direction face = getFacing(stack);
 		
-		int width = InventoryPlayer.getHotbarSize(),
+		int width = PlayerInventory.getHotbarSize(),
 			height = inv.mainInventory.size() / width,
 			x = itemSlot % width,
 			y = itemSlot / width,
-			fillX = x - face.getFrontOffsetX(),
-			fillY = y - face.getFrontOffsetZ();
+			fillX = x - face.getXOffset(),
+			fillY = y - face.getZOffset();
 
 		if (fillY == 0 && y != 0) fillY = height;
 		else if (y == 0 && fillY ==  1) fillY = -1;
@@ -117,20 +121,18 @@ public class InventoryPumpItem extends RotatableInventoryItem
 			int fillSlot = fillX + width * fillY;
 			ItemStack fillStack = inv.getStackInSlot(fillSlot);
 			
-			IFluidHandlerItem contentCapa = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null);
+			IFluidHandlerItem contentCapa = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).orElseThrow(IllegalStateException::new);
 			
-			if (fillStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, face))
+			fillStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, face).ifPresent(fillCapa ->
 			{
 				int transferTime = getTransferTime(stack);
 				
-				IFluidHandlerItem fillCapa = fillStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, face);
-				
-				FluidStack fillFluid = contentCapa.drain(Fluid.BUCKET_VOLUME, false);
-				boolean canTransfer = fillFluid == null || transferTime > 4;
+				FluidStack fillFluid = contentCapa.drain(FluidAttributes.BUCKET_VOLUME, FluidAction.SIMULATE);
+				boolean canTransfer = fillFluid.isEmpty() || transferTime > 4;
 				
 				if (!canTransfer)
 				{
-					int val = fillCapa.fill(fillFluid, false);
+					int val = fillCapa.fill(fillFluid, FluidAction.SIMULATE);
 					if (val > 0)
 					{
 						canTransfer = true;
@@ -148,20 +150,20 @@ public class InventoryPumpItem extends RotatableInventoryItem
 						//updatePump(stack, inv, itemSlot);
 						
 						
-						if (fillFluid != null)
+						if (!fillFluid.isEmpty())
 						{
-							int val = fillCapa.fill(fillFluid, true);
+							int val = fillCapa.fill(fillFluid, FluidAction.EXECUTE);
 							if (val > 0)
 							{
-								fillFluid.amount = val;
-								contentCapa.drain(fillFluid, true);
+								fillFluid.setAmount(val);
+								contentCapa.drain(fillFluid, FluidAction.EXECUTE);
 								
 								inv.setInventorySlotContents(fillSlot, fillCapa.getContainer());
 							}
 						}
 						
-						int drainX = x + face.getFrontOffsetX(),
-							drainY = y + face.getFrontOffsetZ();
+						int drainX = x + face.getXOffset(),
+							drainY = y + face.getZOffset();
 						
 						if (drainY == 0 && y != 0) drainY = height;
 						else if (y == 0 && drainY == 1) drainY = -1;
@@ -175,55 +177,53 @@ public class InventoryPumpItem extends RotatableInventoryItem
 							
 							ItemStack drainStack = inv.getStackInSlot(drainSlot);
 							
-							if (drainStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, face.getOpposite()))
+							drainStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, face.getOpposite()).ifPresent(drainCapa ->
 							{
-								IFluidHandlerItem drainCapa = drainStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, face.getOpposite());
-								
-								FluidStack drainFluid = drainCapa.drain(Fluid.BUCKET_VOLUME, false);
-								if (drainFluid != null)
+								FluidStack drainFluid = drainCapa.drain(FluidAttributes.BUCKET_VOLUME, FluidAction.SIMULATE);
+								if (!drainFluid.isEmpty())
 								{
-									drainFluid.amount = contentCapa.fill(drainFluid, false);
-									if (drainFluid.amount > 0)
+									drainFluid.setAmount(contentCapa.fill(drainFluid, FluidAction.SIMULATE));
+									if (drainFluid.getAmount() > 0)
 									{
-										drainFluid.amount = fillCapa.fill(drainFluid, false);
-										if (drainFluid.amount > 0)
+										drainFluid.setAmount(fillCapa.fill(drainFluid, FluidAction.SIMULATE));
+										if (drainFluid.getAmount() > 0)
 										{
-											drainCapa.drain(drainFluid, true);
-											contentCapa.fill(drainFluid, true);
+											drainCapa.drain(drainFluid, FluidAction.EXECUTE);
+											contentCapa.fill(drainFluid, FluidAction.EXECUTE);
 											
 											inv.setInventorySlotContents(drainSlot, drainCapa.getContainer());
 											inv.setInventorySlotContents(fillSlot, fillCapa.getContainer());
 										}
 									}
 								}
-							}
+							});
 						}
 					}
 					setTransferTime(stack, transferTime);
 				}
-			}
+			});
 		}
 	}
 
 	@Override
-	public List<Icon> getRenderIcons(ItemStack stack, GuiContainer gui, Slot slot, InventoryPlayer inv)
+	public List<Icon> getRenderIcons(ItemStack stack, ContainerScreen<?> gui, Slot slot, PlayerInventory inv)
 	{
 		List<Icon> icons = new ArrayList<>();
 		
-		EnumFacing face = getFacing(stack);
+		Direction face = getFacing(stack);
 		
 		int itemSlot = slot.getSlotIndex(),
-			width = InventoryPlayer.getHotbarSize(),
+			width = PlayerInventory.getHotbarSize(),
 			height = inv.mainInventory.size() / width;
 		
 		if (itemSlot >= width * height) return icons;
 		
 		int x = itemSlot % width,
 			y = itemSlot / width,
-			extractX = x + face.getFrontOffsetX(),
-			extractY = y + face.getFrontOffsetZ(),
-			insertX  = x - face.getFrontOffsetX(),
-			insertY  = y - face.getFrontOffsetZ();
+			extractX = x + face.getXOffset(),
+			extractY = y + face.getZOffset(),
+			insertX  = x - face.getXOffset(),
+			insertY  = y - face.getZOffset();
 		
 		if (extractY == 0 && y != 0)
 			extractY = height;
@@ -245,14 +245,14 @@ public class InventoryPumpItem extends RotatableInventoryItem
 		
 		if (extractX >= 0 && extractX < width && extractY >= 0 && extractY < height)
 		{
-			Slot extractSlot = gui.inventorySlots.getSlotFromInventory(inv, extractX + width * extractY);
+			Slot extractSlot = findSlot(gui, slot, extractX + width * extractY);
 			icons.add(new Icon(extractSlot, face, 0x0099FF, true, false));
 		}
 		else icons.add(new Icon(null, face, 0x0099FF, true, true));
 		
 		if (insertX >= 0 && insertX < width && insertY >= 0 && insertY < height)
 		{
-			Slot fillSlot = gui.inventorySlots.getSlotFromInventory(inv, insertX + width * insertY);
+			Slot fillSlot = findSlot(gui, slot, insertX + width * insertY);
 			icons.add(new Icon(fillSlot, face.getOpposite(), 0xFF7700, false, false));
 		}
 		else icons.add(new Icon(null, face.getOpposite(), 0xFF7700, false, true));
@@ -261,9 +261,9 @@ public class InventoryPumpItem extends RotatableInventoryItem
 	}
 	
 	@Override
-	public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound nbt)
+	public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt)
 	{
-		return new FluidHandlerItemStack(stack, Fluid.BUCKET_VOLUME);
+		return new FluidHandlerItemStack(stack, FluidAttributes.BUCKET_VOLUME);
 	}
 	
 	/*private static final String NBT_TRANSFERRING_FLUID = "TransferringFluid";
@@ -290,19 +290,17 @@ public class InventoryPumpItem extends RotatableInventoryItem
 	
 	public static int getTransferTime(ItemStack stack)
 	{
-		if (stack.hasTagCompound())
+		if (stack.hasTag())
 		{
-			NBTTagCompound tag = stack.getTagCompound();
-			if (tag.hasKey(NBT_TRANSFER_TIME, NBT.TAG_INT)) return tag.getInteger(NBT_TRANSFER_TIME);
+			CompoundNBT tag = stack.getTag();
+			if (tag.contains(NBT_TRANSFER_TIME, NBT.TAG_INT)) return tag.getInt(NBT_TRANSFER_TIME);
 		}
 		return 0;
 	}
 	
 	public static void setTransferTime(ItemStack stack, int transferTime)
 	{
-		if (!stack.hasTagCompound()) stack.setTagCompound(new NBTTagCompound());
-		
-		stack.getTagCompound().setInteger(NBT_TRANSFER_TIME, transferTime);
+		stack.setTagInfo(NBT_TRANSFER_TIME, new IntNBT(transferTime));
 	}
 	
 }

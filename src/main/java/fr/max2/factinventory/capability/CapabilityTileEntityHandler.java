@@ -1,8 +1,8 @@
 package fr.max2.factinventory.capability;
 
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -17,16 +17,16 @@ public class CapabilityTileEntityHandler
 		INSTANCE;
 
 		@Override
-		public NBTBase writeNBT(Capability<ITileEntityHandler> capability, ITileEntityHandler instance, EnumFacing side)
+		public INBT writeNBT(Capability<ITileEntityHandler> capability, ITileEntityHandler instance, Direction side)
 		{
 			return ((InventoryLinkerHandler)instance).serializeNBT();
 		}
 
 		@Override
-		public void readNBT(Capability<ITileEntityHandler> capability, ITileEntityHandler instance, EnumFacing side, NBTBase nbt)
+		public void readNBT(Capability<ITileEntityHandler> capability, ITileEntityHandler instance, Direction side, INBT nbt)
 		{
-			if (nbt instanceof NBTTagCompound)
-				((InventoryLinkerHandler)instance).deserializeNBT((NBTTagCompound)nbt);
+			if (nbt instanceof CompoundNBT)
+				((InventoryLinkerHandler)instance).deserializeNBT((CompoundNBT)nbt);
 		}
 		
 	}

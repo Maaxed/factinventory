@@ -1,19 +1,16 @@
 package fr.max2.factinventory.proxy;
 
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 public class ServerProxy implements ISidedProxy
 {
-
-	@Override
-	public void preInit()
-	{ }
 	
 	@Override
-	public World getWorldByDimension(int dim)
+	public World getWorldByDimension(DimensionType dim)
 	{
-		return FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(dim);
+		return ServerLifecycleHooks.getCurrentServer().getWorld(dim);
 	}
 	
 }

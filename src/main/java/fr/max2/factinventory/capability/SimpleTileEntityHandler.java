@@ -3,23 +3,26 @@ package fr.max2.factinventory.capability;
 import javax.annotation.Nullable;
 
 import fr.max2.factinventory.FactinventoryMod;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.fml.common.thread.EffectiveSide;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
 
-public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializable<NBTTagCompound>
+public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializable<CompoundNBT>
 {
 	@Nullable
 	protected BlockPos targetPos;
 	@Nullable
-	protected EnumFacing targetSide;
-	protected int dim;
+	protected Direction targetSide;
+	@Nullable
+	protected DimensionType dim;
 	
 	@Override
 	public boolean hasTileData()
@@ -28,26 +31,30 @@ public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializ
 	}
 	
 	@Override
+	@Nullable
 	public BlockPos getTilePos()
 	{
 		return this.targetPos;
 	}
 	
 	@Override
-	public int getTileDim()
+	@Nullable
+	public DimensionType getTileDim()
 	{
 		return this.dim;
 	}
-	
+
+	@Nullable
 	protected World getWorld()
 	{
-		FMLCommonHandler handler = FMLCommonHandler.instance();
-		return handler.getEffectiveSide() == Side.CLIENT
+		if (this.dim == null) return null;
+		return EffectiveSide.get().isClient()
 			? FactinventoryMod.proxy.getWorldByDimension(this.dim)
-			: handler.getMinecraftServerInstance().getWorld(dim);
+			: ServerLifecycleHooks.getCurrentServer().getWorld(dim);
 	}
 	
 	@Override
+	@Nullable
 	public TileEntity getTile()
 	{
 		World world = this.getWorld();
@@ -56,7 +63,7 @@ public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializ
 	}
 
 	@Override
-	public void setTile(TileEntity tile, EnumFacing side)
+	public void setTile(@Nullable TileEntity tile, @Nullable Direction side)
 	{
 		if (tile == null)
 		{
@@ -65,7 +72,7 @@ public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializ
 		else
 		{
 			this.targetPos = tile.getPos();
-			this.dim = tile.getWorld().provider.getDimension();
+			this.dim = tile.getWorld().getDimension().getType();
 			this.targetSide = side;
 		}
 	}
@@ -73,37 +80,37 @@ public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializ
 	protected void reset()
 	{
 		this.targetPos = null;
-		this.dim = 0;
+		this.dim = null;
 		this.targetSide = null;
 	}
 
 	@Override
-	public NBTTagCompound serializeNBT()
+	public CompoundNBT serializeNBT()
 	{
-		NBTTagCompound data = new NBTTagCompound();
-		if (this.targetPos != null)
+		CompoundNBT data = new CompoundNBT();
+		if (hasTileData())
 		{
-			data.setInteger("link_x", this.targetPos.getX());
-			data.setInteger("link_y", this.targetPos.getY());
-			data.setInteger("link_z", this.targetPos.getZ());
-			data.setInteger("link_dimension", this.dim);
-			data.setByte("link_side", (byte) (this.targetSide == null ? -1 : this.targetSide.getIndex()));
+			data.putInt("link_x", this.targetPos.getX());
+			data.putInt("link_y", this.targetPos.getY());
+			data.putInt("link_z", this.targetPos.getZ());
+			data.putString("link_dimension", this.dim.getRegistryName().toString());
+			data.putByte("link_side", (byte) (this.targetSide == null ? -1 : this.targetSide.getIndex()));
 		}
 		return data;
 	}
 
 	@Override
-	public void deserializeNBT(NBTTagCompound nbt)
+	public void deserializeNBT(CompoundNBT nbt)
 	{
-		if (nbt.hasKey("link_dimension", NBT.TAG_INT))
+		if (nbt.contains("link_dimension", NBT.TAG_STRING))
 		{
-			this.targetPos = new BlockPos(nbt.getInteger("link_x"),
-										  nbt.getInteger("link_y"),
-										  nbt.getInteger("link_z"));
-			this.dim = nbt.getInteger("link_dimension");
+			this.targetPos = new BlockPos(nbt.getInt("link_x"),
+										  nbt.getInt("link_y"),
+										  nbt.getInt("link_z"));
+			this.dim = DimensionType.byName(new ResourceLocation(nbt.getString("link_dimension")));
 			byte side = nbt.getByte("link_side");
 			
-			this.targetSide = side == (byte)-1 ? null : EnumFacing.getFront(side);
+			this.targetSide = side == (byte)-1 ? null : Direction.byIndex(side);
 		}
 		else
 		{

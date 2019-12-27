@@ -1,28 +1,29 @@
 package fr.max2.factinventory.init;
 
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 import fr.max2.factinventory.FactinventoryMod;
+import fr.max2.factinventory.client.model.item.ModelFluidItem;
 import fr.max2.factinventory.item.FastInventoryHopperItem;
 import fr.max2.factinventory.item.InventoryDropperItem;
 import fr.max2.factinventory.item.InventoryFurnaceItem;
 import fr.max2.factinventory.item.InventoryLinkerItem;
 import fr.max2.factinventory.item.InventoryPumpItem;
 import fr.max2.factinventory.item.SlowInventoryHopperItem;
-import fr.max2.factinventory.item.mesh.IVarientMesh;
-import net.minecraft.client.renderer.block.model.ModelBakery;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.item.Item.Properties;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import net.minecraftforge.registries.ObjectHolder;
 
-@EventBusSubscriber
+@EventBusSubscriber(bus = Bus.MOD, modid = FactinventoryMod.MOD_ID)
 @ObjectHolder(FactinventoryMod.MOD_ID)
 public class ModItems
 {
@@ -34,68 +35,36 @@ public class ModItems
 	public static final InventoryLinkerItem INVENTORY_LINKER = null;
 	public static final Item INTERACTION_MODULE = null;
 	
+	private static final Supplier<Properties> DEFAULT_PROPERTIES = () -> new Properties().group(ModCreativeTabs.ITEMS_TAB);
+	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event)
 	{
-		Item slowInventoryHopper = name("slow_inventory_hopper", new SlowInventoryHopperItem()),
-			fastInventoryHopper = name("fast_inventory_hopper", new FastInventoryHopperItem()),
-			inventoryFurnace = name("inventory_furnace", new InventoryFurnaceItem()),
-			inventoryDropper = name("inventory_dropper", new InventoryDropperItem()),
-			inventoryPump = name("inventory_pump", new InventoryPumpItem()),
-			inventoryLinker = name("inventory_linker", new InventoryLinkerItem()),
-			interactionModule = name("interaction_module", new Item());
-		event.getRegistry().registerAll(slowInventoryHopper, fastInventoryHopper,
-										inventoryFurnace, inventoryDropper,
-										inventoryPump,
-										inventoryLinker,
-										interactionModule);
+		event.getRegistry().registerAll(
+			name("slow_inventory_hopper", SlowInventoryHopperItem::new),
+			name("fast_inventory_hopper", FastInventoryHopperItem::new),
+			name("inventory_furnace", InventoryFurnaceItem::new),
+			name("inventory_dropper", InventoryDropperItem::new),
+			name("inventory_pump", InventoryPumpItem::new),
+			name("inventory_linker", InventoryLinkerItem::new),
+			name("interaction_module", Item::new));
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
-	public static void registerRenders(ModelRegistryEvent event)
+	public static void initRendering(ModelRegistryEvent event)
 	{
-		registerRenderAll(SLOW_INVENTORY_HOPPER, FAST_INVENTORY_HOPPER,
-						  INVENTORY_FURNACE, INVENTORY_DROPPER,
-						  INVENTORY_LINKER,
-						  INTERACTION_MODULE);
-		registerCustomRender(INVENTORY_PUMP, InventoryPumpItem.MESH);
+		ModelLoaderRegistry.registerLoader(ModelFluidItem.LoaderDynFluid.INSTANCE);
 	}
 
-	@SideOnly(Side.CLIENT)
-	private static void registerRenderAll(Item... items)
+	private static <I extends Item> I name(String name, Function<Properties, I> itemConstructor)
 	{
-		for (Item item : items)
-		{
-			registerRender(item);
-		}
+	    return nameItem(name, itemConstructor.apply(DEFAULT_PROPERTIES.get()));
 	}
 
-	@SideOnly(Side.CLIENT)
-	private static void registerRender(Item item)
+	private static <I extends Item> I nameItem(String name, I item)
 	{
-		ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
-	}
-
-	@SideOnly(Side.CLIENT)
-	private static void registerCustomRender(Item item, IVarientMesh state)
-	{
-		ResourceLocation loc = item.getRegistryName();
-		ModelLoader.setCustomMeshDefinition(item, stack -> new ModelResourceLocation(loc, state.getVarient(stack)));
-		for (String varient : state.varients())
-		{
-			ModelBakery.registerItemVariants(item, new ModelResourceLocation(loc, varient));
-		}
-	}
-
-	private static <I extends Item> I name(String name, I item)
-	{
-		return name(name, item, ModCreativeTabs.ITEMS_TAB);
-	}
-
-	private static <I extends Item> I name(String name, I item, CreativeTabs tab)
-	{
-		item.setRegistryName(FactinventoryMod.MOD_ID, name).setUnlocalizedName(name).setCreativeTab(tab);
+		item.setRegistryName(FactinventoryMod.MOD_ID, name);
 	    return item;
 	}
 }

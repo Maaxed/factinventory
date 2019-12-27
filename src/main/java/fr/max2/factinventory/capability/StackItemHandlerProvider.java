@@ -1,15 +1,19 @@
 package fr.max2.factinventory.capability;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
-public class StackItemHandlerProvider extends ItemStackHandler implements ICapabilitySerializable<NBTTagCompound>
+public class StackItemHandlerProvider extends ItemStackHandler implements ICapabilitySerializable<CompoundNBT>
 {
 	
 	public StackItemHandlerProvider()
@@ -27,17 +31,13 @@ public class StackItemHandlerProvider extends ItemStackHandler implements ICapab
 	{
 		super(stacks);
 	}
-	
-	@Override
-	public boolean hasCapability(Capability<?> capability, EnumFacing facing)
-	{
-		return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
-	}
+
 
 	@Override
-	public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+	@Nonnull
+	public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side)
 	{
-		return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY ? CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this) : null;
+		return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.orEmpty(cap, LazyOptional.of(() -> this));
 	}
 	
 }

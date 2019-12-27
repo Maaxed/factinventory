@@ -1,7 +1,11 @@
 package fr.max2.factinventory.client.model.item;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 import java.util.function.Function;
 
 import javax.annotation.Nullable;
@@ -12,37 +16,48 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
 import fr.max2.factinventory.FactinventoryMod;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
+import fr.max2.factinventory.client.model.item.BakedModelFluidItem.FluidItemOverride;
+import fr.max2.factinventory.item.InventoryPumpItem;
+import fr.max2.factinventory.item.RotatableInventoryItem;
+import net.minecraft.client.renderer.model.BakedQuad;
+import net.minecraft.client.renderer.model.BlockModel;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.IUnbakedModel;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.model.ItemModelGenerator;
+import net.minecraft.client.renderer.model.ModelBakery;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.client.renderer.texture.ISprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.resources.IResourceManager;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.ForgeBlockStateV1.Transforms;
 import net.minecraftforge.client.model.ICustomModelLoader;
-import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.ItemLayerModel;
 import net.minecraftforge.client.model.ItemTextureQuadConverter;
-import net.minecraftforge.client.model.PerspectiveMapWrapper;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.registries.ForgeRegistries;
 
-@SideOnly(Side.CLIENT)
-public class ModelFluidItem implements IModel
+
+@OnlyIn(Dist.CLIENT)
+public class ModelFluidItem implements IUnbakedModel
 {
+	private static final ItemModelGenerator field_217854_z = new ItemModelGenerator();
+	
     public static final ModelResourceLocation LOCATION = new ModelResourceLocation(FactinventoryMod.loc("item/dyn_fluid"), "inventory");
-
+    
+    private static final Random RAND = new Random();
+    
     // minimal Z offset to prevent depth-fighting
     private static final float NORTH_Z_FLUID = 7.498f / 16f;
     private static final float SOUTH_Z_FLUID = 8.502f / 16f;
 
-    public static final IModel MODEL = new ModelFluidItem();
+    public static final IUnbakedModel MODEL = new ModelFluidItem();
 
     @Nullable
     private final ResourceLocation baseLocation;
@@ -62,18 +77,26 @@ public class ModelFluidItem implements IModel
         this.liquidLocation = liquidLocation;
         this.fluid = fluid;
     }
-
+    
     @Override
-    public Collection<ResourceLocation> getTextures()
+    public Collection<ResourceLocation> getTextures(Function<ResourceLocation, IUnbakedModel> modelGetter, Set<String> missingTextureErrors)
     {
         ImmutableSet.Builder<ResourceLocation> builder = ImmutableSet.builder();
         if (baseLocation != null)
             builder.add(baseLocation);
         if (liquidLocation != null)
             builder.add(liquidLocation);
+        if (fluid != null)
+            builder.add(fluid.getAttributes().getStillTexture());
 
         return builder.build();
     }
+
+	@Override
+	public Collection<ResourceLocation> getDependencies()
+	{
+		return ImmutableSet.of();
+	}
 
     /**
      * Allows to use different textures for the model.
@@ -84,7 +107,6 @@ public class ModelFluidItem implements IModel
     @Override
     public ModelFluidItem retexture(ImmutableMap<String, String> textures)
     {
-
         ResourceLocation base = baseLocation;
         ResourceLocation liquid = liquidLocation;
 
@@ -103,43 +125,71 @@ public class ModelFluidItem implements IModel
     @Override
     public ModelFluidItem process(ImmutableMap<String, String> customData)
     {
-        Fluid fluid = FluidRegistry.getFluid(customData.get("fluid"));
+        Fluid fluid = ForgeRegistries.FLUIDS.getValue(new ResourceLocation(customData.get("fluid")));
 
         if (fluid == null) fluid = this.fluid;
 
         // create new model with correct liquid
         return new ModelFluidItem(baseLocation, liquidLocation, fluid);
     }
+    
+    @Override
+    public IModelState getDefaultState()
+    {
+    	return Transforms.get("forge:default-item").get();
+    }
 
 	@Override
-	public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter)
+	@Nullable
+	public IBakedModel bake(ModelBakery bakery, Function<ResourceLocation, TextureAtlasSprite> spriteGetter, ISprite sprite, VertexFormat format)
 	{
-		ImmutableMap<TransformType, TRSRTransformation> transformMap = PerspectiveMapWrapper.getTransforms(state);
-		
-        TRSRTransformation transform = state.apply(Optional.empty()).orElse(TRSRTransformation.identity());
+        TRSRTransformation transform = sprite.getState().apply(Optional.empty()).orElse(TRSRTransformation.identity());
         TextureAtlasSprite particleSprite = null;
         ImmutableList.Builder<BakedQuad> builder = ImmutableList.builder();
+        
+        if (liquidLocation != null && fluid != null && fluid.getAttributes().getStillTexture() != null)
+        {
+            TextureAtlasSprite liquid = spriteGetter.apply(liquidLocation);
+            
+            //Try find fluid texture
+            TextureAtlasSprite fluidSprite = spriteGetter.apply(fluid.getAttributes().getStillTexture());
+            int color = fluid.getAttributes().getColor();
+            builder.addAll(ItemTextureQuadConverter.convertTextureVertical(format, transform, liquid, fluidSprite, NORTH_Z_FLUID, Direction.NORTH, color, 1));
+            builder.addAll(ItemTextureQuadConverter.convertTextureVertical(format, transform, liquid, fluidSprite, SOUTH_Z_FLUID, Direction.SOUTH, color, 1));
+            particleSprite = fluidSprite;
+        }
 
         if (baseLocation != null)
         {
-            IBakedModel model = (new ItemLayerModel(ImmutableList.of(baseLocation))).bake(state, format, bakedTextureGetter);
-            builder.addAll(model.getQuads(null, null, 0));
+        	BlockModel baseModel = new BlockModel(null, ImmutableList.of(), ImmutableMap.of("layer0", baseLocation.toString()), false, false, ItemCameraTransforms.DEFAULT, ImmutableList.of());
+            IBakedModel model = field_217854_z.makeItemModel(spriteGetter, baseModel).bake(bakery, baseModel, spriteGetter, sprite, format);
+            RAND.setSeed(42);
+            builder.addAll(model.getQuads(null, null, RAND));
             particleSprite = model.getParticleTexture();
         }
         
-        if (liquidLocation != null && fluid != null)
+        List<FluidItemOverride> overrides = new ArrayList<>();
+        
+        if (baseLocation == null && liquidLocation == null && fluid == null)
         {
-            TextureAtlasSprite liquid = bakedTextureGetter.apply(liquidLocation);
-            TextureAtlasSprite fluidSprite = bakedTextureGetter.apply(fluid.getStill());
-            int color = fluid.getColor();
-            builder.addAll(ItemTextureQuadConverter.convertTextureVertical(format, transform, liquid, fluidSprite, NORTH_Z_FLUID, EnumFacing.NORTH, color));
-            builder.addAll(ItemTextureQuadConverter.convertTextureVertical(format, transform, liquid, fluidSprite, SOUTH_Z_FLUID, EnumFacing.SOUTH, color));
+        	for (Direction dir : RotatableInventoryItem.ITEM_DIRECTIONS)
+    		{
+    			float dirValue = dir.getHorizontalIndex() - 0.01f;
+    			for (int filled = 0; filled <= 8; filled++)
+    			{
+    				float filledValue = filled - 0.01f;
+    				
+    				ResourceLocation model = new ModelResourceLocation(FactinventoryMod.loc("inventory_pump_" + dir.getName() + "_" + filled), "inventory");
+    				
+    				overrides.add(new FluidItemOverride(model, ImmutableMap.of(RotatableInventoryItem.FACING_GETTER_LOC, dirValue, InventoryPumpItem.FILL_GETTER_LOC, filledValue)));
+    			}
+    		}
         }
 
-        return new BakedModelFluidItem(this, builder.build(), particleSprite, format, Maps.immutableEnumMap(transformMap), Maps.newHashMap());
+        return new BakedModelFluidItem(bakery, this, builder.build(), particleSprite, format, sprite, Maps.newHashMap(), transform.isIdentity(), spriteGetter, overrides);
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
     public enum LoaderDynFluid implements ICustomModelLoader
     {
         INSTANCE;
@@ -147,11 +197,11 @@ public class ModelFluidItem implements IModel
         @Override
         public boolean accepts(ResourceLocation modelLocation)
         {
-            return modelLocation.getResourceDomain().equals(FactinventoryMod.MOD_ID) && modelLocation.getResourcePath().contains("dyn_fluid");
+            return modelLocation.getNamespace().equals(FactinventoryMod.MOD_ID) && modelLocation.getPath().contains("dyn_fluid");
         }
 
         @Override
-        public IModel loadModel(ResourceLocation modelLocation)
+        public IUnbakedModel loadModel(ResourceLocation modelLocation)
         {
             return MODEL;
         }

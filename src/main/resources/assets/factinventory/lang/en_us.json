@@ -1,0 +1,42 @@
+{
+	"item.factinventory.interaction_module": "Inventory Interaction Module",
+	"item.factinventory.slow_inventory_hopper": "Inventory Hopper",
+	"item.factinventory.fast_inventory_hopper": "Fast Inventory Hopper",
+	"item.factinventory.inventory_furnace": "Inventory Furnace",
+	"item.factinventory.inventory_dropper": "Inventory Dropper",
+	"item.factinventory.inventory_pump": "Inventory Pump",
+	"item.factinventory.inventory_linker": "Inventory linker",
+
+	"itemGroup.factinventory.inventory_item_tab": "Inventory Items",
+
+	"tooltip.interaction_info_on_shift.desc": "Hold §e§lSHIFT§r for input/output details",
+	"tooltip.input.desc": "Input",
+	"tooltip.output.desc": "Output",
+	"tooltip.ingredient_input.desc": "Ingredients input",
+	"tooltip.fuel_input.desc": "Fuel inputs",
+	"tooltip.product_output.desc": "Products output",
+	"tooltip.progress_bar.full": "§2█§r",
+	"tooltip.progress_bar.empty": "§8█§r",
+
+	"tooltip.smelting_info_on_ctrl.desc": "Hold §e§lCTRL§r for smelting details",
+	"tooltip.not_smelting.desc": "Empty",
+	"tooltip.smelting_item.desc": "Smelting: %s",
+	"tooltip.not_burning.desc": "Not burning",
+	"tooltip.burning_time.desc": "Burn time remaining: %d ticks",
+
+	"tooltip.transfer_info_on_ctrl.desc": "Hold §e§lCTRL§r for transfer details",
+	"tooltip.not_transferring.desc": "Empty",
+	"tooltip.transferring_item.desc": "Transferring: %s",
+	"tooltip.transfer_progress.desc": "Transfer progress:  [%s]",
+
+	"tooltip.drop_info_on_ctrl.desc": "Hold §e§lCTRL§r for inventory details",
+	"tooltip.not_dropping.desc": "Inventory: Empty",
+	"tooltip.dropping_item.desc": "Inventory: %s x%d",
+	"tooltip.drop_time.desc": "Drop time remaining: %d ticks",
+
+	"tooltip.linked_tile.desc": "Linked to: %s",
+	"tooltip.linked_other_dimension.desc": "Linked to: another dimension",
+	"tooltip.linked_unloaded.desc": "Linked to: unloaded block",
+	"tooltip.linked_missing.desc": "Not linked: missing block",
+	"tooltip.not_linked.desc": "Not linked"
+}

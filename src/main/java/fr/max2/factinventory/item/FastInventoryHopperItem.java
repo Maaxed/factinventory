@@ -1,34 +1,35 @@
 package fr.max2.factinventory.item;
 
 import fr.max2.factinventory.utils.InventoryUtils;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 public class FastInventoryHopperItem extends InventoryHopperItem
 {
 	
-	public FastInventoryHopperItem()
+	public FastInventoryHopperItem(Properties properties)
 	{
-		super();
+		super(properties);
 	}
 	
 	@Override
-	protected void update(ItemStack stack, InventoryPlayer inv, EntityPlayer player, int itemSlot)
+	protected void update(ItemStack stack, PlayerInventory inv, PlayerEntity player, int itemSlot)
 	{
-		EnumFacing face = getFacing(stack);
+		Direction face = getFacing(stack);
 		
-		int width = InventoryPlayer.getHotbarSize(),
+		int width = PlayerInventory.getHotbarSize(),
 			height = inv.mainInventory.size() / width,
 			x = itemSlot % width,
 			y = itemSlot / width,
-			extractX = x + face.getFrontOffsetX(),
-			extractY = y + face.getFrontOffsetZ(),
-			insertX  = x - face.getFrontOffsetX(),
-			insertY  = y - face.getFrontOffsetZ();
+			extractX = x + face.getXOffset(),
+			extractY = y + face.getZOffset(),
+			insertX  = x - face.getXOffset(),
+			insertY  = y - face.getZOffset();
 		
 		if (extractY == 0 && y != 0) extractY = height;
 		else if (y == 0 && extractY == 1) extractY = -1;
@@ -50,16 +51,18 @@ public class FastInventoryHopperItem extends InventoryHopperItem
 			
 			ItemStack extractStack = inv.getStackInSlot(extractSlot);
 			ItemStack insertStack = inv.getStackInSlot(insertSlot);
+
+			LazyOptional<IItemHandler> insertCapaOptional = insertStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face);
 			
-			if (!insertStack.isEmpty() && insertStack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face))
+			if (!insertStack.isEmpty() && insertCapaOptional.isPresent())
 			{
 				if (!extractStack.isEmpty())
 				{
-					if (extractStack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face.getOpposite()))
+					IItemHandler insertCapa = insertCapaOptional.orElse(null);
+					IItemHandler extractCapa = extractStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face.getOpposite()).orElse(null);
+					
+					if (extractCapa != null)
 					{
-						IItemHandler extractCapa = extractStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face.getOpposite());
-						IItemHandler insertCapa = insertStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face);
-						
 						int extractSlots = extractCapa.getSlots();
 						int insertSlots = insertCapa.getSlots();
 						for (int extractIndex = 0; extractIndex < extractSlots; extractIndex++)
@@ -82,8 +85,6 @@ public class FastInventoryHopperItem extends InventoryHopperItem
 					}
 					else
 					{
-						IItemHandler insertCapa = insertStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face);
-						
 						ItemStack extractedStack = extractStack.copy();
 						extractedStack.setCount(1);
 						
@@ -107,10 +108,10 @@ public class FastInventoryHopperItem extends InventoryHopperItem
 			}
 			else if (insertStack.isEmpty() || (insertStack.getCount() < insertStack.getMaxStackSize() && insertStack.getCount() < inv.getInventoryStackLimit()))
 			{
-				if (extractStack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face.getOpposite()))
+				IItemHandler extractCapa = extractStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face.getOpposite()).orElse(null);
+				
+				if (extractCapa != null)
 				{
-					IItemHandler extractCapa = extractStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face.getOpposite());
-					
 					int extractSlots = extractCapa.getSlots();
 					for (int extractIndex = 0; extractIndex < extractSlots; extractIndex++)
 					{
