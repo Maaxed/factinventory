@@ -221,7 +221,7 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 	
 	public static void setTransferTime(ItemStack stack, int transferTime)
 	{
-		stack.setTagInfo(NBT_TRANSFER_TIME, new IntNBT(transferTime));
+		stack.setTagInfo(NBT_TRANSFER_TIME, IntNBT.valueOf(transferTime));
 	}
 	
 }

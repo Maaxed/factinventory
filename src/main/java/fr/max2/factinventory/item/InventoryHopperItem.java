@@ -31,8 +31,8 @@ public abstract class InventoryHopperItem extends RotatableInventoryItem
 	{
 		if (Screen.hasShiftDown())
 		{
-			tooltip.add(new TranslationTextComponent("tooltip.input.desc").applyTextStyle(TextFormatting.BLUE));
-			tooltip.add(new TranslationTextComponent("tooltip.output.desc").applyTextStyle(TextFormatting.GOLD));
+			tooltip.add(new TranslationTextComponent("tooltip.input.desc").mergeStyle(TextFormatting.BLUE));
+			tooltip.add(new TranslationTextComponent("tooltip.output.desc").mergeStyle(TextFormatting.GOLD));
 		}
 		else
 		{

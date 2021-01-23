@@ -44,7 +44,7 @@ public class InventoryLinkerItem extends Item
 			
 			if (te == null)
 			{
-				if (worldIn == null || worldIn.getDimension().getType() == handler.getTileDim())
+				if (worldIn == null || worldIn.getDimensionKey() == handler.getTileWorld())
 				{
 					if (worldIn != null && worldIn.isBlockLoaded(handler.getTilePos()))
 					{
@@ -58,7 +58,7 @@ public class InventoryLinkerItem extends Item
 			{
 				ITextComponent name = null;
 				if (te instanceof INamedContainerProvider) name = ((INamedContainerProvider)te).getDisplayName();
-				if (name == null) name = te.getBlockState().getBlock().getNameTextComponent();
+				if (name == null) name = te.getBlockState().getBlock().getTranslatedName();
 				tooltip.add(new TranslationTextComponent("tooltip.linked_tile.desc", name));
 			}
 		}

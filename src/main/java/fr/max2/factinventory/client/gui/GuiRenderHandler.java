@@ -2,6 +2,7 @@ package fr.max2.factinventory.client.gui;
 
 import java.util.List;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 
 import fr.max2.factinventory.FactinventoryMod;
@@ -42,6 +43,7 @@ public class GuiRenderHandler
 				
 				ItemStack stack = slot.getStack();
 				PlayerInventory inv = (PlayerInventory) slot.inventory;
+				MatrixStack ms = event.getMatrixStack();
 				
 				List<Icon> icons = ((InventoryItem)stack.getItem()).getRenderIcons(stack, gui, slot, inv);
 				
@@ -49,12 +51,11 @@ public class GuiRenderHandler
 				{
 					if (icon.slot == null)
 					{
-						drawIOIcon(gui, slot.xPos + 18 * icon.face.getXOffset(), slot.yPos + 18 * icon.face.getZOffset(), icon.face, icon.color, icon.extract, icon.missing);
+						drawIOIcon(gui, ms, slot.xPos + 18 * icon.face.getXOffset(), slot.yPos + 18 * icon.face.getZOffset(), icon.face, icon.color, icon.extract, icon.missing);
 					}
-					else drawIOIcon(gui, icon.slot.xPos, icon.slot.yPos, icon.face, icon.color, icon.extract, icon.missing);
+					else drawIOIcon(gui, ms, icon.slot.xPos, icon.slot.yPos, icon.face, icon.color, icon.extract, icon.missing);
 				}
 				
-				GlStateManager.color3f(1.0f, 1.0f, 1.0f);
 		        GlStateManager.enableLighting();
 		        GlStateManager.enableDepthTest();
 		        RenderHelper.enableStandardItemLighting();
@@ -64,17 +65,16 @@ public class GuiRenderHandler
 	
 	public static final ResourceLocation ICONS = new ResourceLocation(FactinventoryMod.MOD_ID, "textures/gui/io_icons.png");
 	
-	public static void drawIOIcon(ContainerScreen<?> gui, int x, int y, Direction face, int color, boolean extract, boolean missing)
+	public static void drawIOIcon(ContainerScreen<?> gui, MatrixStack ms, int x, int y, Direction face, int color, boolean extract, boolean missing)
 	{
-		gui.getMinecraft().getTextureManager().bindTexture(new ResourceLocation(FactinventoryMod.MOD_ID, "textures/gui/io_icons.png"));
+		gui.getMinecraft().getTextureManager().bindTexture(ICONS);
 		
-		float r = (color >> 16 & 255) / 255.0F;
-		float g = (color >> 8 & 255) / 255.0F;
-		float b = (color & 255) / 255.0F;
-		GlStateManager.color3f(r, g, b);
+		int r = (color >> 16) & 255;
+		int g = (color >> 8) & 255;
+		int b = (color & 255);
 		
-		CustomGuiUtils.drawRectWithSizedTexture(x + gui.getGuiLeft(), y + gui.getGuiTop(), 400.0D, 16 * ((1 - face.getHorizontalIndex()) % 3),
-			(extract ? 0 : 16) + (missing ? 32 : 0), 16, 16, 64, 64);
+		CustomGuiUtils.drawRectWithSizedTexture(ms, x + gui.getGuiLeft(), y + gui.getGuiTop(), 400.0f, 16 * ((1 - face.getHorizontalIndex()) % 3),
+			(extract ? 0 : 16) + (missing ? 32 : 0), 16, 16, 64, 64, r, g, b, 255);
 	}
 	
 	public static class Icon
@@ -92,7 +92,6 @@ public class GuiRenderHandler
 			this.extract = extract;
 			this.missing = missing;
 		}
-		
 	}
 	
 }

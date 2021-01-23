@@ -15,7 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.IntNBT;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -120,7 +120,7 @@ public class InventoryDropperItem extends Item
 	
 	public static void setDropTime(ItemStack stack, int transferTime)
 	{
-		stack.setTagInfo(NBT_DROP_TIME, new IntNBT(transferTime));
+		stack.setTagInfo(NBT_DROP_TIME, IntNBT.valueOf(transferTime));
 	}
 
     /**
@@ -140,7 +140,7 @@ public class InventoryDropperItem extends Item
     	}
     	else
     	{
-    		Vec3d pos = entity.getEyePosition(1.0F);
+    		Vector3d pos = entity.getEyePosition(1.0F);
 
     		ItemEntity entityitem = new ItemEntity(worldIn, pos.x, pos.y, pos.z, stack);
             entityitem.setDefaultPickupDelay();

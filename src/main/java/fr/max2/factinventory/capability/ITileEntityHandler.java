@@ -4,8 +4,9 @@ import javax.annotation.Nullable;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
 
 public interface ITileEntityHandler
 {
@@ -14,7 +15,7 @@ public interface ITileEntityHandler
 	@Nullable
 	BlockPos getTilePos();
 	@Nullable
-	DimensionType getTileDim();
+	RegistryKey<World> getTileWorld();
 
 	@Nullable
 	TileEntity getTile();

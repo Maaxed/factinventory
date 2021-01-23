@@ -33,7 +33,7 @@ public class InventoryLinkerHandler extends SimpleTileEntityHandler implements I
 		
 		if (cap == CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY && this.stack != null)
 		{
-			return te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, this.targetSide).map(fluidHandler -> new ToFluidItemHandler(this.stack, fluidHandler)).cast();
+			return te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, this.targetSide).lazyMap(fluidHandler -> new ToFluidItemHandler(this.stack, fluidHandler)).cast();
 		}
 		
 		return te.getCapability(cap, this.targetSide);

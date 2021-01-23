@@ -4,14 +4,16 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import fr.max2.factinventory.FactinventoryMod;
-import fr.max2.factinventory.client.model.item.ModelFluidItem;
+import fr.max2.factinventory.client.model.item.RecursiveOverrideModel;
 import fr.max2.factinventory.item.FastInventoryHopperItem;
 import fr.max2.factinventory.item.InventoryDropperItem;
 import fr.max2.factinventory.item.InventoryFurnaceItem;
 import fr.max2.factinventory.item.InventoryLinkerItem;
 import fr.max2.factinventory.item.InventoryPumpItem;
+import fr.max2.factinventory.item.RotatableInventoryItem;
 import fr.max2.factinventory.item.SlowInventoryHopperItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.item.Item.Properties;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -21,6 +23,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.ObjectHolder;
 
 @EventBusSubscriber(bus = Bus.MOD, modid = FactinventoryMod.MOD_ID)
@@ -35,7 +38,7 @@ public class ModItems
 	public static final InventoryLinkerItem INVENTORY_LINKER = null;
 	public static final Item INTERACTION_MODULE = null;
 	
-	private static final Supplier<Properties> DEFAULT_PROPERTIES = () -> new Properties().group(ModCreativeTabs.ITEMS_TAB);
+	private static final Supplier<Properties> DEFAULT_PROPERTIES = () -> new Properties().group(ModItemGroups.ITEM_TAB);
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event)
@@ -49,12 +52,22 @@ public class ModItems
 			name("inventory_linker", InventoryLinkerItem::new),
 			name("interaction_module", Item::new));
 	}
+	@OnlyIn(Dist.CLIENT)
+	@SubscribeEvent
+	public static void initRendering(FMLClientSetupEvent event)
+	{
+		ItemModelsProperties.registerProperty(INVENTORY_FURNACE, InventoryFurnaceItem.BURN_TIME_GETTER_LOC, InventoryFurnaceItem.BURN_TIME_GETTER);
+		ItemModelsProperties.registerProperty(SLOW_INVENTORY_HOPPER, RotatableInventoryItem.FACING_GETTER_LOC, RotatableInventoryItem.FACING_GETTER);
+		ItemModelsProperties.registerProperty(FAST_INVENTORY_HOPPER, RotatableInventoryItem.FACING_GETTER_LOC, RotatableInventoryItem.FACING_GETTER);
+		ItemModelsProperties.registerProperty(INVENTORY_PUMP, RotatableInventoryItem.FACING_GETTER_LOC, RotatableInventoryItem.FACING_GETTER);
+		ItemModelsProperties.registerProperty(INVENTORY_PUMP, InventoryPumpItem.FILL_GETTER_LOC, InventoryPumpItem.FILL_GETTER);
+	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void initRendering(ModelRegistryEvent event)
 	{
-		ModelLoaderRegistry.registerLoader(ModelFluidItem.LoaderDynFluid.INSTANCE);
+		ModelLoaderRegistry.registerLoader(RecursiveOverrideModel.Loader.ID, RecursiveOverrideModel.Loader.INSTANCE);
 	}
 
 	private static <I extends Item> I name(String name, Function<Properties, I> itemConstructor)

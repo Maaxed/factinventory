@@ -6,10 +6,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class ModCreativeTabs
+public class ModItemGroups
 {
-	
-	public static final ItemGroup ITEMS_TAB = new ItemGroup(FactinventoryMod.MOD_ID + ".inventory_item_tab")
+	public static final ItemGroup ITEM_TAB = new ItemGroup(FactinventoryMod.MOD_ID + ".inventory_item_tab")
 	{
 		
 		@Override
@@ -21,5 +20,4 @@ public class ModCreativeTabs
 		}
 		
 	};
-	
 }

@@ -11,7 +11,6 @@ import fr.max2.factinventory.utils.InventoryUtils;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -44,20 +43,14 @@ import net.minecraftforge.items.IItemHandler;
 
 public class InventoryFurnaceItem extends InventoryItem
 {
-
-	private static final IItemPropertyGetter BURN_TIME_GETTER = new IItemPropertyGetter()
-	{
-		@Override
-		public float call(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn)
-		{
-			return getStackBurnTime(stack);
-		}
-	};
+	public static final ResourceLocation BURN_TIME_GETTER_LOC = new ResourceLocation(FactinventoryMod.MOD_ID, "burn_time");
+	@OnlyIn(Dist.CLIENT)
+	public static final IItemPropertyGetter
+		BURN_TIME_GETTER = (stack, worldIn, entityIn) -> getStackBurnTime(stack);
 	
 	public InventoryFurnaceItem(Properties properties)
 	{
 		super(properties);
-		this.addPropertyOverride(new ResourceLocation(FactinventoryMod.MOD_ID, "burn_time"), BURN_TIME_GETTER);
 	}
 	
 	@Override
@@ -84,9 +77,9 @@ public class InventoryFurnaceItem extends InventoryItem
 	{
 		if (Screen.hasShiftDown())
 		{
-			tooltip.add(new TranslationTextComponent("tooltip.ingredient_input.desc").applyTextStyle(TextFormatting.BLUE));
-			tooltip.add(new TranslationTextComponent("tooltip.fuel_input.desc").applyTextStyle(TextFormatting.DARK_PURPLE));
-			tooltip.add(new TranslationTextComponent("tooltip.product_output.desc").applyTextStyle(TextFormatting.GOLD));
+			tooltip.add(new TranslationTextComponent("tooltip.ingredient_input.desc").mergeStyle(TextFormatting.BLUE));
+			tooltip.add(new TranslationTextComponent("tooltip.fuel_input.desc").mergeStyle(TextFormatting.DARK_PURPLE));
+			tooltip.add(new TranslationTextComponent("tooltip.product_output.desc").mergeStyle(TextFormatting.GOLD));
 		}
 		else
 		{
@@ -178,13 +171,15 @@ public class InventoryFurnaceItem extends InventoryItem
 	            			IInventory slotInv = new Inventory(currentSlot);
 	    	            	
 	    	            	FurnaceRecipe recipe = getSmeltingRecipe(player, slotInv);
-	    	            	
-	            			ItemStack result = recipe.getCraftingResult(slotInv);
-	            			if(!result.isEmpty() && canPush(result, outputStack, Direction.NORTH))
-	            			{
-	            				smeltingStack = inputCapa.extractItem(i, 1, false);
-	            				totalCookTime = recipe.getCookTime();
-	            			}
+	    	            	if (recipe != null)
+	    	            	{
+		            			ItemStack result = recipe.getCraftingResult(slotInv);
+		            			if(!result.isEmpty() && canPush(result, outputStack, Direction.NORTH))
+		            			{
+		            				smeltingStack = inputCapa.extractItem(i, 1, false);
+		            				totalCookTime = recipe.getCookTime();
+		            			}
+	    	            	}
 	            		}
 	            	}
 	            	else
@@ -192,17 +187,19 @@ public class InventoryFurnaceItem extends InventoryItem
 	            		IInventory slotInv = new Inventory(newInputStack);
     	            	
     	            	FurnaceRecipe recipe = getSmeltingRecipe(player, slotInv);
-    	            	
-            			ItemStack result = recipe.getCraftingResult(slotInv);
-	        			if(!result.isEmpty() && canPush(result, outputStack, Direction.NORTH))
-		            	{
-		            		smeltingStack = newInputStack.copy();
-		            		smeltingStack.setCount(1);
-		            		
-		            		newInputStack.shrink(1);
-		            		if (newInputStack.isEmpty()) inv.setInventorySlotContents(inputSlot, ItemStack.EMPTY);
-            				totalCookTime = recipe.getCookTime();
-		            	}
+    	            	if (recipe != null)
+    	            	{
+                			ItemStack result = recipe.getCraftingResult(slotInv);
+    	        			if(!result.isEmpty() && canPush(result, outputStack, Direction.NORTH))
+    		            	{
+    		            		smeltingStack = newInputStack.copy();
+    		            		smeltingStack.setCount(1);
+    		            		
+    		            		newInputStack.shrink(1);
+    		            		if (newInputStack.isEmpty()) inv.setInventorySlotContents(inputSlot, ItemStack.EMPTY);
+                				totalCookTime = recipe.getCookTime();
+    		            	}
+    	            	}
 	            	}
 	            	
 		            if (!smeltingStack.isEmpty())
@@ -303,67 +300,70 @@ public class InventoryFurnaceItem extends InventoryItem
     	                IInventory slotInv = new Inventory(smeltingStack);
     	            	
     	            	FurnaceRecipe recipe = getSmeltingRecipe(player, slotInv);
-	            		ItemStack result = recipe.getCraftingResult(inv);
-
-	            		IItemHandler outputHandler = outputStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.SOUTH).orElse(null);
-    	            	if (outputHandler != null)
-    	        		{
-    	            		if (canPush(result, outputHandler))
-    	            		{
-    	            			result.onCrafting(player.world, player, result.getCount());
-    	            			BasicEventHooks.firePlayerSmeltedEvent(player, result);
-    	            			push(result, outputHandler);
-    	            			smeltingStack = ItemStack.EMPTY;
-    	            		}
-    	        		}
-    	        		else
-    	        		{
-    	        			if (outputStack.isEmpty())
-    	        			{
-    	        				inv.setInventorySlotContents(outputSlot, result.copy());
-    	            			smeltingStack = ItemStack.EMPTY;
-    	        			}
-    	        			else if (InventoryUtils.canCombine(result, outputStack) && outputStack.getCount() + result.getCount() <= outputStack.getMaxStackSize() && outputStack.getCount() + result.getCount() <= inv.getInventoryStackLimit())
-    	        			{
-    	        				outputStack.grow(result.getCount());
-    	        				outputStack.onCrafting(player.world, player, result.getCount());
-    	        				BasicEventHooks.firePlayerSmeltedEvent(player, outputStack);
-    	            			smeltingStack = ItemStack.EMPTY;
-    	        			}
-    	        		}
-    	            	
-    		            if (smeltingStack.isEmpty())
-    		            {
-		                    int i = result.getCount();
-		                    float f = recipe.getExperience();
-
-		                    if (f == 0.0F)
-		                    {
-		                        i = 0;
-		                    }
-		                    else if (f < 1.0F)
-		                    {
-		                        int j = MathHelper.floor(i * f);
-
-		                        if (j < MathHelper.ceil(i * f) && Math.random() < i * f - j)
-		                        {
-		                            ++j;
-		                        }
-
-		                        i = j;
-		                    }
-		                    
-		                    while (i > 0)
-		                    {
-		                        int k = ExperienceOrbEntity.getXPSplit(i);
-		                        i -= k;
-		                        player.world.addEntity(new ExperienceOrbEntity(player.world, player.posX, player.posY + 0.5D, player.posZ + 0.5D, k));
-		                    }
-    		            	
-    	                	setCookTime(stack, 0);
-    		            	setSmeltingStack(stack, ItemStack.EMPTY);
-    		            	setTotalCookTime(stack, 200);
-    		            }
+    	            	if (recipe != null)
+    	            	{
+		            		ItemStack result = recipe.getCraftingResult(inv);
+	
+		            		IItemHandler outputHandler = outputStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.SOUTH).orElse(null);
+	    	            	if (outputHandler != null)
+	    	        		{
+	    	            		if (canPush(result, outputHandler))
+	    	            		{
+	    	            			result.onCrafting(player.world, player, result.getCount());
+	    	            			BasicEventHooks.firePlayerSmeltedEvent(player, result);
+	    	            			push(result, outputHandler);
+	    	            			smeltingStack = ItemStack.EMPTY;
+	    	            		}
+	    	        		}
+	    	        		else
+	    	        		{
+	    	        			if (outputStack.isEmpty())
+	    	        			{
+	    	        				inv.setInventorySlotContents(outputSlot, result.copy());
+	    	            			smeltingStack = ItemStack.EMPTY;
+	    	        			}
+	    	        			else if (InventoryUtils.canCombine(result, outputStack) && outputStack.getCount() + result.getCount() <= outputStack.getMaxStackSize() && outputStack.getCount() + result.getCount() <= inv.getInventoryStackLimit())
+	    	        			{
+	    	        				outputStack.grow(result.getCount());
+	    	        				outputStack.onCrafting(player.world, player, result.getCount());
+	    	        				BasicEventHooks.firePlayerSmeltedEvent(player, outputStack);
+	    	            			smeltingStack = ItemStack.EMPTY;
+	    	        			}
+	    	        		}
+	    	            	
+	    		            if (smeltingStack.isEmpty())
+	    		            {
+			                    int i = result.getCount();
+			                    float f = recipe.getExperience();
+	
+			                    if (f == 0.0F)
+			                    {
+			                        i = 0;
+			                    }
+			                    else if (f < 1.0F)
+			                    {
+			                        int j = MathHelper.floor(i * f);
+	
+			                        if (j < MathHelper.ceil(i * f) && Math.random() < i * f - j)
+			                        {
+			                            ++j;
+			                        }
+	
+			                        i = j;
+			                    }
+			                    
+			                    while (i > 0)
+			                    {
+			                        int k = ExperienceOrbEntity.getXPSplit(i);
+			                        i -= k;
+			                        player.world.addEntity(new ExperienceOrbEntity(player.world, player.getPosX(), player.getPosY() + 0.5D, player.getPosZ() + 0.5D, k));
+			                    }
+	    		            	
+	    	                	setCookTime(stack, 0);
+	    		            	setSmeltingStack(stack, ItemStack.EMPTY);
+	    		            	setTotalCookTime(stack, 200);
+	    		            }
+    	            	}
     	            }
                 	
                 }
@@ -477,7 +477,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	
 	public static void setBurnTime(ItemStack stack, int burnTime)
 	{
-		stack.setTagInfo(NBT_BURN_TIME, new IntNBT(burnTime));
+		stack.setTagInfo(NBT_BURN_TIME, IntNBT.valueOf(burnTime));
 	}
 	
 	
@@ -495,7 +495,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	
 	public static void setCookTime(ItemStack stack, int cookTime)
 	{
-		stack.setTagInfo(NBT_COOK_TIME, new IntNBT(cookTime));
+		stack.setTagInfo(NBT_COOK_TIME, IntNBT.valueOf(cookTime));
 	}
 	
 	
@@ -513,7 +513,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	
 	public static void setTotalCookTime(ItemStack stack, int cookTime)
 	{
-		stack.setTagInfo(NBT_TOTAL_COOK_TIME, new IntNBT(cookTime));
+		stack.setTagInfo(NBT_TOTAL_COOK_TIME, IntNBT.valueOf(cookTime));
 	}
 	
 	

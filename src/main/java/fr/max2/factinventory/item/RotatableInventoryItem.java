@@ -11,6 +11,8 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public abstract class RotatableInventoryItem extends InventoryItem
@@ -18,12 +20,13 @@ public abstract class RotatableInventoryItem extends InventoryItem
 	public static final Direction[] ITEM_DIRECTIONS = new Direction[]{Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST};
 
 	public static final ResourceLocation FACING_GETTER_LOC = new ResourceLocation(FactinventoryMod.MOD_ID, "facing");
-	private static final IItemPropertyGetter FACING_GETTER = (stack, worldIn, entityIn) -> getFacing(stack).getHorizontalIndex();
+	@OnlyIn(Dist.CLIENT)
+	public static final IItemPropertyGetter
+		FACING_GETTER = (stack, worldIn, entityIn) -> getFacing(stack).getHorizontalIndex();
 	
 	public RotatableInventoryItem(Properties properties)
 	{
 		super(properties);
-		this.addPropertyOverride(new ResourceLocation(FactinventoryMod.MOD_ID, "facing"), FACING_GETTER);
 	}
 	
 	@Override

@@ -6,10 +6,11 @@ import fr.max2.factinventory.FactinventoryMod;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.thread.EffectiveSide;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
@@ -22,7 +23,7 @@ public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializ
 	@Nullable
 	protected Direction targetSide;
 	@Nullable
-	protected DimensionType dim;
+	protected RegistryKey<World> worldKey;
 	
 	@Override
 	public boolean hasTileData()
@@ -39,18 +40,18 @@ public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializ
 	
 	@Override
 	@Nullable
-	public DimensionType getTileDim()
+	public RegistryKey<World> getTileWorld()
 	{
-		return this.dim;
+		return this.worldKey;
 	}
 
 	@Nullable
 	protected World getWorld()
 	{
-		if (this.dim == null) return null;
+		if (this.worldKey == null) return null;
 		return EffectiveSide.get().isClient()
-			? FactinventoryMod.proxy.getWorldByDimension(this.dim)
-			: ServerLifecycleHooks.getCurrentServer().getWorld(dim);
+			? FactinventoryMod.proxy.getWorldByDimension(this.worldKey)
+			: ServerLifecycleHooks.getCurrentServer().getWorld(this.worldKey);
 	}
 	
 	@Override
@@ -72,7 +73,7 @@ public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializ
 		else
 		{
 			this.targetPos = tile.getPos();
-			this.dim = tile.getWorld().getDimension().getType();
+			this.worldKey = tile.getWorld().getDimensionKey();
 			this.targetSide = side;
 		}
 	}
@@ -80,7 +81,7 @@ public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializ
 	protected void reset()
 	{
 		this.targetPos = null;
-		this.dim = null;
+		this.worldKey = null;
 		this.targetSide = null;
 	}
 
@@ -93,7 +94,7 @@ public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializ
 			data.putInt("link_x", this.targetPos.getX());
 			data.putInt("link_y", this.targetPos.getY());
 			data.putInt("link_z", this.targetPos.getZ());
-			data.putString("link_dimension", this.dim.getRegistryName().toString());
+			data.putString("link_dimension", this.worldKey.getLocation().toString());
 			data.putByte("link_side", (byte) (this.targetSide == null ? -1 : this.targetSide.getIndex()));
 		}
 		return data;
@@ -107,7 +108,7 @@ public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializ
 			this.targetPos = new BlockPos(nbt.getInt("link_x"),
 										  nbt.getInt("link_y"),
 										  nbt.getInt("link_z"));
-			this.dim = DimensionType.byName(new ResourceLocation(nbt.getString("link_dimension")));
+			this.worldKey = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(nbt.getString("link_dimension")));
 			byte side = nbt.getByte("link_side");
 			
 			this.targetSide = side == (byte)-1 ? null : Direction.byIndex(side);

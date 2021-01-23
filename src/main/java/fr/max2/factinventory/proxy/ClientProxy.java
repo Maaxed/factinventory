@@ -1,8 +1,8 @@
 package fr.max2.factinventory.proxy;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -11,10 +11,10 @@ public class ClientProxy implements ISidedProxy
 {
 	
 	@Override
-	public World getWorldByDimension(DimensionType dim)
+	public World getWorldByDimension(RegistryKey<World> worldKey)
 	{
 		World w = Minecraft.getInstance().world;
-		return w == null ? null : (w.getDimension().getType() == dim ? w : null);
+		return w == null ? null : (w.getDimensionKey() == worldKey ? w : null);
 	}
 	
 }

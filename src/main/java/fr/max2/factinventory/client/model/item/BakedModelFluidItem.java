@@ -19,7 +19,6 @@ import net.minecraft.client.renderer.model.IUnbakedModel;
 import net.minecraft.client.renderer.model.ItemOverride;
 import net.minecraft.client.renderer.model.ItemOverrideList;
 import net.minecraft.client.renderer.model.ModelBakery;
-import net.minecraft.client.renderer.texture.ISprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.entity.LivingEntity;
@@ -36,9 +35,9 @@ import net.minecraftforge.client.model.PerspectiveMapWrapper;
 import net.minecraftforge.fluids.FluidUtil;
 
 @OnlyIn(Dist.CLIENT)
-public class BakedModelFluidItem extends BakedItemModel
+public class BakedModelFluidItem //extends BakedItemModel //TODO fix or remove
 {
-	
+	/*
 	private final ModelFluidItem parent;
 	private final ISprite modelState;
 	// contains all the baked models since they'll never change
@@ -156,6 +155,6 @@ public class BakedModelFluidItem extends BakedItemModel
 			
 			return model;
 		}
-	}
+	}*/
 	
 }

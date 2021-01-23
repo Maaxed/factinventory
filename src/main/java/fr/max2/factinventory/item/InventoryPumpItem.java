@@ -24,6 +24,8 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.FluidAttributes;
@@ -37,24 +39,25 @@ import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
 public class InventoryPumpItem extends RotatableInventoryItem
 {
 	public static final ResourceLocation FILL_GETTER_LOC = new ResourceLocation(FactinventoryMod.MOD_ID, "filled");
-	private static final IItemPropertyGetter FILL_GETTER = (stack, world, entity) ->
-	{
-		IFluidHandlerItem contentCapa = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).orElse(null);
-		if (contentCapa == null) return 0;
-		
-		FluidStack fluid = contentCapa.drain(FluidAttributes.BUCKET_VOLUME, FluidAction.SIMULATE);
-		if (fluid.isEmpty()) return 0;
-		
-		int value = getTransferTime(stack);
-		if (value > 8) value = 8;
-		if (value < 0) value = 0;
-		return value;
-	};
+	@OnlyIn(Dist.CLIENT)
+	public static final IItemPropertyGetter
+		FILL_GETTER = (stack, world, entity) ->
+		{
+			IFluidHandlerItem contentCapa = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).orElse(null);
+			if (contentCapa == null) return 0;
+			
+			FluidStack fluid = contentCapa.drain(FluidAttributes.BUCKET_VOLUME, FluidAction.SIMULATE);
+			if (fluid.isEmpty()) return 0;
+			
+			int value = getTransferTime(stack);
+			if (value > 8) value = 8;
+			if (value < 0) value = 0;
+			return value;
+		};
 	
 	public InventoryPumpItem(Properties properties)
 	{
 		super(properties);
-		this.addPropertyOverride(FILL_GETTER_LOC, FILL_GETTER);
 	}
 	
 	@Override
@@ -62,8 +65,8 @@ public class InventoryPumpItem extends RotatableInventoryItem
 	{
 		if (Screen.hasShiftDown())
 		{
-			tooltip.add(new TranslationTextComponent("tooltip.input.desc").applyTextStyle(TextFormatting.BLUE));
-			tooltip.add(new TranslationTextComponent("tooltip.output.desc").applyTextStyle(TextFormatting.GOLD));
+			tooltip.add(new TranslationTextComponent("tooltip.input.desc").mergeStyle(TextFormatting.BLUE));
+			tooltip.add(new TranslationTextComponent("tooltip.output.desc").mergeStyle(TextFormatting.GOLD));
 		}
 		else
 		{
@@ -300,7 +303,7 @@ public class InventoryPumpItem extends RotatableInventoryItem
 	
 	public static void setTransferTime(ItemStack stack, int transferTime)
 	{
-		stack.setTagInfo(NBT_TRANSFER_TIME, new IntNBT(transferTime));
+		stack.setTagInfo(NBT_TRANSFER_TIME, IntNBT.valueOf(transferTime));
 	}
 	
 }

@@ -1,7 +1,0 @@
-{
-	"parent": "item/generated",
-	"textures": {
-		"layer0": "factinventory:items/inventory_pump/pump_0",
-		"layer1": "factinventory:items/inventory_pump/fluid_0"
-	}
-}
