@@ -40,7 +40,7 @@ public class ModLanguagesProvider implements IDataProvider
     	add(ModItems.INVENTORY_FURNACE, "Inventory Furnace", "Fourneau d'inventaire");
     	add(ModItems.INVENTORY_DROPPER, "Inventory Dropper", "Dropper d'inventaire");
     	add(ModItems.INVENTORY_PUMP, "Inventory Pump", "Pompe d'inventaire");
-    	add(ModItems.INVENTORY_LINKER, "Inventory linker", "Connecteur d'inventaire");
+    	add(ModItems.INVENTORY_LINKER, "[WIP] Inventory linker", "[WIP] Connecteur d'inventaire");
     	
     	// ItemGroups
     	add(ModItemGroups.ITEM_TAB, "Inventory Items", "Items d'inventaire");

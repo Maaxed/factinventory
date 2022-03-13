@@ -17,7 +17,7 @@ public class FactinventoryMod
 {
 	public static final String MOD_ID = "factinventory";
 	
-	public static final ISidedProxy proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> ServerProxy::new);
+	public static final ISidedProxy proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> ServerProxy::new);
 	
 	
 	public FactinventoryMod()

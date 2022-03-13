@@ -49,7 +49,7 @@ public class ModItems
 			name("inventory_furnace", InventoryFurnaceItem::new),
 			name("inventory_dropper", InventoryDropperItem::new),
 			name("inventory_pump", InventoryPumpItem::new),
-			name("inventory_linker", InventoryLinkerItem::new),
+			name("inventory_linker", prop -> new InventoryLinkerItem(prop.group(null))),
 			name("interaction_module", Item::new));
 	}
 	@OnlyIn(Dist.CLIENT)

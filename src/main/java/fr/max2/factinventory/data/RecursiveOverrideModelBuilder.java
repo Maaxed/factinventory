@@ -25,7 +25,7 @@ public class RecursiveOverrideModelBuilder<T extends ModelBuilder<T>> extends Cu
     public RecursiveOverrideModelBuilder<T> base(T modelBuilder)
     {
         Preconditions.checkNotNull(modelBuilder, "modelBuilder must not be null");
-        base = modelBuilder;
+        this.base = modelBuilder;
         return this;
     }
 
@@ -34,9 +34,9 @@ public class RecursiveOverrideModelBuilder<T extends ModelBuilder<T>> extends Cu
     {
         json = super.toJson(json);
 
-        if (base != null)
+        if (this.base != null)
         {
-            json.add("base", base.toJson());
+            json.add("base", this.base.toJson());
         }
 
         return json;

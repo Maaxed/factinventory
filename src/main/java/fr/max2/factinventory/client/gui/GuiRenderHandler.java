@@ -3,7 +3,7 @@ package fr.max2.factinventory.client.gui;
 import java.util.List;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import fr.max2.factinventory.FactinventoryMod;
 import fr.max2.factinventory.item.InventoryItem;
@@ -37,9 +37,12 @@ public class GuiRenderHandler
 			
 			if (slot != null && slot.inventory instanceof PlayerInventory && slot.getStack().getItem() instanceof InventoryItem)
 			{
-		        RenderHelper.disableStandardItemLighting();
-		        GlStateManager.disableDepthTest();
-		        GlStateManager.disableLighting();
+				RenderHelper.disableStandardItemLighting();
+				RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+				RenderSystem.enableBlend();
+				RenderSystem.defaultBlendFunc();
+				RenderSystem.enableDepthTest();
+				RenderSystem.enableAlphaTest();
 				
 				ItemStack stack = slot.getStack();
 				PlayerInventory inv = (PlayerInventory) slot.inventory;
@@ -56,9 +59,7 @@ public class GuiRenderHandler
 					else drawIOIcon(gui, ms, icon.slot.xPos, icon.slot.yPos, icon.face, icon.color, icon.extract, icon.missing);
 				}
 				
-		        GlStateManager.enableLighting();
-		        GlStateManager.enableDepthTest();
-		        RenderHelper.enableStandardItemLighting();
+				RenderHelper.enableStandardItemLighting();
 			}
 		}
 	}

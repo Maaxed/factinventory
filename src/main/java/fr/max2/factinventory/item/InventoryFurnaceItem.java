@@ -36,6 +36,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.hooks.BasicEventHooks;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -234,7 +235,7 @@ public class InventoryFurnaceItem extends InventoryItem
 							
 							if (AbstractFurnaceTileEntity.isFuel(testStack) || FurnaceFuelSlot.isBucket(testStack) && testStack.getItem() != Items.BUCKET)
 							{
-								burnTime = AbstractFurnaceTileEntity.getBurnTimes().get(testStack.getItem());
+								burnTime = ForgeHooks.getBurnTime(testStack, IRecipeType.SMELTING);
 								
 								if (burnTime > 0)
 								{
@@ -253,7 +254,7 @@ public class InventoryFurnaceItem extends InventoryItem
 					}
 					else if (AbstractFurnaceTileEntity.isFuel(fuelItem) || FurnaceFuelSlot.isBucket(fuelItem) && fuelItem.getItem() != Items.BUCKET)
 					{
-						burnTime = AbstractFurnaceTileEntity.getBurnTimes().get(fuelItem.getItem());
+						burnTime = ForgeHooks.getBurnTime(fuelItem, IRecipeType.SMELTING);
 						
 						if (burnTime > 0)
 						{
@@ -448,12 +449,6 @@ public class InventoryFurnaceItem extends InventoryItem
 		
 		
 		return icons;
-	}
-	
-	private static ItemStack getSmeltingResult(PlayerEntity player, ItemStack ingredient)
-	{
-        IInventory slotInv = new Inventory(ingredient);
-		return player.world.getRecipeManager().getRecipe(IRecipeType.SMELTING, slotInv, player.world).map(recipe -> recipe.getCraftingResult(slotInv)).orElse(ItemStack.EMPTY);
 	}
 	
 	private static FurnaceRecipe getSmeltingRecipe(PlayerEntity player, IInventory inv)

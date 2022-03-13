@@ -79,7 +79,8 @@ public class ModRecipeProvider extends RecipeProvider
 			.addCriterion("has_interactivity_modules", hasItem(ModItems.INTERACTION_MODULE))
 			.build(consumer);
 		
-		ShapedRecipeBuilder.shapedRecipe(ModItems.INVENTORY_LINKER)
+		// Inventory linker is too experimental
+		/*ShapedRecipeBuilder.shapedRecipe(ModItems.INVENTORY_LINKER)
 			.patternLine("DMD")
 			.patternLine("MEM")
 			.patternLine("DMD")
@@ -87,7 +88,7 @@ public class ModRecipeProvider extends RecipeProvider
 			.key('D', Tags.Items.GEMS_DIAMOND)
 			.key('E', Tags.Items.ENDER_PEARLS)
 			.addCriterion("has_interactivity_modules", hasItem(ModItems.INTERACTION_MODULE))
-			.build(consumer);
+			.build(consumer);*/
 	}
 	
 	@Override
