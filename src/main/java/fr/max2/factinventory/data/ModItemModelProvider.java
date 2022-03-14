@@ -104,24 +104,24 @@ public class ModItemModelProvider extends ItemModelProvider
 		for (Direction dir : RotatableInventoryItem.ITEM_DIRECTIONS)
 		{
 			boolean isMain = dir == Direction.SOUTH;
-			String modelSuffix = isMain ? "" : "_" + dir.getString();
+			String modelSuffix = isMain ? "" : "_" + dir.getName();
 			
 			// Hoppers
 			ItemModelBuilder rotatedBase = nested()
 				.parent(baseModel)
 				.transforms()
 					.transform(Perspective.GUI)
-						.rotation(0, 0, 180 - dir.getHorizontalAngle())
+						.rotation(0, 0, 180 - dir.toYRot())
 						.translation(0, 0, 0)
 						.scale(1)
 						.end()
 					.transform(Perspective.FIRSTPERSON_RIGHT)
-						.rotation(0, -90, 205 - dir.getHorizontalAngle())
+						.rotation(0, -90, 205 - dir.toYRot())
 						.translation(1.13f, 3.2f, 1.13f)
 						.scale(0.68f)
 						.end()
 					.transform(Perspective.FIRSTPERSON_LEFT)
-						.rotation(0, -90,  -155 + dir.getHorizontalAngle())
+						.rotation(0, -90,  -155 + dir.toYRot())
 						.translation(1.13f, 3.2f, 1.13f)
 						.scale(0.68f)
 						.end()
@@ -140,7 +140,7 @@ public class ModItemModelProvider extends ItemModelProvider
 			else
 			{
 				mainBase.override()
-					.predicate(RotatableInventoryItem.FACING_GETTER_LOC, dir.getHorizontalIndex() - 0.01f)
+					.predicate(RotatableInventoryItem.FACING_GETTER_LOC, dir.get3DDataValue() - 0.01f)
 					.model(rotatedModel)
 					.end();
 			}

@@ -28,11 +28,11 @@ public class InventoryDropperItem extends Item
 	
 	public InventoryDropperItem(Properties properties)
 	{
-		super(properties.maxStackSize(1));
+		super(properties.stacksTo(1));
 	}
 	
 	@Override
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
+	public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
 	{
 		if (Screen.hasControlDown())
 		{
@@ -57,13 +57,13 @@ public class InventoryDropperItem extends Item
 	@Override
 	public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged)
 	{
-		return super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged) && (slotChanged || newStack.getItem() != oldStack.getItem() || newStack.getCount() != oldStack.getCount() || !ItemStack.areItemStacksEqual(getContentStack(newStack), getContentStack(oldStack)));
+		return super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged) && (slotChanged || newStack.getItem() != oldStack.getItem() || newStack.getCount() != oldStack.getCount() || !ItemStack.matches(getContentStack(newStack), getContentStack(oldStack)));
 	}
 	
 	@Override
 	public void inventoryTick(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected)
 	{
-		if (!world.isRemote)
+		if (!world.isClientSide)
 		{
 			stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(inventory ->
 			{
@@ -120,7 +120,7 @@ public class InventoryDropperItem extends Item
 	
 	public static void setDropTime(ItemStack stack, int transferTime)
 	{
-		stack.setTagInfo(NBT_DROP_TIME, IntNBT.valueOf(transferTime));
+		stack.addTagElement(NBT_DROP_TIME, IntNBT.valueOf(transferTime));
 	}
 
     /**
@@ -128,14 +128,14 @@ public class InventoryDropperItem extends Item
      */
     protected static void playDispenseSound(World worldIn, Entity entity)
     {
-    	worldIn.playEvent(1000, entity.getPosition(), 0);
+    	worldIn.levelEvent(1000, entity.blockPosition(), 0);
     }
     
     protected static boolean doDispense(World worldIn, ItemStack stack, Entity entity)
     {
     	if (entity instanceof PlayerEntity)
     	{
-    		((PlayerEntity)entity).dropItem(stack, true, false);
+    		((PlayerEntity)entity).drop(stack, true, false);
     		return true;
     	}
     	else
@@ -143,13 +143,13 @@ public class InventoryDropperItem extends Item
     		Vector3d pos = entity.getEyePosition(1.0F);
 
     		ItemEntity entityitem = new ItemEntity(worldIn, pos.x, pos.y, pos.z, stack);
-            entityitem.setDefaultPickupDelay();
+            entityitem.setDefaultPickUpDelay();
             
-            float speed = worldIn.rand.nextFloat() * 0.5F;
-            float angle = worldIn.rand.nextFloat() * ((float)Math.PI * 2F);
-            entityitem.setMotion(-MathHelper.sin(angle) * speed, 0.20000000298023224D, MathHelper.cos(angle) * speed);
+            float speed = worldIn.random.nextFloat() * 0.5F;
+            float angle = worldIn.random.nextFloat() * ((float)Math.PI * 2F);
+            entityitem.setDeltaMovement(-MathHelper.sin(angle) * speed, 0.20000000298023224D, MathHelper.cos(angle) * speed);
             
-            return worldIn.addEntity(entityitem);
+            return worldIn.addFreshEntity(entityitem);
     	}
     }
 	

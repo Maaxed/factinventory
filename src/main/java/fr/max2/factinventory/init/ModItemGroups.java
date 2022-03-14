@@ -13,7 +13,7 @@ public class ModItemGroups
 		
 		@Override
 		@OnlyIn(Dist.CLIENT)
-		public ItemStack createIcon()
+		public ItemStack makeIcon()
 		{
 			ItemStack iStack = new ItemStack(ModItems.SLOW_INVENTORY_HOPPER);
 			return iStack;

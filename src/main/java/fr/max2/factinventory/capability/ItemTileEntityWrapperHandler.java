@@ -94,7 +94,7 @@ public class ItemTileEntityWrapperHandler implements IItemHandlerModifiable, ICa
 			int index = item.getByte("Slot");
 			if (index == slot)
 			{
-				return ItemStack.read(item);
+				return ItemStack.of(item);
 			}
 		}
 		
@@ -162,7 +162,7 @@ public class ItemTileEntityWrapperHandler implements IItemHandlerModifiable, ICa
 		
 		CompoundNBT newItemTag = new CompoundNBT();
 		newItemTag.putByte("Slot", (byte)slot);
-		stack.write(newItemTag);
+		stack.save(newItemTag);
 		
 		for (int i = 0, count = items.size(); i < count; i++)
 		{
@@ -206,7 +206,7 @@ public class ItemTileEntityWrapperHandler implements IItemHandlerModifiable, ICa
 		@Override
 		public boolean isItemValid(int slot, @Nonnull ItemStack stack)
 		{
-			return !(Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock);
+			return !(Block.byItem(stack.getItem()) instanceof ShulkerBoxBlock);
 		}
 		
 	}

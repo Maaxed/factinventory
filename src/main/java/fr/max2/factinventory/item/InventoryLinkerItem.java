@@ -30,12 +30,12 @@ public class InventoryLinkerItem extends Item
 	
 	public InventoryLinkerItem(Properties properties)
 	{
-		super(properties.maxStackSize(1));
+		super(properties.stacksTo(1));
 	}
 	
 	@Override
     @OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
+	public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
 	{
 		ITileEntityHandler handler = stack.getCapability(CapabilityTileEntityHandler.CAPABILITY_TILE, null).orElse(null);
 		if (handler != null && handler.hasTileData())
@@ -44,9 +44,9 @@ public class InventoryLinkerItem extends Item
 			
 			if (te == null)
 			{
-				if (worldIn == null || worldIn.getDimensionKey() == handler.getTileWorld())
+				if (worldIn == null || worldIn.dimension() == handler.getTileWorld())
 				{
-					if (worldIn != null && worldIn.isBlockLoaded(handler.getTilePos()))
+					if (worldIn != null && worldIn.hasChunkAt(handler.getTilePos()))
 					{
 						tooltip.add(new TranslationTextComponent("tooltip.linked_missing.desc"));
 					}
@@ -58,7 +58,7 @@ public class InventoryLinkerItem extends Item
 			{
 				ITextComponent name = null;
 				if (te instanceof INamedContainerProvider) name = ((INamedContainerProvider)te).getDisplayName();
-				if (name == null) name = te.getBlockState().getBlock().getTranslatedName();
+				if (name == null) name = te.getBlockState().getBlock().getName();
 				tooltip.add(new TranslationTextComponent("tooltip.linked_tile.desc", name));
 			}
 		}
@@ -66,22 +66,22 @@ public class InventoryLinkerItem extends Item
 	}
 	
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context)
+	public ActionResultType useOn(ItemUseContext context)
 	{
 		PlayerEntity player = context.getPlayer();
-		if (player == null || player.isSneaking())
+		if (player == null || player.isCrouching())
 		{
-			TileEntity te = context.getWorld().getTileEntity(context.getPos());
-			if (te != null && (te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, context.getFace()).isPresent() || te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, context.getFace()).isPresent()))
+			TileEntity te = context.getLevel().getBlockEntity(context.getClickedPos());
+			if (te != null && (te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, context.getClickedFace()).isPresent() || te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, context.getClickedFace()).isPresent()))
 			{
-				context.getItem().getCapability(CapabilityTileEntityHandler.CAPABILITY_TILE, null).ifPresent(handler -> handler.setTile(te, context.getFace()));
+				context.getItemInHand().getCapability(CapabilityTileEntityHandler.CAPABILITY_TILE, null).ifPresent(handler -> handler.setTile(te, context.getClickedFace()));
 				
 				return ActionResultType.SUCCESS;
 			}
 			
 			return ActionResultType.FAIL;
 		}
-		return super.onItemUse(context);
+		return super.useOn(context);
 	}
 	
 	@Override

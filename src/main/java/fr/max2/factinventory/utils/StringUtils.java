@@ -12,7 +12,7 @@ public class StringUtils
 	
 	public static String progress(int value, int max)
 	{
-		return multiply(I18n.format("tooltip.progress_bar.full"), value) + multiply(I18n.format("tooltip.progress_bar.empty"), max - value);
+		return multiply(I18n.get("tooltip.progress_bar.full"), value) + multiply(I18n.get("tooltip.progress_bar.empty"), max - value);
 	}
 	
 }

@@ -17,15 +17,15 @@ public class CustomGuiUtils
 		float f = 1.0f / textureWidth;
 		float f1 = 1.0f / textureHeight;
 		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder buffer = tessellator.getBuffer();
+		BufferBuilder buffer = tessellator.getBuilder();
 		buffer.begin(7, DefaultVertexFormats.POSITION_COLOR_TEX);
 		
-		Matrix4f mat = ms.getLast().getMatrix();
-		buffer.pos(mat, x        , y + height, z).color(r, g, b, a).tex( u * f         , (v + height) * f1).endVertex();
-		buffer.pos(mat, x + width, y + height, z).color(r, g, b, a).tex((u + width) * f, (v + height) * f1).endVertex();
-		buffer.pos(mat, x + width, y         , z).color(r, g, b, a).tex((u + width) * f,  v * f1          ).endVertex();
-		buffer.pos(mat, x        , y         , z).color(r, g, b, a).tex( u * f         ,  v * f1          ).endVertex();
+		Matrix4f mat = ms.last().pose();
+		buffer.vertex(mat, x        , y + height, z).color(r, g, b, a).uv( u * f         , (v + height) * f1).endVertex();
+		buffer.vertex(mat, x + width, y + height, z).color(r, g, b, a).uv((u + width) * f, (v + height) * f1).endVertex();
+		buffer.vertex(mat, x + width, y         , z).color(r, g, b, a).uv((u + width) * f,  v * f1          ).endVertex();
+		buffer.vertex(mat, x        , y         , z).color(r, g, b, a).uv( u * f         ,  v * f1          ).endVertex();
 		
-		tessellator.draw();
+		tessellator.end();
 	}
 }

@@ -18,10 +18,8 @@ public class ModItemTagsProvider extends ItemTagsProvider
     }
 
     @Override
-    public void registerTags()
-    {
-    	
-    }
+    protected void addTags()
+    { }
 
     @Override
     public String getName()

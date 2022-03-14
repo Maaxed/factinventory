@@ -61,12 +61,12 @@ public class InventoryPumpItem extends RotatableInventoryItem
 	}
 	
 	@Override
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
+	public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
 	{
 		if (Screen.hasShiftDown())
 		{
-			tooltip.add(new TranslationTextComponent("tooltip.input.desc").mergeStyle(TextFormatting.BLUE));
-			tooltip.add(new TranslationTextComponent("tooltip.output.desc").mergeStyle(TextFormatting.GOLD));
+			tooltip.add(new TranslationTextComponent("tooltip.input.desc").withStyle(TextFormatting.BLUE));
+			tooltip.add(new TranslationTextComponent("tooltip.output.desc").withStyle(TextFormatting.GOLD));
 		}
 		else
 		{
@@ -105,12 +105,12 @@ public class InventoryPumpItem extends RotatableInventoryItem
 	{
 		Direction face = getFacing(stack);
 		
-		int width = PlayerInventory.getHotbarSize(),
-			height = inv.mainInventory.size() / width,
+		int width = PlayerInventory.getSelectionSize(),
+			height = inv.items.size() / width,
 			x = itemSlot % width,
 			y = itemSlot / width,
-			fillX = x - face.getXOffset(),
-			fillY = y - face.getZOffset();
+			fillX = x - face.getStepX(),
+			fillY = y - face.getStepZ();
 
 		if (fillY == 0 && y != 0) fillY = height;
 		else if (y == 0 && fillY ==  1) fillY = -1;
@@ -122,7 +122,7 @@ public class InventoryPumpItem extends RotatableInventoryItem
 			fillY >= 0 && fillY < height)
 		{
 			int fillSlot = fillX + width * fillY;
-			ItemStack fillStack = inv.getStackInSlot(fillSlot);
+			ItemStack fillStack = inv.getItem(fillSlot);
 			
 			IFluidHandlerItem contentCapa = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).orElseThrow(IllegalStateException::new);
 			
@@ -161,12 +161,12 @@ public class InventoryPumpItem extends RotatableInventoryItem
 								fillFluid.setAmount(val);
 								contentCapa.drain(fillFluid, FluidAction.EXECUTE);
 								
-								inv.setInventorySlotContents(fillSlot, fillCapa.getContainer());
+								inv.setItem(fillSlot, fillCapa.getContainer());
 							}
 						}
 						
-						int drainX = x + face.getXOffset(),
-							drainY = y + face.getZOffset();
+						int drainX = x + face.getStepX(),
+							drainY = y + face.getStepZ();
 						
 						if (drainY == 0 && y != 0) drainY = height;
 						else if (y == 0 && drainY == 1) drainY = -1;
@@ -178,7 +178,7 @@ public class InventoryPumpItem extends RotatableInventoryItem
 						{
 							int drainSlot = drainX + width * drainY;
 							
-							ItemStack drainStack = inv.getStackInSlot(drainSlot);
+							ItemStack drainStack = inv.getItem(drainSlot);
 							
 							drainStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, face.getOpposite()).ifPresent(drainCapa ->
 							{
@@ -194,8 +194,8 @@ public class InventoryPumpItem extends RotatableInventoryItem
 											drainCapa.drain(drainFluid, FluidAction.EXECUTE);
 											contentCapa.fill(drainFluid, FluidAction.EXECUTE);
 											
-											inv.setInventorySlotContents(drainSlot, drainCapa.getContainer());
-											inv.setInventorySlotContents(fillSlot, fillCapa.getContainer());
+											inv.setItem(drainSlot, drainCapa.getContainer());
+											inv.setItem(fillSlot, fillCapa.getContainer());
 										}
 									}
 								}
@@ -216,17 +216,17 @@ public class InventoryPumpItem extends RotatableInventoryItem
 		Direction face = getFacing(stack);
 		
 		int itemSlot = slot.getSlotIndex(),
-			width = PlayerInventory.getHotbarSize(),
-			height = inv.mainInventory.size() / width;
+			width = PlayerInventory.getSelectionSize(),
+			height = inv.items.size() / width;
 		
 		if (itemSlot >= width * height) return icons;
 		
 		int x = itemSlot % width,
 			y = itemSlot / width,
-			extractX = x + face.getXOffset(),
-			extractY = y + face.getZOffset(),
-			insertX  = x - face.getXOffset(),
-			insertY  = y - face.getZOffset();
+			extractX = x + face.getStepX(),
+			extractY = y + face.getStepZ(),
+			insertX  = x - face.getStepX(),
+			insertY  = y - face.getStepZ();
 		
 		if (extractY == 0 && y != 0)
 			extractY = height;
@@ -303,7 +303,7 @@ public class InventoryPumpItem extends RotatableInventoryItem
 	
 	public static void setTransferTime(ItemStack stack, int transferTime)
 	{
-		stack.setTagInfo(NBT_TRANSFER_TIME, IntNBT.valueOf(transferTime));
+		stack.addTagElement(NBT_TRANSFER_TIME, IntNBT.valueOf(transferTime));
 	}
 	
 }

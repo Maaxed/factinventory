@@ -21,7 +21,7 @@ public class CapabilityHandler
 	public static void attachCapabilitiesToItem(AttachCapabilitiesEvent<ItemStack> event)
 	{
 		ItemStack stack = event.getObject();
-		if (Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock)
+		if (Block.byItem(stack.getItem()) instanceof ShulkerBoxBlock)
 			event.addCapability(WRAPPER_NAME, new ItemTileEntityWrapperHandler.ShulkerBox(stack, 27));
 	}
 	

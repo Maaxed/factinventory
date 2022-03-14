@@ -51,7 +51,7 @@ public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializ
 		if (this.worldKey == null) return null;
 		return EffectiveSide.get().isClient()
 			? FactinventoryMod.proxy.getWorldByDimension(this.worldKey)
-			: ServerLifecycleHooks.getCurrentServer().getWorld(this.worldKey);
+			: ServerLifecycleHooks.getCurrentServer().getLevel(this.worldKey);
 	}
 	
 	@Override
@@ -60,7 +60,7 @@ public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializ
 	{
 		World world = this.getWorld();
 		
-		return world == null || this.targetPos == null ? null : world.getTileEntity(this.targetPos);
+		return world == null || this.targetPos == null ? null : world.getBlockEntity(this.targetPos);
 	}
 
 	@Override
@@ -72,8 +72,8 @@ public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializ
 		}
 		else
 		{
-			this.targetPos = tile.getPos();
-			this.worldKey = tile.getWorld().getDimensionKey();
+			this.targetPos = tile.getBlockPos();
+			this.worldKey = tile.getLevel().dimension();
 			this.targetSide = side;
 		}
 	}
@@ -94,8 +94,8 @@ public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializ
 			data.putInt("link_x", this.targetPos.getX());
 			data.putInt("link_y", this.targetPos.getY());
 			data.putInt("link_z", this.targetPos.getZ());
-			data.putString("link_dimension", this.worldKey.getLocation().toString());
-			data.putByte("link_side", (byte) (this.targetSide == null ? -1 : this.targetSide.getIndex()));
+			data.putString("link_dimension", this.worldKey.location().toString());
+			data.putByte("link_side", (byte) (this.targetSide == null ? -1 : this.targetSide.get3DDataValue()));
 		}
 		return data;
 	}
@@ -108,10 +108,10 @@ public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializ
 			this.targetPos = new BlockPos(nbt.getInt("link_x"),
 										  nbt.getInt("link_y"),
 										  nbt.getInt("link_z"));
-			this.worldKey = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(nbt.getString("link_dimension")));
+			this.worldKey = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(nbt.getString("link_dimension")));
 			byte side = nbt.getByte("link_side");
 			
-			this.targetSide = side == (byte)-1 ? null : Direction.byIndex(side);
+			this.targetSide = side == (byte)-1 ? null : Direction.from3DDataValue(side);
 		}
 		else
 		{

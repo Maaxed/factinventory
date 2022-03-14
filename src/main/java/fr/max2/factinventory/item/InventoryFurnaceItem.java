@@ -74,13 +74,13 @@ public class InventoryFurnaceItem extends InventoryItem
 	
 	@Override
     @OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
+	public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
 	{
 		if (Screen.hasShiftDown())
 		{
-			tooltip.add(new TranslationTextComponent("tooltip.ingredient_input.desc").mergeStyle(TextFormatting.BLUE));
-			tooltip.add(new TranslationTextComponent("tooltip.fuel_input.desc").mergeStyle(TextFormatting.DARK_PURPLE));
-			tooltip.add(new TranslationTextComponent("tooltip.product_output.desc").mergeStyle(TextFormatting.GOLD));
+			tooltip.add(new TranslationTextComponent("tooltip.ingredient_input.desc").withStyle(TextFormatting.BLUE));
+			tooltip.add(new TranslationTextComponent("tooltip.fuel_input.desc").withStyle(TextFormatting.DARK_PURPLE));
+			tooltip.add(new TranslationTextComponent("tooltip.product_output.desc").withStyle(TextFormatting.GOLD));
 		}
 		else
 		{
@@ -118,8 +118,8 @@ public class InventoryFurnaceItem extends InventoryItem
 	@Override
 	protected void update(ItemStack stack, PlayerInventory inv, PlayerEntity player, int itemSlot)
 	{
-		int width = PlayerInventory.getHotbarSize(),
-			height = inv.mainInventory.size() / width,
+		int width = PlayerInventory.getSelectionSize(),
+			height = inv.items.size() / width,
 			x = itemSlot % width,
 			y = itemSlot / width;
 		
@@ -155,12 +155,12 @@ public class InventoryFurnaceItem extends InventoryItem
 			if (inputY >= 0 && inputY < height && outputY >= 0 && outputY < height)
 			{
 				int inputSlot = inputX + width * inputY;
-	            ItemStack newInputStack = inv.getStackInSlot(inputSlot);
+	            ItemStack newInputStack = inv.getItem(inputSlot);
 	            
 	            if (!newInputStack.isEmpty())
 	            {
 					int outputSlot = outputX + width * outputY;
-	            	ItemStack outputStack = inv.getStackInSlot(outputSlot);
+	            	ItemStack outputStack = inv.getItem(outputSlot);
             		IItemHandler inputCapa = newInputStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.SOUTH).orElse(null);
 	            	if (inputCapa != null)
 	            	{
@@ -174,11 +174,11 @@ public class InventoryFurnaceItem extends InventoryItem
 	    	            	FurnaceRecipe recipe = getSmeltingRecipe(player, slotInv);
 	    	            	if (recipe != null)
 	    	            	{
-		            			ItemStack result = recipe.getCraftingResult(slotInv);
+		            			ItemStack result = recipe.assemble(slotInv);
 		            			if(!result.isEmpty() && canPush(result, outputStack, Direction.NORTH))
 		            			{
 		            				smeltingStack = inputCapa.extractItem(i, 1, false);
-		            				totalCookTime = recipe.getCookTime();
+		            				totalCookTime = recipe.getCookingTime();
 		            			}
 	    	            	}
 	            		}
@@ -190,15 +190,15 @@ public class InventoryFurnaceItem extends InventoryItem
     	            	FurnaceRecipe recipe = getSmeltingRecipe(player, slotInv);
     	            	if (recipe != null)
     	            	{
-                			ItemStack result = recipe.getCraftingResult(slotInv);
+                			ItemStack result = recipe.assemble(slotInv);
     	        			if(!result.isEmpty() && canPush(result, outputStack, Direction.NORTH))
     		            	{
     		            		smeltingStack = newInputStack.copy();
     		            		smeltingStack.setCount(1);
     		            		
     		            		newInputStack.shrink(1);
-    		            		if (newInputStack.isEmpty()) inv.setInventorySlotContents(inputSlot, ItemStack.EMPTY);
-                				totalCookTime = recipe.getCookTime();
+    		            		if (newInputStack.isEmpty()) inv.setItem(inputSlot, ItemStack.EMPTY);
+                				totalCookTime = recipe.getCookingTime();
     		            	}
     	            	}
 	            	}
@@ -217,12 +217,12 @@ public class InventoryFurnaceItem extends InventoryItem
 			// Try fill with fuel
 			for (Direction side : FUEL_SIDE)
 			{
-				int fuelX = x + side.getXOffset(), fuelY = y;
+				int fuelX = x + side.getStepX(), fuelY = y;
 				
 				if (fuelX >= 0 && fuelX < width)
 				{
 					int fuelSlot = fuelX + width * fuelY;
-					ItemStack fuelItem = inv.getStackInSlot(fuelSlot);
+					ItemStack fuelItem = inv.getItem(fuelSlot);
 
 					IItemHandler fuelCapa = fuelItem.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side).orElse(null);
 					if (fuelCapa != null)
@@ -263,7 +263,7 @@ public class InventoryFurnaceItem extends InventoryItem
 							
 							if (fuelItem.isEmpty())
 							{
-								inv.setInventorySlotContents(fuelSlot, item.getContainerItem(fuelItem));
+								inv.setItem(fuelSlot, item.getContainerItem(fuelItem));
 							}
 							setBurnTime(stack, burnTime);
 						}
@@ -297,20 +297,20 @@ public class InventoryFurnaceItem extends InventoryItem
         			if (outputY >= 0 && outputY < height)
         			{
     					int outputSlot = outputX + width * outputY;
-    	            	ItemStack outputStack = inv.getStackInSlot(outputSlot);
+    	            	ItemStack outputStack = inv.getItem(outputSlot);
     	                IInventory slotInv = new Inventory(smeltingStack);
     	            	
     	            	FurnaceRecipe recipe = getSmeltingRecipe(player, slotInv);
     	            	if (recipe != null)
     	            	{
-		            		ItemStack result = recipe.getCraftingResult(inv);
+		            		ItemStack result = recipe.assemble(inv);
 	
 		            		IItemHandler outputHandler = outputStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.SOUTH).orElse(null);
 	    	            	if (outputHandler != null)
 	    	        		{
 	    	            		if (canPush(result, outputHandler))
 	    	            		{
-	    	            			result.onCrafting(player.world, player, result.getCount());
+	    	            			result.onCraftedBy(player.level, player, result.getCount());
 	    	            			BasicEventHooks.firePlayerSmeltedEvent(player, result);
 	    	            			push(result, outputHandler);
 	    	            			smeltingStack = ItemStack.EMPTY;
@@ -320,13 +320,13 @@ public class InventoryFurnaceItem extends InventoryItem
 	    	        		{
 	    	        			if (outputStack.isEmpty())
 	    	        			{
-	    	        				inv.setInventorySlotContents(outputSlot, result.copy());
+	    	        				inv.setItem(outputSlot, result.copy());
 	    	            			smeltingStack = ItemStack.EMPTY;
 	    	        			}
-	    	        			else if (InventoryUtils.canCombine(result, outputStack) && outputStack.getCount() + result.getCount() <= outputStack.getMaxStackSize() && outputStack.getCount() + result.getCount() <= inv.getInventoryStackLimit())
+	    	        			else if (InventoryUtils.canCombine(result, outputStack) && outputStack.getCount() + result.getCount() <= outputStack.getMaxStackSize() && outputStack.getCount() + result.getCount() <= inv.getMaxStackSize())
 	    	        			{
 	    	        				outputStack.grow(result.getCount());
-	    	        				outputStack.onCrafting(player.world, player, result.getCount());
+	    	        				outputStack.onCraftedBy(player.level, player, result.getCount());
 	    	        				BasicEventHooks.firePlayerSmeltedEvent(player, outputStack);
 	    	            			smeltingStack = ItemStack.EMPTY;
 	    	        			}
@@ -355,9 +355,9 @@ public class InventoryFurnaceItem extends InventoryItem
 			                    
 			                    while (i > 0)
 			                    {
-			                        int k = ExperienceOrbEntity.getXPSplit(i);
+			                        int k = ExperienceOrbEntity.getExperienceValue(i);
 			                        i -= k;
-			                        player.world.addEntity(new ExperienceOrbEntity(player.world, player.getPosX(), player.getPosY() + 0.5D, player.getPosZ() + 0.5D, k));
+			                        player.level.addFreshEntity(new ExperienceOrbEntity(player.level, player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, k));
 			                    }
 	    		            	
 	    	                	setCookTime(stack, 0);
@@ -388,8 +388,8 @@ public class InventoryFurnaceItem extends InventoryItem
 		List<Icon> icons = new ArrayList<>();
 		
 		int itemSlot = slot.getSlotIndex(),
-			width = PlayerInventory.getHotbarSize(),
-			height = inv.mainInventory.size() / width;
+			width = PlayerInventory.getSelectionSize(),
+			height = inv.items.size() / width;
 		
 		if (itemSlot >= width * height) return icons;
 		
@@ -453,7 +453,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	
 	private static FurnaceRecipe getSmeltingRecipe(PlayerEntity player, IInventory inv)
 	{
-		return player.world.getRecipeManager().getRecipe(IRecipeType.SMELTING, inv, player.world).orElse(null);
+		return player.level.getRecipeManager().getRecipeFor(IRecipeType.SMELTING, inv, player.level).orElse(null);
 	}
 	
 	private static final Direction[] FUEL_SIDE = { Direction.EAST, Direction.WEST };
@@ -472,7 +472,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	
 	public static void setBurnTime(ItemStack stack, int burnTime)
 	{
-		stack.setTagInfo(NBT_BURN_TIME, IntNBT.valueOf(burnTime));
+		stack.addTagElement(NBT_BURN_TIME, IntNBT.valueOf(burnTime));
 	}
 	
 	
@@ -490,7 +490,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	
 	public static void setCookTime(ItemStack stack, int cookTime)
 	{
-		stack.setTagInfo(NBT_COOK_TIME, IntNBT.valueOf(cookTime));
+		stack.addTagElement(NBT_COOK_TIME, IntNBT.valueOf(cookTime));
 	}
 	
 	
@@ -508,7 +508,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	
 	public static void setTotalCookTime(ItemStack stack, int cookTime)
 	{
-		stack.setTagInfo(NBT_TOTAL_COOK_TIME, IntNBT.valueOf(cookTime));
+		stack.addTagElement(NBT_TOTAL_COOK_TIME, IntNBT.valueOf(cookTime));
 	}
 	
 	
@@ -519,14 +519,14 @@ public class InventoryFurnaceItem extends InventoryItem
 		if (stack.hasTag())
 		{
 			CompoundNBT tag = stack.getTag();
-			if (tag.contains(NBT_ACTUAL_INPUT, NBT.TAG_COMPOUND)) return ItemStack.read(tag.getCompound(NBT_ACTUAL_INPUT));
+			if (tag.contains(NBT_ACTUAL_INPUT, NBT.TAG_COMPOUND)) return ItemStack.of(tag.getCompound(NBT_ACTUAL_INPUT));
 		}
 		return ItemStack.EMPTY;
 	}
 	
 	public static void setSmeltingStack(ItemStack stack, ItemStack smeltingStck)
 	{
-		stack.setTagInfo(NBT_ACTUAL_INPUT, smeltingStck.serializeNBT());
+		stack.addTagElement(NBT_ACTUAL_INPUT, smeltingStck.serializeNBT());
 	}
 	
 }

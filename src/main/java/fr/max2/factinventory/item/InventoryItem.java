@@ -23,17 +23,17 @@ public abstract class InventoryItem extends Item
 	
 	public InventoryItem(Properties properties)
 	{
-		super(properties.maxStackSize(1));
+		super(properties.stacksTo(1));
 	}
 	
 	@Override
 	public void inventoryTick(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected)
 	{
-		if (entity instanceof PlayerEntity && !world.isRemote)
+		if (entity instanceof PlayerEntity && !world.isClientSide)
 		{
 			PlayerInventory inv = ((PlayerEntity)entity).inventory;
 			
-			if (inv.getStackInSlot(itemSlot) == stack) this.update(stack, inv, (PlayerEntity)entity, itemSlot);
+			if (inv.getItem(itemSlot) == stack) this.update(stack, inv, (PlayerEntity)entity, itemSlot);
 			
 		}
 		
@@ -80,7 +80,7 @@ public abstract class InventoryItem extends Item
 	
 	public static Slot findSlot(ContainerScreen<?> gui, Slot original, int newIndex)
 	{
-		return gui.getContainer().inventorySlots.stream().filter(slot -> slot.isSameInventory(original) && slot.getSlotIndex() == newIndex).findAny().orElse(null);
+		return gui.getMenu().slots.stream().filter(slot -> slot.isSameInventory(original) && slot.getSlotIndex() == newIndex).findAny().orElse(null);
 	}
 	
 }

@@ -22,14 +22,14 @@ public class FastInventoryHopperItem extends InventoryHopperItem
 	{
 		Direction face = getFacing(stack);
 		
-		int width = PlayerInventory.getHotbarSize(),
-			height = inv.mainInventory.size() / width,
+		int width = PlayerInventory.getSelectionSize(),
+			height = inv.items.size() / width,
 			x = itemSlot % width,
 			y = itemSlot / width,
-			extractX = x + face.getXOffset(),
-			extractY = y + face.getZOffset(),
-			insertX  = x - face.getXOffset(),
-			insertY  = y - face.getZOffset();
+			extractX = x + face.getStepX(),
+			extractY = y + face.getStepZ(),
+			insertX  = x - face.getStepX(),
+			insertY  = y - face.getStepZ();
 		
 		if (extractY == 0 && y != 0) extractY = height;
 		else if (y == 0 && extractY == 1) extractY = -1;
@@ -49,8 +49,8 @@ public class FastInventoryHopperItem extends InventoryHopperItem
 			int extractSlot = extractX + width * extractY,
 		        insertSlot = insertX + width * insertY;
 			
-			ItemStack extractStack = inv.getStackInSlot(extractSlot);
-			ItemStack insertStack = inv.getStackInSlot(insertSlot);
+			ItemStack extractStack = inv.getItem(extractSlot);
+			ItemStack insertStack = inv.getItem(insertSlot);
 
 			LazyOptional<IItemHandler> insertCapaOptional = insertStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face);
 			
@@ -97,7 +97,7 @@ public class FastInventoryHopperItem extends InventoryHopperItem
 								extractStack.shrink(1);
 								if (extractStack.isEmpty())
 								{
-									inv.setInventorySlotContents(extractSlot, ItemStack.EMPTY);
+									inv.setItem(extractSlot, ItemStack.EMPTY);
 								}
 								
 								return;											//   <-- Here is a return !
@@ -106,7 +106,7 @@ public class FastInventoryHopperItem extends InventoryHopperItem
 					}
 				}
 			}
-			else if (insertStack.isEmpty() || (insertStack.getCount() < insertStack.getMaxStackSize() && insertStack.getCount() < inv.getInventoryStackLimit()))
+			else if (insertStack.isEmpty() || (insertStack.getCount() < insertStack.getMaxStackSize() && insertStack.getCount() < inv.getMaxStackSize()))
 			{
 				IItemHandler extractCapa = extractStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face.getOpposite()).orElse(null);
 				
@@ -120,7 +120,7 @@ public class FastInventoryHopperItem extends InventoryHopperItem
 						{
 							if (insertStack.isEmpty())
 							{
-								inv.setInventorySlotContents(insertSlot, extractedStack);
+								inv.setItem(insertSlot, extractedStack);
 							}
 							else insertStack.grow(1);
 							
@@ -137,14 +137,14 @@ public class FastInventoryHopperItem extends InventoryHopperItem
 					{
 						ItemStack extractedStack = extractStack.copy();
 						extractedStack.setCount(1);
-						inv.setInventorySlotContents(insertSlot, extractedStack);
+						inv.setItem(insertSlot, extractedStack);
 					}
 					else insertStack.grow(1);
 					
 					extractStack.shrink(1);
 					if (extractStack.isEmpty())
 					{
-						inv.setInventorySlotContents(extractSlot, ItemStack.EMPTY);
+						inv.setItem(extractSlot, ItemStack.EMPTY);
 					}
 					
 					return;											//   <-- Here is a return !

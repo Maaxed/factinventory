@@ -22,7 +22,7 @@ public abstract class RotatableInventoryItem extends InventoryItem
 	public static final ResourceLocation FACING_GETTER_LOC = new ResourceLocation(FactinventoryMod.MOD_ID, "facing");
 	@OnlyIn(Dist.CLIENT)
 	public static final IItemPropertyGetter
-		FACING_GETTER = (stack, worldIn, entityIn) -> getFacing(stack).getHorizontalIndex();
+		FACING_GETTER = (stack, worldIn, entityIn) -> getFacing(stack).get2DDataValue();
 	
 	public RotatableInventoryItem(Properties properties)
 	{
@@ -30,9 +30,9 @@ public abstract class RotatableInventoryItem extends InventoryItem
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand)
+	public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand)
 	{
-		ItemStack stack = player.getHeldItem(hand);
+		ItemStack stack = player.getItemInHand(hand);
 		
 		rotate(stack);
 		
@@ -47,7 +47,7 @@ public abstract class RotatableInventoryItem extends InventoryItem
 		if (stack.hasTag())
 		{
 			CompoundNBT tag = stack.getTag();
-			if (tag.contains(NBT_FACING, NBT.TAG_BYTE)) return Direction.byHorizontalIndex(tag.getByte(NBT_FACING));
+			if (tag.contains(NBT_FACING, NBT.TAG_BYTE)) return Direction.from2DDataValue(tag.getByte(NBT_FACING));
 		}
 		return Direction.NORTH;
 	}
@@ -58,10 +58,10 @@ public abstract class RotatableInventoryItem extends InventoryItem
 		
 		CompoundNBT tag = stack.getTag();
 		
-		Direction face = tag.contains(NBT_FACING, NBT.TAG_BYTE) ? Direction.byHorizontalIndex(tag.getByte(NBT_FACING)) : Direction.NORTH;
-		face = face.rotateY();
+		Direction face = tag.contains(NBT_FACING, NBT.TAG_BYTE) ? Direction.from2DDataValue(tag.getByte(NBT_FACING)) : Direction.NORTH;
+		face = face.getClockWise();
 		
-		tag.putByte(NBT_FACING, (byte)face.getHorizontalIndex());
+		tag.putByte(NBT_FACING, (byte)face.get2DDataValue());
 	}
 	
 }

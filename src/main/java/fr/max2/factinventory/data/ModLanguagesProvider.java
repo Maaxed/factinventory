@@ -78,23 +78,23 @@ public class ModLanguagesProvider implements IDataProvider
     }
 	
 	@Override
-	public void act(DirectoryCache cache) throws IOException
+	public void run(DirectoryCache cache) throws IOException
 	{
 		this.addTranslations();
 		for (LanguageProvider language : this.languages)
 		{
-			language.act(cache);
+			language.run(cache);
 		}
 	}
 	
 	protected void add(Item key, String... names)
 	{
-		add(key.getTranslationKey(), names);
+		add(key.getDescriptionId(), names);
 	}
 	
 	protected void add(ItemGroup key, String... names)
 	{
-		add("itemGroup." + key.getPath(), names);
+		add("itemGroup." + key.getRecipeFolderName(), names);
 	}
 	
 	protected void add(String key, String... values)

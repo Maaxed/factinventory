@@ -24,7 +24,7 @@ public class ModDataProviders
         	BlockTagsProvider blockTags = new BlockTagsProvider(gen, FactinventoryMod.MOD_ID, files)
     		{
         		@Override
-        		protected void registerTags()
+        		protected void addTags()
         		{ }
     		};
             gen.addProvider(new ModItemTagsProvider(gen, blockTags, files));

@@ -38,7 +38,7 @@ public class ModItems
 	public static final InventoryLinkerItem INVENTORY_LINKER = null;
 	public static final Item INTERACTION_MODULE = null;
 	
-	private static final Supplier<Properties> DEFAULT_PROPERTIES = () -> new Properties().group(ModItemGroups.ITEM_TAB);
+	private static final Supplier<Properties> DEFAULT_PROPERTIES = () -> new Properties().tab(ModItemGroups.ITEM_TAB);
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event)
@@ -49,18 +49,18 @@ public class ModItems
 			name("inventory_furnace", InventoryFurnaceItem::new),
 			name("inventory_dropper", InventoryDropperItem::new),
 			name("inventory_pump", InventoryPumpItem::new),
-			name("inventory_linker", prop -> new InventoryLinkerItem(prop.group(null))),
+			name("inventory_linker", prop -> new InventoryLinkerItem(prop.tab(null))),
 			name("interaction_module", Item::new));
 	}
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void initRendering(FMLClientSetupEvent event)
 	{
-		ItemModelsProperties.registerProperty(INVENTORY_FURNACE, InventoryFurnaceItem.BURN_TIME_GETTER_LOC, InventoryFurnaceItem.BURN_TIME_GETTER);
-		ItemModelsProperties.registerProperty(SLOW_INVENTORY_HOPPER, RotatableInventoryItem.FACING_GETTER_LOC, RotatableInventoryItem.FACING_GETTER);
-		ItemModelsProperties.registerProperty(FAST_INVENTORY_HOPPER, RotatableInventoryItem.FACING_GETTER_LOC, RotatableInventoryItem.FACING_GETTER);
-		ItemModelsProperties.registerProperty(INVENTORY_PUMP, RotatableInventoryItem.FACING_GETTER_LOC, RotatableInventoryItem.FACING_GETTER);
-		ItemModelsProperties.registerProperty(INVENTORY_PUMP, InventoryPumpItem.FILL_GETTER_LOC, InventoryPumpItem.FILL_GETTER);
+		ItemModelsProperties.register(INVENTORY_FURNACE, InventoryFurnaceItem.BURN_TIME_GETTER_LOC, InventoryFurnaceItem.BURN_TIME_GETTER);
+		ItemModelsProperties.register(SLOW_INVENTORY_HOPPER, RotatableInventoryItem.FACING_GETTER_LOC, RotatableInventoryItem.FACING_GETTER);
+		ItemModelsProperties.register(FAST_INVENTORY_HOPPER, RotatableInventoryItem.FACING_GETTER_LOC, RotatableInventoryItem.FACING_GETTER);
+		ItemModelsProperties.register(INVENTORY_PUMP, RotatableInventoryItem.FACING_GETTER_LOC, RotatableInventoryItem.FACING_GETTER);
+		ItemModelsProperties.register(INVENTORY_PUMP, InventoryPumpItem.FILL_GETTER_LOC, InventoryPumpItem.FILL_GETTER);
 	}
 	
 	@OnlyIn(Dist.CLIENT)

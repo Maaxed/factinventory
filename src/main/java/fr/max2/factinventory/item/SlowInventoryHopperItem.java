@@ -31,9 +31,9 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 	}
 	
 	@Override
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
+	public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
 	{
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		
 		if (Screen.hasControlDown())
 		{
@@ -58,7 +58,7 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 	@Override
 	public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged)
 	{
-		return super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged) && (slotChanged || newStack.getItem() != oldStack.getItem() || newStack.getCount() != oldStack.getCount() || !ItemStack.areItemStacksEqual(getTransferringStack(newStack), getTransferringStack(oldStack)));
+		return super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged) && (slotChanged || newStack.getItem() != oldStack.getItem() || newStack.getCount() != oldStack.getCount() || !ItemStack.matches(getTransferringStack(newStack), getTransferringStack(oldStack)));
 	}
 	
 	@Override
@@ -80,13 +80,13 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 	{
 		Direction face = getFacing(stack);
 		
-		int width = PlayerInventory.getHotbarSize(),
-			height = inv.mainInventory.size() / width,
+		int width = PlayerInventory.getSelectionSize(),
+			height = inv.items.size() / width,
 			x = itemSlot % width,
 			y = itemSlot / width;
 		
-		int insertX  = x - face.getXOffset(),
-			insertY  = y - face.getZOffset();
+		int insertX  = x - face.getStepX(),
+			insertY  = y - face.getStepZ();
 		
 		if (insertY == 0 && y != 0) insertY = height;
 		else if (y == 0 && insertY ==  1) insertY = -1;
@@ -100,7 +100,7 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 			
 			ItemStack contentStack = getTransferringStack(stack);
 			ItemStack originalContent = contentStack;
-			ItemStack insertStack = inv.getStackInSlot(insertSlot);
+			ItemStack insertStack = inv.getItem(insertSlot);
 			
 			if (!contentStack.isEmpty())
 			{
@@ -115,13 +115,13 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 						contentStack = insertCapa.insertItem(insertIndex, contentStack, false);
 					}
 				}
-				else if (insertStack.isEmpty() || (insertStack.getCount() < insertStack.getMaxStackSize() && insertStack.getCount() < inv.getInventoryStackLimit()))
+				else if (insertStack.isEmpty() || (insertStack.getCount() < insertStack.getMaxStackSize() && insertStack.getCount() < inv.getMaxStackSize()))
 				{
 					if ((insertStack.isEmpty() || InventoryUtils.canCombine(insertStack, contentStack)))
 					{
 						if (insertStack.isEmpty())
 						{
-							inv.setInventorySlotContents(insertSlot, contentStack);
+							inv.setItem(insertSlot, contentStack);
 						}
 						else insertStack.grow(1);
 						
@@ -132,8 +132,8 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 			
 			if (contentStack.isEmpty())
 			{
-				int extractX = x + face.getXOffset(),
-					extractY = y + face.getZOffset();
+				int extractX = x + face.getStepX(),
+					extractY = y + face.getStepZ();
 				
 				if (extractY == 0 && y != 0) extractY = height;
 				else if (y == 0 && extractY == 1) extractY = -1;
@@ -145,7 +145,7 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 				{
 					int extractSlot = extractX + width * extractY;
 					
-					ItemStack extractStack = inv.getStackInSlot(extractSlot);
+					ItemStack extractStack = inv.getItem(extractSlot);
 					
 					if (!extractStack.isEmpty())
 					{
@@ -174,7 +174,7 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 							extractStack.shrink(1);
 							if (extractStack.isEmpty())
 							{
-								inv.setInventorySlotContents(extractSlot, ItemStack.EMPTY);
+								inv.setItem(extractSlot, ItemStack.EMPTY);
 							}
 						}
 					}
@@ -196,14 +196,14 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 		if (stack.hasTag())
 		{
 			CompoundNBT tag = stack.getTag();
-			if (tag.contains(NBT_TRANSFERRING_ITEM, NBT.TAG_COMPOUND)) return ItemStack.read(tag.getCompound(NBT_TRANSFERRING_ITEM));
+			if (tag.contains(NBT_TRANSFERRING_ITEM, NBT.TAG_COMPOUND)) return ItemStack.of(tag.getCompound(NBT_TRANSFERRING_ITEM));
 		}
 		return ItemStack.EMPTY;
 	}
 	
 	public static void setTransferringStack(ItemStack stack, ItemStack transferringStack)
 	{
-		stack.setTagInfo(NBT_TRANSFERRING_ITEM, transferringStack.serializeNBT());
+		stack.addTagElement(NBT_TRANSFERRING_ITEM, transferringStack.serializeNBT());
 	}
 	
 	
@@ -221,7 +221,7 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 	
 	public static void setTransferTime(ItemStack stack, int transferTime)
 	{
-		stack.setTagInfo(NBT_TRANSFER_TIME, IntNBT.valueOf(transferTime));
+		stack.addTagElement(NBT_TRANSFER_TIME, IntNBT.valueOf(transferTime));
 	}
 	
 }

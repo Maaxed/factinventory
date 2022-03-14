@@ -10,7 +10,7 @@ public class ServerProxy implements ISidedProxy
 	@Override
 	public World getWorldByDimension(RegistryKey<World> worldKey)
 	{
-		return ServerLifecycleHooks.getCurrentServer().getWorld(worldKey);
+		return ServerLifecycleHooks.getCurrentServer().getLevel(worldKey);
 	}
 	
 }

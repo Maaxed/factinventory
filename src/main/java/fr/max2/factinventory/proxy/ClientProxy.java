@@ -13,8 +13,8 @@ public class ClientProxy implements ISidedProxy
 	@Override
 	public World getWorldByDimension(RegistryKey<World> worldKey)
 	{
-		World w = Minecraft.getInstance().world;
-		return w == null ? null : (w.getDimensionKey() == worldKey ? w : null);
+		World w = Minecraft.getInstance().level;
+		return w == null ? null : (w.dimension() == worldKey ? w : null);
 	}
 	
 }

@@ -19,76 +19,76 @@ public class ModRecipeProvider extends RecipeProvider
 	}
 	
 	@Override
-	protected void registerRecipes(Consumer<IFinishedRecipe> consumer)
+	protected void buildShapelessRecipes(Consumer<IFinishedRecipe> consumer)
 	{
-		ShapedRecipeBuilder.shapedRecipe(ModItems.INTERACTION_MODULE)
-			.patternLine("GIG")
-			.patternLine("IEI")
-			.patternLine("GIG")
-			.key('G', Tags.Items.INGOTS_GOLD)
-			.key('I', Tags.Items.INGOTS_IRON)
-			.key('E', Tags.Items.ENDER_PEARLS)
-			.addCriterion("has_ender_pearl", hasItem(Items.ENDER_PEARL))
-			.build(consumer);
+		ShapedRecipeBuilder.shaped(ModItems.INTERACTION_MODULE)
+			.pattern("GIG")
+			.pattern("IEI")
+			.pattern("GIG")
+			.define('G', Tags.Items.INGOTS_GOLD)
+			.define('I', Tags.Items.INGOTS_IRON)
+			.define('E', Tags.Items.ENDER_PEARLS)
+			.unlockedBy("has_ender_pearl", has(Items.ENDER_PEARL))
+			.save(consumer);
 		
-		ShapedRecipeBuilder.shapedRecipe(ModItems.SLOW_INVENTORY_HOPPER)
-			.patternLine("M")
-			.patternLine("H")
-			.patternLine("M")
-			.key('M', ModItems.INTERACTION_MODULE)
-			.key('H', Items.HOPPER)
-			.addCriterion("has_interactivity_modules", hasItem(ModItems.INTERACTION_MODULE))
-			.build(consumer);
+		ShapedRecipeBuilder.shaped(ModItems.SLOW_INVENTORY_HOPPER)
+			.pattern("M")
+			.pattern("H")
+			.pattern("M")
+			.define('M', ModItems.INTERACTION_MODULE)
+			.define('H', Items.HOPPER)
+			.unlockedBy("has_interactivity_modules", has(ModItems.INTERACTION_MODULE))
+			.save(consumer);
 
-		ShapedRecipeBuilder.shapedRecipe(ModItems.FAST_INVENTORY_HOPPER)
-			.patternLine("DHD")
-			.patternLine("DMD")
-			.patternLine("DHD")
-			.key('M', ModItems.INTERACTION_MODULE)
-			.key('H', ModItems.SLOW_INVENTORY_HOPPER)
-			.key('D', Tags.Items.GEMS_DIAMOND)
-			.addCriterion("has_interactivity_modules", hasItem(ModItems.INTERACTION_MODULE))
-			.build(consumer);
+		ShapedRecipeBuilder.shaped(ModItems.FAST_INVENTORY_HOPPER)
+			.pattern("DHD")
+			.pattern("DMD")
+			.pattern("DHD")
+			.define('M', ModItems.INTERACTION_MODULE)
+			.define('H', ModItems.SLOW_INVENTORY_HOPPER)
+			.define('D', Tags.Items.GEMS_DIAMOND)
+			.unlockedBy("has_interactivity_modules", has(ModItems.INTERACTION_MODULE))
+			.save(consumer);
 
-		ShapedRecipeBuilder.shapedRecipe(ModItems.INVENTORY_FURNACE)
-			.patternLine(" M ")
-			.patternLine("MFM")
-			.patternLine(" M ")
-			.key('M', ModItems.INTERACTION_MODULE)
-			.key('F', Items.FURNACE)
-			.addCriterion("has_interactivity_modules", hasItem(ModItems.INTERACTION_MODULE))
-			.build(consumer);
+		ShapedRecipeBuilder.shaped(ModItems.INVENTORY_FURNACE)
+			.pattern(" M ")
+			.pattern("MFM")
+			.pattern(" M ")
+			.define('M', ModItems.INTERACTION_MODULE)
+			.define('F', Items.FURNACE)
+			.unlockedBy("has_interactivity_modules", has(ModItems.INTERACTION_MODULE))
+			.save(consumer);
 
-		ShapedRecipeBuilder.shapedRecipe(ModItems.INVENTORY_DROPPER)
-			.patternLine(" M ")
-			.patternLine("MDM")
-			.patternLine(" M ")
-			.key('M', ModItems.INTERACTION_MODULE)
-			.key('D', Items.DROPPER)
-			.addCriterion("has_interactivity_modules", hasItem(ModItems.INTERACTION_MODULE))
-			.build(consumer);
+		ShapedRecipeBuilder.shaped(ModItems.INVENTORY_DROPPER)
+			.pattern(" M ")
+			.pattern("MDM")
+			.pattern(" M ")
+			.define('M', ModItems.INTERACTION_MODULE)
+			.define('D', Items.DROPPER)
+			.unlockedBy("has_interactivity_modules", has(ModItems.INTERACTION_MODULE))
+			.save(consumer);
 
-		ShapedRecipeBuilder.shapedRecipe(ModItems.INVENTORY_PUMP)
-			.patternLine("BMB")
-			.patternLine("GIG")
-			.patternLine("GMG")
-			.key('M', ModItems.INTERACTION_MODULE)
-			.key('B', Items.BUCKET)
-			.key('G', Tags.Items.INGOTS_GOLD)
-			.key('I', Tags.Items.INGOTS_IRON)
-			.addCriterion("has_interactivity_modules", hasItem(ModItems.INTERACTION_MODULE))
-			.build(consumer);
+		ShapedRecipeBuilder.shaped(ModItems.INVENTORY_PUMP)
+			.pattern("BMB")
+			.pattern("GIG")
+			.pattern("GMG")
+			.define('M', ModItems.INTERACTION_MODULE)
+			.define('B', Items.BUCKET)
+			.define('G', Tags.Items.INGOTS_GOLD)
+			.define('I', Tags.Items.INGOTS_IRON)
+			.unlockedBy("has_interactivity_modules", has(ModItems.INTERACTION_MODULE))
+			.save(consumer);
 		
 		// Inventory linker is too experimental
-		/*ShapedRecipeBuilder.shapedRecipe(ModItems.INVENTORY_LINKER)
-			.patternLine("DMD")
-			.patternLine("MEM")
-			.patternLine("DMD")
-			.key('M', ModItems.INTERACTION_MODULE)
-			.key('D', Tags.Items.GEMS_DIAMOND)
-			.key('E', Tags.Items.ENDER_PEARLS)
-			.addCriterion("has_interactivity_modules", hasItem(ModItems.INTERACTION_MODULE))
-			.build(consumer);*/
+		/*ShapedRecipeBuilder.shaped(ModItems.INVENTORY_LINKER)
+			.pattern("DMD")
+			.pattern("MEM")
+			.pattern("DMD")
+			.define('M', ModItems.INTERACTION_MODULE)
+			.define('D', Tags.Items.GEMS_DIAMOND)
+			.define('E', Tags.Items.ENDER_PEARLS)
+			.unlockedBy("has_interactivity_modules", has(ModItems.INTERACTION_MODULE))
+			.save(consumer);*/
 	}
 	
 	@Override

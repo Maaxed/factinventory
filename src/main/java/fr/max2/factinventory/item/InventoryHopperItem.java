@@ -27,12 +27,12 @@ public abstract class InventoryHopperItem extends RotatableInventoryItem
 	}
 	
 	@Override
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
+	public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
 	{
 		if (Screen.hasShiftDown())
 		{
-			tooltip.add(new TranslationTextComponent("tooltip.input.desc").mergeStyle(TextFormatting.BLUE));
-			tooltip.add(new TranslationTextComponent("tooltip.output.desc").mergeStyle(TextFormatting.GOLD));
+			tooltip.add(new TranslationTextComponent("tooltip.input.desc").withStyle(TextFormatting.BLUE));
+			tooltip.add(new TranslationTextComponent("tooltip.output.desc").withStyle(TextFormatting.GOLD));
 		}
 		else
 		{
@@ -48,17 +48,17 @@ public abstract class InventoryHopperItem extends RotatableInventoryItem
 		Direction face = getFacing(stack);
 		
 		int itemSlot = slot.getSlotIndex(),
-			width = PlayerInventory.getHotbarSize(),
-			height = inv.mainInventory.size() / width;
+			width = PlayerInventory.getSelectionSize(),
+			height = inv.items.size() / width;
 		
 		if (itemSlot >= width * height) return icons;
 		
 		int x = itemSlot % width,
 			y = itemSlot / width,
-			extractX = x + face.getXOffset(),
-			extractY = y + face.getZOffset(),
-			insertX  = x - face.getXOffset(),
-			insertY  = y - face.getZOffset();
+			extractX = x + face.getStepX(),
+			extractY = y + face.getStepZ(),
+			insertX  = x - face.getStepX(),
+			insertY  = y - face.getStepZ();
 		
 		if (extractY == 0 && y != 0)
 			extractY = height;

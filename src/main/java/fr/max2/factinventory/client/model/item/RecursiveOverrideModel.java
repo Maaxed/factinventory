@@ -44,13 +44,13 @@ public class RecursiveOverrideModel implements IModelGeometry<RecursiveOverrideM
 	@Override
 	public IBakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<RenderMaterial, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform, ItemOverrideList overrides, ResourceLocation modelLocation)
 	{
-		return new BakedModel(this.baseModel.bakeModel(bakery, this.baseModel, spriteGetter, modelTransform, modelLocation, owner.isSideLit()));
+		return new BakedModel(this.baseModel.bake(bakery, this.baseModel, spriteGetter, modelTransform, modelLocation, owner.isSideLit()));
 	}
 
 	@Override
 	public Collection<RenderMaterial> getTextures(IModelConfiguration owner, Function<ResourceLocation, IUnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors)
 	{
-		return this.baseModel.getTextures(modelGetter, missingTextureErrors);
+		return this.baseModel.getMaterials(modelGetter, missingTextureErrors);
 	}
 	
 	public static class BakedModel extends BakedModelWrapper<IBakedModel>
@@ -80,12 +80,12 @@ public class RecursiveOverrideModel implements IModelGeometry<RecursiveOverrideM
 		
 		@Override
 		@Nullable
-		public IBakedModel getOverrideModel(IBakedModel model, ItemStack stack, @Nullable ClientWorld world, @Nullable LivingEntity livingEntity)
+		public IBakedModel resolve(IBakedModel model, ItemStack stack, @Nullable ClientWorld world, @Nullable LivingEntity livingEntity)
 		{
-			IBakedModel overrideModel = this.base.getOverrideModel(model, stack, world, livingEntity);
+			IBakedModel overrideModel = this.base.resolve(model, stack, world, livingEntity);
 			if (overrideModel == model || overrideModel == null)
 				return overrideModel;
-			return overrideModel.getOverrides().getOverrideModel(overrideModel, stack, world, livingEntity);
+			return overrideModel.getOverrides().resolve(overrideModel, stack, world, livingEntity);
 		}
 		
 		@Override
@@ -94,47 +94,6 @@ public class RecursiveOverrideModel implements IModelGeometry<RecursiveOverrideM
 			return this.base.getOverrides();
 		}
 	}
-	
-	/*public static class RecursiveOverrideList extends ItemOverrideList
-	{
-		private static final int MAX_ITERATIONS = 100;
-		private final ItemOverrideList base;
-
-		public RecursiveOverrideList(ItemOverrideList base)
-		{
-			this.base = base;
-		}
-		
-		@Override
-		@Nullable
-		public IBakedModel getOverrideModel(IBakedModel model, ItemStack stack, @Nullable ClientWorld world, @Nullable LivingEntity livingEntity)
-		{
-			IBakedModel initialModel = model;
-			Set<IBakedModel> seenModels = new HashSet<>();
-			
-			ItemOverrideList overrideList = this.base;
-			IBakedModel overrideModel = model;
-			for (int i = 0; i < MAX_ITERATIONS && seenModels.add(overrideModel); i++)
-			{
-				model = overrideModel;
-				overrideModel = overrideList.getOverrideModel(model, stack, world, livingEntity);
-				if (overrideModel == null)
-					return null;
-				
-				if (model == overrideModel)
-					return overrideModel;
-				
-				overrideList = overrideModel.getOverrides();
-			}
-			return initialModel; // Error !
-		}
-		
-		@Override
-		public ImmutableList<ItemOverride> getOverrides()
-		{
-			return this.base.getOverrides();
-		}
-	}*/
 	
 	public static enum Loader implements IModelLoader<RecursiveOverrideModel>
 	{
@@ -150,7 +109,7 @@ public class RecursiveOverrideModel implements IModelGeometry<RecursiveOverrideM
 		@Override
 		public RecursiveOverrideModel read(JsonDeserializationContext deserializationContext, JsonObject modelContents)
 		{
-			BlockModel baseModel = deserializationContext.deserialize(JSONUtils.getJsonObject(modelContents, "base"), BlockModel.class);
+			BlockModel baseModel = deserializationContext.deserialize(JSONUtils.getAsJsonObject(modelContents, "base"), BlockModel.class);
 			return new RecursiveOverrideModel(baseModel);
 		}
 		

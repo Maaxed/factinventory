@@ -35,17 +35,17 @@ public class GuiRenderHandler
 			
 			Slot slot = gui.getSlotUnderMouse();
 			
-			if (slot != null && slot.inventory instanceof PlayerInventory && slot.getStack().getItem() instanceof InventoryItem)
+			if (slot != null && slot.container instanceof PlayerInventory && slot.getItem().getItem() instanceof InventoryItem)
 			{
-				RenderHelper.disableStandardItemLighting();
+				RenderHelper.setupForFlatItems();
 				RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
 				RenderSystem.enableDepthTest();
 				RenderSystem.enableAlphaTest();
 				
-				ItemStack stack = slot.getStack();
-				PlayerInventory inv = (PlayerInventory) slot.inventory;
+				ItemStack stack = slot.getItem();
+				PlayerInventory inv = (PlayerInventory) slot.container;
 				MatrixStack ms = event.getMatrixStack();
 				
 				List<Icon> icons = ((InventoryItem)stack.getItem()).getRenderIcons(stack, gui, slot, inv);
@@ -54,12 +54,12 @@ public class GuiRenderHandler
 				{
 					if (icon.slot == null)
 					{
-						drawIOIcon(gui, ms, slot.xPos + 18 * icon.face.getXOffset(), slot.yPos + 18 * icon.face.getZOffset(), icon.face, icon.color, icon.extract, icon.missing);
+						drawIOIcon(gui, ms, slot.x + 18 * icon.face.getStepX(), slot.y + 18 * icon.face.getStepZ(), icon.face, icon.color, icon.extract, icon.missing);
 					}
-					else drawIOIcon(gui, ms, icon.slot.xPos, icon.slot.yPos, icon.face, icon.color, icon.extract, icon.missing);
+					else drawIOIcon(gui, ms, icon.slot.x, icon.slot.y, icon.face, icon.color, icon.extract, icon.missing);
 				}
 				
-				RenderHelper.enableStandardItemLighting();
+				RenderHelper.setupFor3DItems();
 			}
 		}
 	}
@@ -68,13 +68,13 @@ public class GuiRenderHandler
 	
 	public static void drawIOIcon(ContainerScreen<?> gui, MatrixStack ms, int x, int y, Direction face, int color, boolean extract, boolean missing)
 	{
-		gui.getMinecraft().getTextureManager().bindTexture(ICONS);
+		gui.getMinecraft().getTextureManager().bind(ICONS);
 		
 		int r = (color >> 16) & 255;
 		int g = (color >> 8) & 255;
 		int b = (color & 255);
 		
-		CustomGuiUtils.drawRectWithSizedTexture(ms, x + gui.getGuiLeft(), y + gui.getGuiTop(), 400.0f, 16 * ((1 - face.getHorizontalIndex()) % 3),
+		CustomGuiUtils.drawRectWithSizedTexture(ms, x + gui.getGuiLeft(), y + gui.getGuiTop(), 400.0f, 16 * ((1 - face.get2DDataValue()) % 3),
 			(extract ? 0 : 16) + (missing ? 32 : 0), 16, 16, 64, 64, r, g, b, 255);
 	}
 	
