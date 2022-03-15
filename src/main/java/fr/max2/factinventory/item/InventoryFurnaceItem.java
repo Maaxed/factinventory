@@ -26,6 +26,7 @@ import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -37,12 +38,9 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fmllegacy.hooks.BasicEventHooks;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-
-import net.minecraft.world.item.Item.Properties;
 
 public class InventoryFurnaceItem extends InventoryItem
 {
@@ -467,7 +465,7 @@ public class InventoryFurnaceItem extends InventoryItem
 		if (stack.hasTag())
 		{
 			CompoundTag tag = stack.getTag();
-			if (tag.contains(NBT_BURN_TIME, NBT.TAG_INT)) return tag.getInt(NBT_BURN_TIME);
+			if (tag.contains(NBT_BURN_TIME, Tag.TAG_INT)) return tag.getInt(NBT_BURN_TIME);
 		}
 		return 0;
 	}
@@ -485,7 +483,7 @@ public class InventoryFurnaceItem extends InventoryItem
 		if (stack.hasTag())
 		{
 			CompoundTag tag = stack.getTag();
-			if (tag.contains(NBT_COOK_TIME, NBT.TAG_INT)) return tag.getInt(NBT_COOK_TIME);
+			if (tag.contains(NBT_COOK_TIME, Tag.TAG_INT)) return tag.getInt(NBT_COOK_TIME);
 		}
 		return 0;
 	}
@@ -503,7 +501,7 @@ public class InventoryFurnaceItem extends InventoryItem
 		if (stack.hasTag())
 		{
 			CompoundTag tag = stack.getTag();
-			if (tag.contains(NBT_TOTAL_COOK_TIME, NBT.TAG_INT)) return tag.getInt(NBT_TOTAL_COOK_TIME);
+			if (tag.contains(NBT_TOTAL_COOK_TIME, Tag.TAG_INT)) return tag.getInt(NBT_TOTAL_COOK_TIME);
 		}
 		return 0;
 	}
@@ -521,7 +519,7 @@ public class InventoryFurnaceItem extends InventoryItem
 		if (stack.hasTag())
 		{
 			CompoundTag tag = stack.getTag();
-			if (tag.contains(NBT_ACTUAL_INPUT, NBT.TAG_COMPOUND)) return ItemStack.of(tag.getCompound(NBT_ACTUAL_INPUT));
+			if (tag.contains(NBT_ACTUAL_INPUT, Tag.TAG_COMPOUND)) return ItemStack.of(tag.getCompound(NBT_ACTUAL_INPUT));
 		}
 		return ItemStack.EMPTY;
 	}

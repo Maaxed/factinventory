@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 
 import fr.max2.factinventory.FactinventoryMod;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
@@ -11,7 +12,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fml.util.thread.EffectiveSide;
 import net.minecraftforge.fmllegacy.server.ServerLifecycleHooks;
@@ -103,7 +103,7 @@ public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializ
 	@Override
 	public void deserializeNBT(CompoundTag nbt)
 	{
-		if (nbt.contains("link_dimension", NBT.TAG_STRING))
+		if (nbt.contains("link_dimension", Tag.TAG_STRING))
 		{
 			this.targetPos = new BlockPos(nbt.getInt("link_x"),
 										  nbt.getInt("link_y"),

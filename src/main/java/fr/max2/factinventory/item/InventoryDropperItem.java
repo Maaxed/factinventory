@@ -14,16 +14,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.items.CapabilityItemHandler;
-
-import net.minecraft.world.item.Item.Properties;
 
 public class InventoryDropperItem extends Item
 {
@@ -115,7 +113,7 @@ public class InventoryDropperItem extends Item
 		if (stack.hasTag())
 		{
 			CompoundTag tag = stack.getTag();
-			if (tag.contains(NBT_DROP_TIME, NBT.TAG_INT)) return tag.getInt(NBT_DROP_TIME);
+			if (tag.contains(NBT_DROP_TIME, Tag.TAG_INT)) return tag.getInt(NBT_DROP_TIME);
 		}
 		return 0;
 	}

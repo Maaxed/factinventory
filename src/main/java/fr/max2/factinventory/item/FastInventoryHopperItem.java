@@ -9,8 +9,6 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-import net.minecraft.world.item.Item.Properties;
-
 public class FastInventoryHopperItem extends InventoryHopperItem
 {
 	

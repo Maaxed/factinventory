@@ -5,6 +5,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.client.renderer.item.ItemPropertyFunction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.core.Direction;
@@ -13,9 +14,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.Constants.NBT;
-
-import net.minecraft.world.item.Item.Properties;
 
 public abstract class RotatableInventoryItem extends InventoryItem
 {
@@ -49,7 +47,7 @@ public abstract class RotatableInventoryItem extends InventoryItem
 		if (stack.hasTag())
 		{
 			CompoundTag tag = stack.getTag();
-			if (tag.contains(NBT_FACING, NBT.TAG_BYTE)) return Direction.from2DDataValue(tag.getByte(NBT_FACING));
+			if (tag.contains(NBT_FACING, Tag.TAG_BYTE)) return Direction.from2DDataValue(tag.getByte(NBT_FACING));
 		}
 		return Direction.NORTH;
 	}
@@ -60,7 +58,7 @@ public abstract class RotatableInventoryItem extends InventoryItem
 		
 		CompoundTag tag = stack.getTag();
 		
-		Direction face = tag.contains(NBT_FACING, NBT.TAG_BYTE) ? Direction.from2DDataValue(tag.getByte(NBT_FACING)) : Direction.NORTH;
+		Direction face = tag.contains(NBT_FACING, Tag.TAG_BYTE) ? Direction.from2DDataValue(tag.getByte(NBT_FACING)) : Direction.NORTH;
 		face = face.getClockWise();
 		
 		tag.putByte(NBT_FACING, (byte)face.get2DDataValue());

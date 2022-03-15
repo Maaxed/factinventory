@@ -10,8 +10,6 @@ import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
-import net.minecraft.data.tags.TagsProvider.TagAppender;
-
 public class ModItemTagsProvider extends ItemTagsProvider
 {
     public ModItemTagsProvider(DataGenerator gen, BlockTagsProvider blockTags, ExistingFileHelper existingFiles)

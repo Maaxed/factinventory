@@ -18,8 +18,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.Level;
 
-import net.minecraft.world.item.Item.Properties;
-
 public abstract class InventoryHopperItem extends RotatableInventoryItem
 {
 	

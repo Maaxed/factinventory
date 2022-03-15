@@ -13,16 +13,14 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-
-import net.minecraft.world.item.Item.Properties;
 
 public class SlowInventoryHopperItem extends InventoryHopperItem
 {
@@ -198,7 +196,7 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 		if (stack.hasTag())
 		{
 			CompoundTag tag = stack.getTag();
-			if (tag.contains(NBT_TRANSFERRING_ITEM, NBT.TAG_COMPOUND)) return ItemStack.of(tag.getCompound(NBT_TRANSFERRING_ITEM));
+			if (tag.contains(NBT_TRANSFERRING_ITEM, Tag.TAG_COMPOUND)) return ItemStack.of(tag.getCompound(NBT_TRANSFERRING_ITEM));
 		}
 		return ItemStack.EMPTY;
 	}
@@ -216,7 +214,7 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 		if (stack.hasTag())
 		{
 			CompoundTag tag = stack.getTag();
-			if (tag.contains(NBT_TRANSFER_TIME, NBT.TAG_INT)) return tag.getInt(NBT_TRANSFER_TIME);
+			if (tag.contains(NBT_TRANSFER_TIME, Tag.TAG_INT)) return tag.getInt(NBT_TRANSFER_TIME);
 		}
 		return 0;
 	}

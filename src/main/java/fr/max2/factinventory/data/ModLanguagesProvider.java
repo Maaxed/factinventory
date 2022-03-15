@@ -3,6 +3,7 @@ package fr.max2.factinventory.data;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import fr.max2.factinventory.FactinventoryMod;
 import fr.max2.factinventory.init.ModItemGroups;
@@ -87,9 +88,9 @@ public class ModLanguagesProvider implements DataProvider
 		}
 	}
 	
-	protected void add(Item key, String... names)
+	protected void add(Supplier<? extends Item> key, String... names)
 	{
-		add(key.getDescriptionId(), names);
+		add(key.get().getDescriptionId(), names);
 	}
 	
 	protected void add(CreativeModeTab key, String... names)

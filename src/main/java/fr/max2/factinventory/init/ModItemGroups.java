@@ -15,8 +15,7 @@ public class ModItemGroups
 		@OnlyIn(Dist.CLIENT)
 		public ItemStack makeIcon()
 		{
-			ItemStack iStack = new ItemStack(ModItems.SLOW_INVENTORY_HOPPER);
-			return iStack;
+			return new ItemStack(ModItems.SLOW_INVENTORY_HOPPER.get());
 		}
 		
 	};

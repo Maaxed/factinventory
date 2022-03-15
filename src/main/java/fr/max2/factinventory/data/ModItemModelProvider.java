@@ -31,26 +31,26 @@ public class ModItemModelProvider extends ItemModelProvider
 	@Override
 	protected void registerModels()
 	{
-		simpleItem(ModItems.INTERACTION_MODULE);
-		ModelFile litFurnace = simpleItem(name(ModItems.INVENTORY_FURNACE) + "_lit", extend(itemTexture(ModItems.INVENTORY_FURNACE), "_lit"));
-		simpleItem(ModItems.INVENTORY_FURNACE)
+		simpleItem(ModItems.INTERACTION_MODULE.get());
+		ModelFile litFurnace = simpleItem(name(ModItems.INVENTORY_FURNACE.get()) + "_lit", extend(itemTexture(ModItems.INVENTORY_FURNACE.get()), "_lit"));
+		simpleItem(ModItems.INVENTORY_FURNACE.get())
 			.override()
 				.predicate(InventoryFurnaceItem.BURN_TIME_GETTER_LOC, 0.5f)
 				.model(litFurnace)
 				.end();
-		simpleItem(ModItems.INVENTORY_DROPPER);
-		simpleItem(ModItems.INVENTORY_LINKER);
+		simpleItem(ModItems.INVENTORY_DROPPER.get());
+		simpleItem(ModItems.INVENTORY_LINKER.get());
 		
 		// Ratatable items
-		rotatableModel(name(ModItems.SLOW_INVENTORY_HOPPER), itemTexture(ModItems.SLOW_INVENTORY_HOPPER));
-		rotatableModel(name(ModItems.FAST_INVENTORY_HOPPER), itemTexture(ModItems.FAST_INVENTORY_HOPPER));
+		rotatableModel(name(ModItems.SLOW_INVENTORY_HOPPER.get()), itemTexture(ModItems.SLOW_INVENTORY_HOPPER.get()));
+		rotatableModel(name(ModItems.FAST_INVENTORY_HOPPER.get()), itemTexture(ModItems.FAST_INVENTORY_HOPPER.get()));
 
 		// Pomp
 		ItemModelBuilder mainPump = nested()
 			.parent(getExistingFile(mcLoc("item/generated")))
-			.texture("layer0", extend(itemTexture(ModItems.INVENTORY_PUMP), "/pump_0"));
+			.texture("layer0", extend(itemTexture(ModItems.INVENTORY_PUMP.get()), "/pump_0"));
 		
-		withExistingParent(name(ModItems.INVENTORY_PUMP), new ResourceLocation("forge", "item/default"))
+		withExistingParent(name(ModItems.INVENTORY_PUMP.get()), new ResourceLocation("forge", "item/default"))
 			.customLoader(RecursiveOverrideModelBuilder::begin)
 				.base(mainPump)
 				.end();
@@ -60,7 +60,7 @@ public class ModItemModelProvider extends ItemModelProvider
 			int actualFillValue = filled <= 0 ? 0 : filled <= 5 ? filled - 1 : 9 - filled;
 			String fluidTextureLabel = actualFillValue + (filled > 0 && filled < 5 ? "_f" : "");
 			
-			ModelFile basePomp = withExistingParent(name(ModItems.INVENTORY_PUMP) + "_" + filled + "_base", new ResourceLocation("forge", "item/default"))
+			ModelFile basePomp = withExistingParent(name(ModItems.INVENTORY_PUMP.get()) + "_" + filled + "_base", new ResourceLocation("forge", "item/default"))
 				.customLoader(DynamicBucketModelBuilder::begin)
 					.fluid(Fluids.EMPTY)
 					.flipGas(false)
@@ -68,10 +68,10 @@ public class ModItemModelProvider extends ItemModelProvider
 					.coverIsMask(false)
 					.applyFluidLuminosity(true)
 					.end()
-				.texture("base", extend(itemTexture(ModItems.INVENTORY_PUMP), "/pump_" + actualFillValue))
-				.texture("fluid", extend(itemTexture(ModItems.INVENTORY_PUMP), "/fluid_" + fluidTextureLabel));
+				.texture("base", extend(itemTexture(ModItems.INVENTORY_PUMP.get()), "/pump_" + actualFillValue))
+				.texture("fluid", extend(itemTexture(ModItems.INVENTORY_PUMP.get()), "/fluid_" + fluidTextureLabel));
 			
-			ModelFile rotatablePomp = rotatableModel(name(ModItems.INVENTORY_PUMP) + "_" + filled, basePomp);
+			ModelFile rotatablePomp = rotatableModel(name(ModItems.INVENTORY_PUMP.get()) + "_" + filled, basePomp);
 			
 			mainPump.override()
 				.predicate(InventoryPumpItem.FILL_GETTER_LOC, filled - 0.01f)

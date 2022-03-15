@@ -1,12 +1,12 @@
 package fr.max2.factinventory.init;
 
 import fr.max2.factinventory.capability.ITileEntityHandler;
-import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 
 public class ModCapabilities
 {
-	public static void registerCappabilities()
+	public static void registerCappabilities(RegisterCapabilitiesEvent event)
 	{
-		CapabilityManager.INSTANCE.register(ITileEntityHandler.class);
+		event.register(ITileEntityHandler.class);
 	}
 }

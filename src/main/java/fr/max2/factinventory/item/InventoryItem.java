@@ -18,8 +18,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-import net.minecraft.world.item.Item.Properties;
-
 public abstract class InventoryItem extends Item
 {
 	

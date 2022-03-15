@@ -21,7 +21,7 @@ public class ModRecipeProvider extends RecipeProvider
 	@Override
 	protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer)
 	{
-		ShapedRecipeBuilder.shaped(ModItems.INTERACTION_MODULE)
+		ShapedRecipeBuilder.shaped(ModItems.INTERACTION_MODULE.get())
 			.pattern("GIG")
 			.pattern("IEI")
 			.pattern("GIG")
@@ -31,52 +31,52 @@ public class ModRecipeProvider extends RecipeProvider
 			.unlockedBy("has_ender_pearl", has(Items.ENDER_PEARL))
 			.save(consumer);
 		
-		ShapedRecipeBuilder.shaped(ModItems.SLOW_INVENTORY_HOPPER)
+		ShapedRecipeBuilder.shaped(ModItems.SLOW_INVENTORY_HOPPER.get())
 			.pattern("M")
 			.pattern("H")
 			.pattern("M")
-			.define('M', ModItems.INTERACTION_MODULE)
+			.define('M', ModItems.INTERACTION_MODULE.get())
 			.define('H', Items.HOPPER)
-			.unlockedBy("has_interactivity_modules", has(ModItems.INTERACTION_MODULE))
+			.unlockedBy("has_interactivity_modules", has(ModItems.INTERACTION_MODULE.get()))
 			.save(consumer);
 
-		ShapedRecipeBuilder.shaped(ModItems.FAST_INVENTORY_HOPPER)
+		ShapedRecipeBuilder.shaped(ModItems.FAST_INVENTORY_HOPPER.get())
 			.pattern("DHD")
 			.pattern("DMD")
 			.pattern("DHD")
-			.define('M', ModItems.INTERACTION_MODULE)
-			.define('H', ModItems.SLOW_INVENTORY_HOPPER)
+			.define('M', ModItems.INTERACTION_MODULE.get())
+			.define('H', ModItems.SLOW_INVENTORY_HOPPER.get())
 			.define('D', Tags.Items.GEMS_DIAMOND)
-			.unlockedBy("has_interactivity_modules", has(ModItems.INTERACTION_MODULE))
+			.unlockedBy("has_interactivity_modules", has(ModItems.INTERACTION_MODULE.get()))
 			.save(consumer);
 
-		ShapedRecipeBuilder.shaped(ModItems.INVENTORY_FURNACE)
+		ShapedRecipeBuilder.shaped(ModItems.INVENTORY_FURNACE.get())
 			.pattern(" M ")
 			.pattern("MFM")
 			.pattern(" M ")
-			.define('M', ModItems.INTERACTION_MODULE)
+			.define('M', ModItems.INTERACTION_MODULE.get())
 			.define('F', Items.FURNACE)
-			.unlockedBy("has_interactivity_modules", has(ModItems.INTERACTION_MODULE))
+			.unlockedBy("has_interactivity_modules", has(ModItems.INTERACTION_MODULE.get()))
 			.save(consumer);
 
-		ShapedRecipeBuilder.shaped(ModItems.INVENTORY_DROPPER)
+		ShapedRecipeBuilder.shaped(ModItems.INVENTORY_DROPPER.get())
 			.pattern(" M ")
 			.pattern("MDM")
 			.pattern(" M ")
-			.define('M', ModItems.INTERACTION_MODULE)
+			.define('M', ModItems.INTERACTION_MODULE.get())
 			.define('D', Items.DROPPER)
-			.unlockedBy("has_interactivity_modules", has(ModItems.INTERACTION_MODULE))
+			.unlockedBy("has_interactivity_modules", has(ModItems.INTERACTION_MODULE.get()))
 			.save(consumer);
 
-		ShapedRecipeBuilder.shaped(ModItems.INVENTORY_PUMP)
+		ShapedRecipeBuilder.shaped(ModItems.INVENTORY_PUMP.get())
 			.pattern("BMB")
 			.pattern("GIG")
 			.pattern("GMG")
-			.define('M', ModItems.INTERACTION_MODULE)
+			.define('M', ModItems.INTERACTION_MODULE.get())
 			.define('B', Items.BUCKET)
 			.define('G', Tags.Items.INGOTS_GOLD)
 			.define('I', Tags.Items.INGOTS_IRON)
-			.unlockedBy("has_interactivity_modules", has(ModItems.INTERACTION_MODULE))
+			.unlockedBy("has_interactivity_modules", has(ModItems.INTERACTION_MODULE.get()))
 			.save(consumer);
 		
 		// Inventory linker is too experimental

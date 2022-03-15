@@ -9,11 +9,11 @@ import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
@@ -35,12 +35,12 @@ public class ItemTileEntityWrapperHandler implements IItemHandlerModifiable, ICa
 		{
 			CompoundTag tag = this.stack.getTag();
 			
-			if (tag.contains("BlockEntityTag", NBT.TAG_COMPOUND))
+			if (tag.contains("BlockEntityTag", Tag.TAG_COMPOUND))
 			{
 				CompoundTag data = tag.getCompound("BlockEntityTag");
-				if (data.contains("Items", NBT.TAG_LIST))
+				if (data.contains("Items", Tag.TAG_LIST))
 				{
-					return data.getList("Items", NBT.TAG_COMPOUND);
+					return data.getList("Items", Tag.TAG_COMPOUND);
 				}
 			}
 		}
@@ -58,7 +58,7 @@ public class ItemTileEntityWrapperHandler implements IItemHandlerModifiable, ICa
 		}
 		
 		
-		if (!tag.contains("BlockEntityTag", NBT.TAG_COMPOUND))
+		if (!tag.contains("BlockEntityTag", Tag.TAG_COMPOUND))
 		{
 			CompoundTag data = new CompoundTag();
 			tag.put("BlockEntityTag", data);
@@ -66,9 +66,9 @@ public class ItemTileEntityWrapperHandler implements IItemHandlerModifiable, ICa
 		
 		CompoundTag data = tag.getCompound("BlockEntityTag");
 		
-		if (data.contains("Items", NBT.TAG_LIST))
+		if (data.contains("Items", Tag.TAG_LIST))
 		{
-			return data.getList("Items", NBT.TAG_COMPOUND);
+			return data.getList("Items", Tag.TAG_COMPOUND);
 		}
 		else
 		{

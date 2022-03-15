@@ -25,8 +25,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 
-import net.minecraft.world.item.Item.Properties;
-
 public class InventoryLinkerItem extends Item
 {
 	
