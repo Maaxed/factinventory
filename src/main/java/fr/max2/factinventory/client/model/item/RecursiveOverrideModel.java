@@ -12,21 +12,20 @@ import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 
 import fr.max2.factinventory.FactinventoryMod;
-import net.minecraft.client.renderer.model.BlockModel;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.IModelTransform;
-import net.minecraft.client.renderer.model.IUnbakedModel;
-import net.minecraft.client.renderer.model.ItemOverride;
-import net.minecraft.client.renderer.model.ItemOverrideList;
-import net.minecraft.client.renderer.model.ModelBakery;
-import net.minecraft.client.renderer.model.RenderMaterial;
+import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.model.BakedModelWrapper;
 import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.IModelLoader;
@@ -42,54 +41,54 @@ public class RecursiveOverrideModel implements IModelGeometry<RecursiveOverrideM
 	}
 
 	@Override
-	public IBakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<RenderMaterial, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform, ItemOverrideList overrides, ResourceLocation modelLocation)
+	public BakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation)
 	{
-		return new BakedModel(this.baseModel.bake(bakery, this.baseModel, spriteGetter, modelTransform, modelLocation, owner.isSideLit()));
+		return new CustomBakedModel(this.baseModel.bake(bakery, this.baseModel, spriteGetter, modelTransform, modelLocation, owner.isSideLit()));
 	}
 
 	@Override
-	public Collection<RenderMaterial> getTextures(IModelConfiguration owner, Function<ResourceLocation, IUnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors)
+	public Collection<Material> getTextures(IModelConfiguration owner, Function<ResourceLocation, UnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors)
 	{
 		return this.baseModel.getMaterials(modelGetter, missingTextureErrors);
 	}
 	
-	public static class BakedModel extends BakedModelWrapper<IBakedModel>
+	public static class CustomBakedModel extends BakedModelWrapper<BakedModel>
 	{
 		private final RecursiveOverrideList overrides;
-		public BakedModel(IBakedModel originalModel)
+		public CustomBakedModel(BakedModel originalModel)
 		{
 			super(originalModel);
 			this.overrides = new RecursiveOverrideList(originalModel.getOverrides());
 		}
 		
 		@Override
-		public ItemOverrideList getOverrides()
+		public ItemOverrides getOverrides()
 		{
 			return this.overrides;
 		}
 	}
 	
-	public static class RecursiveOverrideList extends ItemOverrideList
+	public static class RecursiveOverrideList extends ItemOverrides
 	{
-		private final ItemOverrideList base;
+		private final ItemOverrides base;
 
-		public RecursiveOverrideList(ItemOverrideList base)
+		public RecursiveOverrideList(ItemOverrides base)
 		{
 			this.base = base;
 		}
 		
 		@Override
 		@Nullable
-		public IBakedModel resolve(IBakedModel model, ItemStack stack, @Nullable ClientWorld world, @Nullable LivingEntity livingEntity)
+		public BakedModel resolve(BakedModel model, ItemStack stack, @Nullable ClientLevel world, @Nullable LivingEntity livingEntity, int pSeed)
 		{
-			IBakedModel overrideModel = this.base.resolve(model, stack, world, livingEntity);
+			BakedModel overrideModel = this.base.resolve(model, stack, world, livingEntity, pSeed);
 			if (overrideModel == model || overrideModel == null)
 				return overrideModel;
-			return overrideModel.getOverrides().resolve(overrideModel, stack, world, livingEntity);
+			return overrideModel.getOverrides().resolve(overrideModel, stack, world, livingEntity, pSeed);
 		}
 		
 		@Override
-		public ImmutableList<ItemOverride> getOverrides()
+		public ImmutableList<BakedOverride> getOverrides()
 		{
 			return this.base.getOverrides();
 		}
@@ -101,7 +100,7 @@ public class RecursiveOverrideModel implements IModelGeometry<RecursiveOverrideM
 		public static final ResourceLocation ID = FactinventoryMod.loc("recursive_overrides");
 
 		@Override
-		public void onResourceManagerReload(IResourceManager resourceManager)
+		public void onResourceManagerReload(ResourceManager resourceManager)
 		{
 			// Nothing to do
 		}
@@ -109,7 +108,7 @@ public class RecursiveOverrideModel implements IModelGeometry<RecursiveOverrideM
 		@Override
 		public RecursiveOverrideModel read(JsonDeserializationContext deserializationContext, JsonObject modelContents)
 		{
-			BlockModel baseModel = deserializationContext.deserialize(JSONUtils.getAsJsonObject(modelContents, "base"), BlockModel.class);
+			BlockModel baseModel = deserializationContext.deserialize(GsonHelper.getAsJsonObject(modelContents, "base"), BlockModel.class);
 			return new RecursiveOverrideModel(baseModel);
 		}
 		

@@ -3,27 +3,27 @@ package fr.max2.factinventory.capability;
 import javax.annotation.Nullable;
 
 import fr.max2.factinventory.FactinventoryMod;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.common.thread.EffectiveSide;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.fml.util.thread.EffectiveSide;
+import net.minecraftforge.fmllegacy.server.ServerLifecycleHooks;
 
-public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializable<CompoundNBT>
+public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializable<CompoundTag>
 {
 	@Nullable
 	protected BlockPos targetPos;
 	@Nullable
 	protected Direction targetSide;
 	@Nullable
-	protected RegistryKey<World> worldKey;
+	protected ResourceKey<Level> worldKey;
 	
 	@Override
 	public boolean hasTileData()
@@ -40,13 +40,13 @@ public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializ
 	
 	@Override
 	@Nullable
-	public RegistryKey<World> getTileWorld()
+	public ResourceKey<Level> getTileWorld()
 	{
 		return this.worldKey;
 	}
 
 	@Nullable
-	protected World getWorld()
+	protected Level getWorld()
 	{
 		if (this.worldKey == null) return null;
 		return EffectiveSide.get().isClient()
@@ -56,15 +56,15 @@ public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializ
 	
 	@Override
 	@Nullable
-	public TileEntity getTile()
+	public BlockEntity getTile()
 	{
-		World world = this.getWorld();
+		Level world = this.getWorld();
 		
 		return world == null || this.targetPos == null ? null : world.getBlockEntity(this.targetPos);
 	}
 
 	@Override
-	public void setTile(@Nullable TileEntity tile, @Nullable Direction side)
+	public void setTile(@Nullable BlockEntity tile, @Nullable Direction side)
 	{
 		if (tile == null)
 		{
@@ -86,9 +86,9 @@ public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializ
 	}
 
 	@Override
-	public CompoundNBT serializeNBT()
+	public CompoundTag serializeNBT()
 	{
-		CompoundNBT data = new CompoundNBT();
+		CompoundTag data = new CompoundTag();
 		if (hasTileData())
 		{
 			data.putInt("link_x", this.targetPos.getX());
@@ -101,14 +101,14 @@ public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializ
 	}
 
 	@Override
-	public void deserializeNBT(CompoundNBT nbt)
+	public void deserializeNBT(CompoundTag nbt)
 	{
 		if (nbt.contains("link_dimension", NBT.TAG_STRING))
 		{
 			this.targetPos = new BlockPos(nbt.getInt("link_x"),
 										  nbt.getInt("link_y"),
 										  nbt.getInt("link_z"));
-			this.worldKey = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(nbt.getString("link_dimension")));
+			this.worldKey = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(nbt.getString("link_dimension")));
 			byte side = nbt.getByte("link_side");
 			
 			this.targetSide = side == (byte)-1 ? null : Direction.from3DDataValue(side);

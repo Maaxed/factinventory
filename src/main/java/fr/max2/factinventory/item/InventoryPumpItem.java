@@ -8,22 +8,22 @@ import javax.annotation.Nullable;
 import fr.max2.factinventory.FactinventoryMod;
 import fr.max2.factinventory.client.gui.GuiRenderHandler.Icon;
 import fr.max2.factinventory.utils.StringUtils;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.IItemPropertyGetter;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.IntNBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.client.renderer.item.ItemPropertyFunction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntTag;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -36,12 +36,14 @@ import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
 
+import net.minecraft.world.item.Item.Properties;
+
 public class InventoryPumpItem extends RotatableInventoryItem
 {
 	public static final ResourceLocation FILL_GETTER_LOC = new ResourceLocation(FactinventoryMod.MOD_ID, "filled");
 	@OnlyIn(Dist.CLIENT)
-	public static final IItemPropertyGetter
-		FILL_GETTER = (stack, world, entity) ->
+	public static final ItemPropertyFunction
+		FILL_GETTER = (stack, world, entity, seed) ->
 		{
 			IFluidHandlerItem contentCapa = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).orElse(null);
 			if (contentCapa == null) return 0;
@@ -61,16 +63,16 @@ public class InventoryPumpItem extends RotatableInventoryItem
 	}
 	
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
+	public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn)
 	{
 		if (Screen.hasShiftDown())
 		{
-			tooltip.add(new TranslationTextComponent("tooltip.input.desc").withStyle(TextFormatting.BLUE));
-			tooltip.add(new TranslationTextComponent("tooltip.output.desc").withStyle(TextFormatting.GOLD));
+			tooltip.add(new TranslatableComponent("tooltip.input.desc").withStyle(ChatFormatting.BLUE));
+			tooltip.add(new TranslatableComponent("tooltip.output.desc").withStyle(ChatFormatting.GOLD));
 		}
 		else
 		{
-			tooltip.add(new TranslationTextComponent("tooltip.interaction_info_on_shift.desc"));
+			tooltip.add(new TranslatableComponent("tooltip.interaction_info_on_shift.desc"));
 		}
 		
 		if (Screen.hasControlDown())
@@ -78,19 +80,19 @@ public class InventoryPumpItem extends RotatableInventoryItem
 			FluidStack transferringItem = FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY);
 			if (transferringItem.isEmpty())
 			{
-				tooltip.add(new TranslationTextComponent("tooltip.not_transferring.desc"));
+				tooltip.add(new TranslatableComponent("tooltip.not_transferring.desc"));
 			}
 			else
 			{
-				tooltip.add(new TranslationTextComponent("tooltip.transferring_item.desc", transferringItem.getDisplayName()));
+				tooltip.add(new TranslatableComponent("tooltip.transferring_item.desc", transferringItem.getDisplayName()));
 			}
 			
 			
-			tooltip.add(new TranslationTextComponent("tooltip.transfer_progress.desc", StringUtils.progress(8 - getTransferTime(stack), 8)));
+			tooltip.add(new TranslatableComponent("tooltip.transfer_progress.desc", StringUtils.progress(8 - getTransferTime(stack), 8)));
 		}
 		else
 		{
-			tooltip.add(new TranslationTextComponent("tooltip.transfer_info_on_ctrl.desc"));
+			tooltip.add(new TranslatableComponent("tooltip.transfer_info_on_ctrl.desc"));
 		}
 	}
 	
@@ -101,11 +103,11 @@ public class InventoryPumpItem extends RotatableInventoryItem
 	}
 	
 	@Override
-	protected void update(ItemStack stack, PlayerInventory inv, PlayerEntity player, int itemSlot)
+	protected void update(ItemStack stack, Inventory inv, Player player, int itemSlot)
 	{
 		Direction face = getFacing(stack);
 		
-		int width = PlayerInventory.getSelectionSize(),
+		int width = Inventory.getSelectionSize(),
 			height = inv.items.size() / width,
 			x = itemSlot % width,
 			y = itemSlot / width,
@@ -209,14 +211,14 @@ public class InventoryPumpItem extends RotatableInventoryItem
 	}
 
 	@Override
-	public List<Icon> getRenderIcons(ItemStack stack, ContainerScreen<?> gui, Slot slot, PlayerInventory inv)
+	public List<Icon> getRenderIcons(ItemStack stack, AbstractContainerScreen<?> gui, Slot slot, Inventory inv)
 	{
 		List<Icon> icons = new ArrayList<>();
 		
 		Direction face = getFacing(stack);
 		
 		int itemSlot = slot.getSlotIndex(),
-			width = PlayerInventory.getSelectionSize(),
+			width = Inventory.getSelectionSize(),
 			height = inv.items.size() / width;
 		
 		if (itemSlot >= width * height) return icons;
@@ -264,7 +266,7 @@ public class InventoryPumpItem extends RotatableInventoryItem
 	}
 	
 	@Override
-	public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt)
+	public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt)
 	{
 		return new FluidHandlerItemStack(stack, FluidAttributes.BUCKET_VOLUME);
 	}
@@ -295,7 +297,7 @@ public class InventoryPumpItem extends RotatableInventoryItem
 	{
 		if (stack.hasTag())
 		{
-			CompoundNBT tag = stack.getTag();
+			CompoundTag tag = stack.getTag();
 			if (tag.contains(NBT_TRANSFER_TIME, NBT.TAG_INT)) return tag.getInt(NBT_TRANSFER_TIME);
 		}
 		return 0;
@@ -303,7 +305,7 @@ public class InventoryPumpItem extends RotatableInventoryItem
 	
 	public static void setTransferTime(ItemStack stack, int transferTime)
 	{
-		stack.addTagElement(NBT_TRANSFER_TIME, IntNBT.valueOf(transferTime));
+		stack.addTagElement(NBT_TRANSFER_TIME, IntTag.valueOf(transferTime));
 	}
 	
 }

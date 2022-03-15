@@ -6,17 +6,19 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import fr.max2.factinventory.client.gui.GuiRenderHandler.Icon;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
+
+import net.minecraft.world.item.Item.Properties;
 
 public abstract class InventoryHopperItem extends RotatableInventoryItem
 {
@@ -27,28 +29,28 @@ public abstract class InventoryHopperItem extends RotatableInventoryItem
 	}
 	
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
+	public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn)
 	{
 		if (Screen.hasShiftDown())
 		{
-			tooltip.add(new TranslationTextComponent("tooltip.input.desc").withStyle(TextFormatting.BLUE));
-			tooltip.add(new TranslationTextComponent("tooltip.output.desc").withStyle(TextFormatting.GOLD));
+			tooltip.add(new TranslatableComponent("tooltip.input.desc").withStyle(ChatFormatting.BLUE));
+			tooltip.add(new TranslatableComponent("tooltip.output.desc").withStyle(ChatFormatting.GOLD));
 		}
 		else
 		{
-			tooltip.add(new TranslationTextComponent("tooltip.interaction_info_on_shift.desc"));
+			tooltip.add(new TranslatableComponent("tooltip.interaction_info_on_shift.desc"));
 		}
 	}
 
 	@Override
-	public List<Icon> getRenderIcons(ItemStack stack, ContainerScreen<?> gui, Slot slot, PlayerInventory inv)
+	public List<Icon> getRenderIcons(ItemStack stack, AbstractContainerScreen<?> gui, Slot slot, Inventory inv)
 	{
 		List<Icon> icons = new ArrayList<>();
 		
 		Direction face = getFacing(stack);
 		
 		int itemSlot = slot.getSlotIndex(),
-			width = PlayerInventory.getSelectionSize(),
+			width = Inventory.getSelectionSize(),
 			height = inv.items.size() / width;
 		
 		if (itemSlot >= width * height) return icons;

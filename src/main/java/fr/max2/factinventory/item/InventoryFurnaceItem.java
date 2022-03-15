@@ -8,46 +8,48 @@ import javax.annotation.Nullable;
 import fr.max2.factinventory.FactinventoryMod;
 import fr.max2.factinventory.client.gui.GuiRenderHandler.Icon;
 import fr.max2.factinventory.utils.InventoryUtils;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.item.ExperienceOrbEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.FurnaceFuelSlot;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.IItemPropertyGetter;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.FurnaceRecipe;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.IntNBT;
-import net.minecraft.tileentity.AbstractFurnaceTileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.inventory.FurnaceFuelSlot;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.client.renderer.item.ItemPropertyFunction;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.SmeltingRecipe;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntTag;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.hooks.BasicEventHooks;
+import net.minecraftforge.fmllegacy.hooks.BasicEventHooks;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+
+import net.minecraft.world.item.Item.Properties;
 
 public class InventoryFurnaceItem extends InventoryItem
 {
 	public static final ResourceLocation BURN_TIME_GETTER_LOC = new ResourceLocation(FactinventoryMod.MOD_ID, "burn_time");
 	@OnlyIn(Dist.CLIENT)
-	public static final IItemPropertyGetter
-		BURN_TIME_GETTER = (stack, worldIn, entityIn) -> getStackBurnTime(stack);
+	public static final ItemPropertyFunction
+		BURN_TIME_GETTER = (stack, worldIn, entityIn, seed) -> getStackBurnTime(stack);
 	
 	public InventoryFurnaceItem(Properties properties)
 	{
@@ -74,17 +76,17 @@ public class InventoryFurnaceItem extends InventoryItem
 	
 	@Override
     @OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
+	public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn)
 	{
 		if (Screen.hasShiftDown())
 		{
-			tooltip.add(new TranslationTextComponent("tooltip.ingredient_input.desc").withStyle(TextFormatting.BLUE));
-			tooltip.add(new TranslationTextComponent("tooltip.fuel_input.desc").withStyle(TextFormatting.DARK_PURPLE));
-			tooltip.add(new TranslationTextComponent("tooltip.product_output.desc").withStyle(TextFormatting.GOLD));
+			tooltip.add(new TranslatableComponent("tooltip.ingredient_input.desc").withStyle(ChatFormatting.BLUE));
+			tooltip.add(new TranslatableComponent("tooltip.fuel_input.desc").withStyle(ChatFormatting.DARK_PURPLE));
+			tooltip.add(new TranslatableComponent("tooltip.product_output.desc").withStyle(ChatFormatting.GOLD));
 		}
 		else
 		{
-			tooltip.add(new TranslationTextComponent("tooltip.interaction_info_on_shift.desc"));
+			tooltip.add(new TranslatableComponent("tooltip.interaction_info_on_shift.desc"));
 		}
 		
 		if (Screen.hasControlDown())
@@ -92,33 +94,33 @@ public class InventoryFurnaceItem extends InventoryItem
 			ItemStack smeltingItem = getSmeltingStack(stack);
 			if (smeltingItem.isEmpty())
 			{
-				tooltip.add(new TranslationTextComponent("tooltip.not_smelting.desc"));
+				tooltip.add(new TranslatableComponent("tooltip.not_smelting.desc"));
 			}
 			else
 			{
-				tooltip.add(new TranslationTextComponent("tooltip.smelting_item.desc", smeltingItem.getDisplayName()));
+				tooltip.add(new TranslatableComponent("tooltip.smelting_item.desc", smeltingItem.getDisplayName()));
 			}
 			
 			int burnTime = getStackBurnTime(stack);
 			if (burnTime > 0)
 			{
-				tooltip.add(new TranslationTextComponent("tooltip.burning_time.desc", burnTime));
+				tooltip.add(new TranslatableComponent("tooltip.burning_time.desc", burnTime));
 			}
 			else
 			{
-				tooltip.add(new TranslationTextComponent("tooltip.not_burning.desc"));
+				tooltip.add(new TranslatableComponent("tooltip.not_burning.desc"));
 			}
 		}
 		else
 		{
-			tooltip.add(new TranslationTextComponent("tooltip.smelting_info_on_ctrl.desc"));
+			tooltip.add(new TranslatableComponent("tooltip.smelting_info_on_ctrl.desc"));
 		}
 	}
 	
 	@Override
-	protected void update(ItemStack stack, PlayerInventory inv, PlayerEntity player, int itemSlot)
+	protected void update(ItemStack stack, Inventory inv, Player player, int itemSlot)
 	{
-		int width = PlayerInventory.getSelectionSize(),
+		int width = Inventory.getSelectionSize(),
 			height = inv.items.size() / width,
 			x = itemSlot % width,
 			y = itemSlot / width;
@@ -169,9 +171,9 @@ public class InventoryFurnaceItem extends InventoryItem
 	            		{
 	            			ItemStack currentSlot = inputCapa.extractItem(i, 1, true);
 	                        
-	            			IInventory slotInv = new Inventory(currentSlot);
+	            			Container slotInv = new SimpleContainer(currentSlot);
 	    	            	
-	    	            	FurnaceRecipe recipe = getSmeltingRecipe(player, slotInv);
+	    	            	SmeltingRecipe recipe = getSmeltingRecipe(player, slotInv);
 	    	            	if (recipe != null)
 	    	            	{
 		            			ItemStack result = recipe.assemble(slotInv);
@@ -185,9 +187,9 @@ public class InventoryFurnaceItem extends InventoryItem
 	            	}
 	            	else
 	            	{
-	            		IInventory slotInv = new Inventory(newInputStack);
+	            		Container slotInv = new SimpleContainer(newInputStack);
     	            	
-    	            	FurnaceRecipe recipe = getSmeltingRecipe(player, slotInv);
+    	            	SmeltingRecipe recipe = getSmeltingRecipe(player, slotInv);
     	            	if (recipe != null)
     	            	{
                 			ItemStack result = recipe.assemble(slotInv);
@@ -233,9 +235,9 @@ public class InventoryFurnaceItem extends InventoryItem
 						{
 							ItemStack testStack = fuelCapa.extractItem(i, 1, true);
 							
-							if (AbstractFurnaceTileEntity.isFuel(testStack) || FurnaceFuelSlot.isBucket(testStack) && testStack.getItem() != Items.BUCKET)
+							if (AbstractFurnaceBlockEntity.isFuel(testStack) || FurnaceFuelSlot.isBucket(testStack) && testStack.getItem() != Items.BUCKET)
 							{
-								burnTime = ForgeHooks.getBurnTime(testStack, IRecipeType.SMELTING);
+								burnTime = ForgeHooks.getBurnTime(testStack, RecipeType.SMELTING);
 								
 								if (burnTime > 0)
 								{
@@ -252,9 +254,9 @@ public class InventoryFurnaceItem extends InventoryItem
 						}
 						if (burnTime != 0) break;
 					}
-					else if (AbstractFurnaceTileEntity.isFuel(fuelItem) || FurnaceFuelSlot.isBucket(fuelItem) && fuelItem.getItem() != Items.BUCKET)
+					else if (AbstractFurnaceBlockEntity.isFuel(fuelItem) || FurnaceFuelSlot.isBucket(fuelItem) && fuelItem.getItem() != Items.BUCKET)
 					{
-						burnTime = ForgeHooks.getBurnTime(fuelItem, IRecipeType.SMELTING);
+						burnTime = ForgeHooks.getBurnTime(fuelItem, RecipeType.SMELTING);
 						
 						if (burnTime > 0)
 						{
@@ -298,9 +300,9 @@ public class InventoryFurnaceItem extends InventoryItem
         			{
     					int outputSlot = outputX + width * outputY;
     	            	ItemStack outputStack = inv.getItem(outputSlot);
-    	                IInventory slotInv = new Inventory(smeltingStack);
+    	                Container slotInv = new SimpleContainer(smeltingStack);
     	            	
-    	            	FurnaceRecipe recipe = getSmeltingRecipe(player, slotInv);
+    	            	SmeltingRecipe recipe = getSmeltingRecipe(player, slotInv);
     	            	if (recipe != null)
     	            	{
 		            		ItemStack result = recipe.assemble(inv);
@@ -343,9 +345,9 @@ public class InventoryFurnaceItem extends InventoryItem
 			                    }
 			                    else if (f < 1.0F)
 			                    {
-			                        int j = MathHelper.floor(i * f);
+			                        int j = Mth.floor(i * f);
 	
-			                        if (j < MathHelper.ceil(i * f) && Math.random() < i * f - j)
+			                        if (j < Mth.ceil(i * f) && Math.random() < i * f - j)
 			                        {
 			                            ++j;
 			                        }
@@ -355,9 +357,9 @@ public class InventoryFurnaceItem extends InventoryItem
 			                    
 			                    while (i > 0)
 			                    {
-			                        int k = ExperienceOrbEntity.getExperienceValue(i);
+			                        int k = ExperienceOrb.getExperienceValue(i);
 			                        i -= k;
-			                        player.level.addFreshEntity(new ExperienceOrbEntity(player.level, player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, k));
+			                        player.level.addFreshEntity(new ExperienceOrb(player.level, player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, k));
 			                    }
 	    		            	
 	    	                	setCookTime(stack, 0);
@@ -383,12 +385,12 @@ public class InventoryFurnaceItem extends InventoryItem
 	}
 
 	@Override
-	public List<Icon> getRenderIcons(ItemStack stack, ContainerScreen<?> gui, Slot slot, PlayerInventory inv)
+	public List<Icon> getRenderIcons(ItemStack stack, AbstractContainerScreen<?> gui, Slot slot, Inventory inv)
 	{
 		List<Icon> icons = new ArrayList<>();
 		
 		int itemSlot = slot.getSlotIndex(),
-			width = PlayerInventory.getSelectionSize(),
+			width = Inventory.getSelectionSize(),
 			height = inv.items.size() / width;
 		
 		if (itemSlot >= width * height) return icons;
@@ -451,9 +453,9 @@ public class InventoryFurnaceItem extends InventoryItem
 		return icons;
 	}
 	
-	private static FurnaceRecipe getSmeltingRecipe(PlayerEntity player, IInventory inv)
+	private static SmeltingRecipe getSmeltingRecipe(Player player, Container inv)
 	{
-		return player.level.getRecipeManager().getRecipeFor(IRecipeType.SMELTING, inv, player.level).orElse(null);
+		return player.level.getRecipeManager().getRecipeFor(RecipeType.SMELTING, inv, player.level).orElse(null);
 	}
 	
 	private static final Direction[] FUEL_SIDE = { Direction.EAST, Direction.WEST };
@@ -464,7 +466,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	{
 		if (stack.hasTag())
 		{
-			CompoundNBT tag = stack.getTag();
+			CompoundTag tag = stack.getTag();
 			if (tag.contains(NBT_BURN_TIME, NBT.TAG_INT)) return tag.getInt(NBT_BURN_TIME);
 		}
 		return 0;
@@ -472,7 +474,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	
 	public static void setBurnTime(ItemStack stack, int burnTime)
 	{
-		stack.addTagElement(NBT_BURN_TIME, IntNBT.valueOf(burnTime));
+		stack.addTagElement(NBT_BURN_TIME, IntTag.valueOf(burnTime));
 	}
 	
 	
@@ -482,7 +484,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	{
 		if (stack.hasTag())
 		{
-			CompoundNBT tag = stack.getTag();
+			CompoundTag tag = stack.getTag();
 			if (tag.contains(NBT_COOK_TIME, NBT.TAG_INT)) return tag.getInt(NBT_COOK_TIME);
 		}
 		return 0;
@@ -490,7 +492,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	
 	public static void setCookTime(ItemStack stack, int cookTime)
 	{
-		stack.addTagElement(NBT_COOK_TIME, IntNBT.valueOf(cookTime));
+		stack.addTagElement(NBT_COOK_TIME, IntTag.valueOf(cookTime));
 	}
 	
 	
@@ -500,7 +502,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	{
 		if (stack.hasTag())
 		{
-			CompoundNBT tag = stack.getTag();
+			CompoundTag tag = stack.getTag();
 			if (tag.contains(NBT_TOTAL_COOK_TIME, NBT.TAG_INT)) return tag.getInt(NBT_TOTAL_COOK_TIME);
 		}
 		return 0;
@@ -508,7 +510,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	
 	public static void setTotalCookTime(ItemStack stack, int cookTime)
 	{
-		stack.addTagElement(NBT_TOTAL_COOK_TIME, IntNBT.valueOf(cookTime));
+		stack.addTagElement(NBT_TOTAL_COOK_TIME, IntTag.valueOf(cookTime));
 	}
 	
 	
@@ -518,7 +520,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	{
 		if (stack.hasTag())
 		{
-			CompoundNBT tag = stack.getTag();
+			CompoundTag tag = stack.getTag();
 			if (tag.contains(NBT_ACTUAL_INPUT, NBT.TAG_COMPOUND)) return ItemStack.of(tag.getCompound(NBT_ACTUAL_INPUT));
 		}
 		return ItemStack.EMPTY;

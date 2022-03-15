@@ -8,13 +8,13 @@ import fr.max2.factinventory.FactinventoryMod;
 import fr.max2.factinventory.init.ModItemGroups;
 import fr.max2.factinventory.init.ModItems;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.DirectoryCache;
-import net.minecraft.data.IDataProvider;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
+import net.minecraft.data.HashCache;
+import net.minecraft.data.DataProvider;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.common.data.LanguageProvider;
 
-public class ModLanguagesProvider implements IDataProvider 
+public class ModLanguagesProvider implements DataProvider 
 {
 	private final List<LanguagePartProvider> languages = new ArrayList<>();
 	
@@ -78,7 +78,7 @@ public class ModLanguagesProvider implements IDataProvider
     }
 	
 	@Override
-	public void run(DirectoryCache cache) throws IOException
+	public void run(HashCache cache) throws IOException
 	{
 		this.addTranslations();
 		for (LanguageProvider language : this.languages)
@@ -92,7 +92,7 @@ public class ModLanguagesProvider implements IDataProvider
 		add(key.getDescriptionId(), names);
 	}
 	
-	protected void add(ItemGroup key, String... names)
+	protected void add(CreativeModeTab key, String... names)
 	{
 		add("itemGroup." + key.getRecipeFolderName(), names);
 	}

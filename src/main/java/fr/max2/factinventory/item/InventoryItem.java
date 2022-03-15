@@ -4,19 +4,21 @@ import java.util.List;
 
 import fr.max2.factinventory.client.gui.GuiRenderHandler;
 import fr.max2.factinventory.utils.InventoryUtils;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
-import net.minecraft.world.World;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+
+import net.minecraft.world.item.Item.Properties;
 
 public abstract class InventoryItem extends Item
 {
@@ -27,22 +29,22 @@ public abstract class InventoryItem extends Item
 	}
 	
 	@Override
-	public void inventoryTick(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected)
+	public void inventoryTick(ItemStack stack, Level world, Entity entity, int itemSlot, boolean isSelected)
 	{
-		if (entity instanceof PlayerEntity && !world.isClientSide)
+		if (entity instanceof Player && !world.isClientSide)
 		{
-			PlayerInventory inv = ((PlayerEntity)entity).inventory;
+			Inventory inv = ((Player)entity).getInventory();
 			
-			if (inv.getItem(itemSlot) == stack) this.update(stack, inv, (PlayerEntity)entity, itemSlot);
+			if (inv.getItem(itemSlot) == stack) this.update(stack, inv, (Player)entity, itemSlot);
 			
 		}
 		
 	}
 
-	protected abstract void update(ItemStack stack, PlayerInventory inv, PlayerEntity player, int itemSlot);
+	protected abstract void update(ItemStack stack, Inventory inv, Player player, int itemSlot);
 	
 	@OnlyIn(Dist.CLIENT)
-	public abstract List<GuiRenderHandler.Icon> getRenderIcons(ItemStack stack, ContainerScreen<?> gui, Slot slot, PlayerInventory inv);
+	public abstract List<GuiRenderHandler.Icon> getRenderIcons(ItemStack stack, AbstractContainerScreen<?> gui, Slot slot, Inventory inv);
 	
 	public static boolean canPush(ItemStack stack, ItemStack output, Direction face)
 	{
@@ -78,7 +80,7 @@ public abstract class InventoryItem extends Item
 		}
 	}
 	
-	public static Slot findSlot(ContainerScreen<?> gui, Slot original, int newIndex)
+	public static Slot findSlot(AbstractContainerScreen<?> gui, Slot original, int newIndex)
 	{
 		return gui.getMenu().slots.stream().filter(slot -> slot.isSameInventory(original) && slot.getSlotIndex() == newIndex).findAny().orElse(null);
 	}

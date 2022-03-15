@@ -1,13 +1,15 @@
 package fr.max2.factinventory.item;
 
 import fr.max2.factinventory.utils.InventoryUtils;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+
+import net.minecraft.world.item.Item.Properties;
 
 public class FastInventoryHopperItem extends InventoryHopperItem
 {
@@ -18,11 +20,11 @@ public class FastInventoryHopperItem extends InventoryHopperItem
 	}
 	
 	@Override
-	protected void update(ItemStack stack, PlayerInventory inv, PlayerEntity player, int itemSlot)
+	protected void update(ItemStack stack, Inventory inv, Player player, int itemSlot)
 	{
 		Direction face = getFacing(stack);
 		
-		int width = PlayerInventory.getSelectionSize(),
+		int width = Inventory.getSelectionSize(),
 			height = inv.items.size() / width,
 			x = itemSlot % width,
 			y = itemSlot / width,

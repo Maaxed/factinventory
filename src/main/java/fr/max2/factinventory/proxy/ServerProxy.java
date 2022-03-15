@@ -1,14 +1,14 @@
 package fr.max2.factinventory.proxy;
 
-import net.minecraft.util.RegistryKey;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.fmllegacy.server.ServerLifecycleHooks;
 
 public class ServerProxy implements ISidedProxy
 {
 	
 	@Override
-	public World getWorldByDimension(RegistryKey<World> worldKey)
+	public Level getWorldByDimension(ResourceKey<Level> worldKey)
 	{
 		return ServerLifecycleHooks.getCurrentServer().getLevel(worldKey);
 	}

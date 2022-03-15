@@ -1,11 +1,11 @@
 package fr.max2.factinventory.proxy;
 
-import net.minecraft.util.RegistryKey;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 
 public interface ISidedProxy
 {
 	
-	World getWorldByDimension(RegistryKey<World> worldKey);
+	Level getWorldByDimension(ResourceKey<Level> worldKey);
 	
 }

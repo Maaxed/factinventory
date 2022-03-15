@@ -3,16 +3,16 @@ package fr.max2.factinventory.capability;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 
-public class InventoryLinkerHandler extends SimpleTileEntityHandler implements ICapabilitySerializable<CompoundNBT>
+public class InventoryLinkerHandler extends SimpleTileEntityHandler implements ICapabilitySerializable<CompoundTag>
 {
 	@Nullable
 	private final ItemStack stack;
@@ -28,7 +28,7 @@ public class InventoryLinkerHandler extends SimpleTileEntityHandler implements I
 	{
 		if (cap == CapabilityTileEntityHandler.CAPABILITY_TILE) return LazyOptional.of(() -> this).cast();
 		
-		TileEntity te = this.getTile();
+		BlockEntity te = this.getTile();
 		if (te == null) return LazyOptional.empty();
 		
 		if (cap == CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY && this.stack != null)

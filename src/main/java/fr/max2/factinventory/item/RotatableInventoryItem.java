@@ -1,19 +1,21 @@
 package fr.max2.factinventory.item;
 
 import fr.max2.factinventory.FactinventoryMod;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.IItemPropertyGetter;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.client.renderer.item.ItemPropertyFunction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
+
+import net.minecraft.world.item.Item.Properties;
 
 public abstract class RotatableInventoryItem extends InventoryItem
 {
@@ -21,8 +23,8 @@ public abstract class RotatableInventoryItem extends InventoryItem
 
 	public static final ResourceLocation FACING_GETTER_LOC = new ResourceLocation(FactinventoryMod.MOD_ID, "facing");
 	@OnlyIn(Dist.CLIENT)
-	public static final IItemPropertyGetter
-		FACING_GETTER = (stack, worldIn, entityIn) -> getFacing(stack).get2DDataValue();
+	public static final ItemPropertyFunction
+		FACING_GETTER = (stack, worldIn, entityIn, seed) -> getFacing(stack).get2DDataValue();
 	
 	public RotatableInventoryItem(Properties properties)
 	{
@@ -30,13 +32,13 @@ public abstract class RotatableInventoryItem extends InventoryItem
 	}
 	
 	@Override
-	public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand)
+	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
 	{
 		ItemStack stack = player.getItemInHand(hand);
 		
 		rotate(stack);
 		
-		return new ActionResult<>(ActionResultType.SUCCESS, stack);
+		return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
 	}
 	
 	
@@ -46,7 +48,7 @@ public abstract class RotatableInventoryItem extends InventoryItem
 	{
 		if (stack.hasTag())
 		{
-			CompoundNBT tag = stack.getTag();
+			CompoundTag tag = stack.getTag();
 			if (tag.contains(NBT_FACING, NBT.TAG_BYTE)) return Direction.from2DDataValue(tag.getByte(NBT_FACING));
 		}
 		return Direction.NORTH;
@@ -54,9 +56,9 @@ public abstract class RotatableInventoryItem extends InventoryItem
 	
 	public static void rotate(ItemStack stack)
 	{
-		if (!stack.hasTag()) stack.setTag(new CompoundNBT());
+		if (!stack.hasTag()) stack.setTag(new CompoundTag());
 		
-		CompoundNBT tag = stack.getTag();
+		CompoundTag tag = stack.getTag();
 		
 		Direction face = tag.contains(NBT_FACING, NBT.TAG_BYTE) ? Direction.from2DDataValue(tag.getByte(NBT_FACING)) : Direction.NORTH;
 		face = face.getClockWise();

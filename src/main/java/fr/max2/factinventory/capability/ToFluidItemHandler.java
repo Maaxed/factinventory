@@ -2,10 +2,12 @@ package fr.max2.factinventory.capability;
 
 import javax.annotation.Nonnull;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 
 public class ToFluidItemHandler implements IFluidHandlerItem
 {

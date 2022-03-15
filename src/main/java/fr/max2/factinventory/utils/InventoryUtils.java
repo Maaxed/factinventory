@@ -1,6 +1,6 @@
 package fr.max2.factinventory.utils;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class InventoryUtils
 {

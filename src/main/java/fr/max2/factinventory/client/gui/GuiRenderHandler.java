@@ -2,18 +2,18 @@ package fr.max2.factinventory.client.gui;
 
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import fr.max2.factinventory.FactinventoryMod;
 import fr.max2.factinventory.item.InventoryItem;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import com.mojang.blaze3d.platform.Lighting;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.GuiScreenEvent;
@@ -29,24 +29,24 @@ public class GuiRenderHandler
 	@SubscribeEvent
 	public static void onGuiRender(GuiScreenEvent.DrawScreenEvent.Post event)
 	{
-		if (event.getGui() instanceof ContainerScreen<?>)
+		if (event.getGui() instanceof AbstractContainerScreen<?>)
 		{
-			ContainerScreen<?> gui = (ContainerScreen<?>) event.getGui();
+			AbstractContainerScreen<?> gui = (AbstractContainerScreen<?>) event.getGui();
 			
 			Slot slot = gui.getSlotUnderMouse();
 			
-			if (slot != null && slot.container instanceof PlayerInventory && slot.getItem().getItem() instanceof InventoryItem)
+			if (slot != null && slot.container instanceof Inventory && slot.getItem().getItem() instanceof InventoryItem)
 			{
-				RenderHelper.setupForFlatItems();
-				RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+				Lighting.setupForFlatItems();
+				RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
 				RenderSystem.enableDepthTest();
-				RenderSystem.enableAlphaTest();
+				//RenderSystem.enableAlphaTest();
 				
 				ItemStack stack = slot.getItem();
-				PlayerInventory inv = (PlayerInventory) slot.container;
-				MatrixStack ms = event.getMatrixStack();
+				Inventory inv = (Inventory) slot.container;
+				PoseStack ms = event.getMatrixStack();
 				
 				List<Icon> icons = ((InventoryItem)stack.getItem()).getRenderIcons(stack, gui, slot, inv);
 				
@@ -59,16 +59,16 @@ public class GuiRenderHandler
 					else drawIOIcon(gui, ms, icon.slot.x, icon.slot.y, icon.face, icon.color, icon.extract, icon.missing);
 				}
 				
-				RenderHelper.setupFor3DItems();
+				Lighting.setupFor3DItems();
 			}
 		}
 	}
 	
 	public static final ResourceLocation ICONS = new ResourceLocation(FactinventoryMod.MOD_ID, "textures/gui/io_icons.png");
 	
-	public static void drawIOIcon(ContainerScreen<?> gui, MatrixStack ms, int x, int y, Direction face, int color, boolean extract, boolean missing)
+	public static void drawIOIcon(AbstractContainerScreen<?> gui, PoseStack ms, int x, int y, Direction face, int color, boolean extract, boolean missing)
 	{
-		gui.getMinecraft().getTextureManager().bind(ICONS);
+		gui.getMinecraft().getTextureManager().bindForSetup(ICONS);
 		
 		int r = (color >> 16) & 255;
 		int g = (color >> 8) & 255;

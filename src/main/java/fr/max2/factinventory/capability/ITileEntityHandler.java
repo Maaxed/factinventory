@@ -2,11 +2,11 @@ package fr.max2.factinventory.capability;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public interface ITileEntityHandler
 {
@@ -15,15 +15,15 @@ public interface ITileEntityHandler
 	@Nullable
 	BlockPos getTilePos();
 	@Nullable
-	RegistryKey<World> getTileWorld();
+	ResourceKey<Level> getTileWorld();
 
 	@Nullable
-	TileEntity getTile();
+	BlockEntity getTile();
 	
-	void setTile(@Nullable TileEntity tile, @Nullable Direction side);
+	void setTile(@Nullable BlockEntity tile, @Nullable Direction side);
 
 	
-	default void setTile(TileEntity tile)
+	default void setTile(BlockEntity tile)
 	{
 		this.setTile(tile, null);
 	}

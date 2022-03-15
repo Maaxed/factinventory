@@ -4,12 +4,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import fr.max2.factinventory.utils.InventoryUtils;
-import net.minecraft.block.Block;
-import net.minecraft.block.ShulkerBoxBlock;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.Direction;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
@@ -29,42 +29,42 @@ public class ItemTileEntityWrapperHandler implements IItemHandlerModifiable, ICa
 		this.slots = slots;
 	}
 
-	private ListNBT getItems()
+	private ListTag getItems()
 	{
 		if (this.stack.hasTag())
 		{
-			CompoundNBT tag = this.stack.getTag();
+			CompoundTag tag = this.stack.getTag();
 			
 			if (tag.contains("BlockEntityTag", NBT.TAG_COMPOUND))
 			{
-				CompoundNBT data = tag.getCompound("BlockEntityTag");
+				CompoundTag data = tag.getCompound("BlockEntityTag");
 				if (data.contains("Items", NBT.TAG_LIST))
 				{
 					return data.getList("Items", NBT.TAG_COMPOUND);
 				}
 			}
 		}
-		return new ListNBT();
+		return new ListTag();
 	}
 	
-	private ListNBT getOrCreateItems()
+	private ListTag getOrCreateItems()
 	{
-		CompoundNBT tag = this.stack.getTag();
+		CompoundTag tag = this.stack.getTag();
 		
 		if (tag == null)
 		{
-			tag = new CompoundNBT();
+			tag = new CompoundTag();
 			this.stack.setTag(tag);
 		}
 		
 		
 		if (!tag.contains("BlockEntityTag", NBT.TAG_COMPOUND))
 		{
-			CompoundNBT data = new CompoundNBT();
+			CompoundTag data = new CompoundTag();
 			tag.put("BlockEntityTag", data);
 		}
 		
-		CompoundNBT data = tag.getCompound("BlockEntityTag");
+		CompoundTag data = tag.getCompound("BlockEntityTag");
 		
 		if (data.contains("Items", NBT.TAG_LIST))
 		{
@@ -72,7 +72,7 @@ public class ItemTileEntityWrapperHandler implements IItemHandlerModifiable, ICa
 		}
 		else
 		{
-			ListNBT items = new ListNBT();
+			ListTag items = new ListTag();
 			data.put("Items", items);
 			return items;
 		}
@@ -87,10 +87,10 @@ public class ItemTileEntityWrapperHandler implements IItemHandlerModifiable, ICa
 	@Override
 	public @Nonnull ItemStack getStackInSlot(int slot)
 	{
-		ListNBT items = this.getItems();
+		ListTag items = this.getItems();
 		for (int i = 0, count = items.size(); i < count; i++)
 		{
-			CompoundNBT item = items.getCompound(i);
+			CompoundTag item = items.getCompound(i);
 			int index = item.getByte("Slot");
 			if (index == slot)
 			{
@@ -158,15 +158,15 @@ public class ItemTileEntityWrapperHandler implements IItemHandlerModifiable, ICa
 	@Override
 	public void setStackInSlot(int slot, @Nonnull ItemStack stack)
 	{
-		ListNBT items = this.getOrCreateItems();
+		ListTag items = this.getOrCreateItems();
 		
-		CompoundNBT newItemTag = new CompoundNBT();
+		CompoundTag newItemTag = new CompoundTag();
 		newItemTag.putByte("Slot", (byte)slot);
 		stack.save(newItemTag);
 		
 		for (int i = 0, count = items.size(); i < count; i++)
 		{
-			CompoundNBT item = items.getCompound(i);
+			CompoundTag item = items.getCompound(i);
 			int index = item.getByte("Slot");
 			if (index == slot)
 			{

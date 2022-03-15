@@ -12,9 +12,9 @@ import fr.max2.factinventory.item.InventoryLinkerItem;
 import fr.max2.factinventory.item.InventoryPumpItem;
 import fr.max2.factinventory.item.RotatableInventoryItem;
 import fr.max2.factinventory.item.SlowInventoryHopperItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemModelsProperties;
-import net.minecraft.item.Item.Properties;
+import net.minecraft.world.item.Item;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.world.item.Item.Properties;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -56,11 +56,11 @@ public class ModItems
 	@SubscribeEvent
 	public static void initRendering(FMLClientSetupEvent event)
 	{
-		ItemModelsProperties.register(INVENTORY_FURNACE, InventoryFurnaceItem.BURN_TIME_GETTER_LOC, InventoryFurnaceItem.BURN_TIME_GETTER);
-		ItemModelsProperties.register(SLOW_INVENTORY_HOPPER, RotatableInventoryItem.FACING_GETTER_LOC, RotatableInventoryItem.FACING_GETTER);
-		ItemModelsProperties.register(FAST_INVENTORY_HOPPER, RotatableInventoryItem.FACING_GETTER_LOC, RotatableInventoryItem.FACING_GETTER);
-		ItemModelsProperties.register(INVENTORY_PUMP, RotatableInventoryItem.FACING_GETTER_LOC, RotatableInventoryItem.FACING_GETTER);
-		ItemModelsProperties.register(INVENTORY_PUMP, InventoryPumpItem.FILL_GETTER_LOC, InventoryPumpItem.FILL_GETTER);
+		ItemProperties.register(INVENTORY_FURNACE, InventoryFurnaceItem.BURN_TIME_GETTER_LOC, InventoryFurnaceItem.BURN_TIME_GETTER);
+		ItemProperties.register(SLOW_INVENTORY_HOPPER, RotatableInventoryItem.FACING_GETTER_LOC, RotatableInventoryItem.FACING_GETTER);
+		ItemProperties.register(FAST_INVENTORY_HOPPER, RotatableInventoryItem.FACING_GETTER_LOC, RotatableInventoryItem.FACING_GETTER);
+		ItemProperties.register(INVENTORY_PUMP, RotatableInventoryItem.FACING_GETTER_LOC, RotatableInventoryItem.FACING_GETTER);
+		ItemProperties.register(INVENTORY_PUMP, InventoryPumpItem.FILL_GETTER_LOC, InventoryPumpItem.FILL_GETTER);
 	}
 	
 	@OnlyIn(Dist.CLIENT)
