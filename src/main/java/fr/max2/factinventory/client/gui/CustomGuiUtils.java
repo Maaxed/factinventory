@@ -7,10 +7,7 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.math.Matrix4f;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
-@OnlyIn(Dist.CLIENT)
 public class CustomGuiUtils
 {
 	public static void drawRectWithSizedTexture(PoseStack ms, int x, int y, float z, int u, int v, int width, int height, int textureWidth, int textureHeight, int r, int g, int b, int a)

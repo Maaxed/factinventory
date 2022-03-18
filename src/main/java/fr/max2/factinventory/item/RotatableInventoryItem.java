@@ -1,29 +1,23 @@
 package fr.max2.factinventory.item;
 
-import fr.max2.factinventory.FactinventoryMod;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.client.renderer.item.ItemPropertyFunction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.InteractionResult;
+import fr.max2.factinventory.FactinventoryMod;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class RotatableInventoryItem extends InventoryItem
 {
 	public static final Direction[] ITEM_DIRECTIONS = new Direction[]{Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST};
 
 	public static final ResourceLocation FACING_GETTER_LOC = new ResourceLocation(FactinventoryMod.MOD_ID, "facing");
-	@OnlyIn(Dist.CLIENT)
-	public static final ItemPropertyFunction
-		FACING_GETTER = (stack, worldIn, entityIn, seed) -> getFacing(stack).get2DDataValue();
-	
+
 	public RotatableInventoryItem(Properties properties)
 	{
 		super(properties);

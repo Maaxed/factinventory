@@ -5,11 +5,10 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import fr.max2.factinventory.client.gui.GuiRenderHandler.Icon;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import fr.max2.factinventory.FactinventoryMod;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.Direction;
@@ -29,7 +28,7 @@ public abstract class InventoryHopperItem extends RotatableInventoryItem
 	@Override
 	public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn)
 	{
-		if (Screen.hasShiftDown())
+		if (FactinventoryMod.proxy.getKeyModifierState().shift)
 		{
 			tooltip.add(new TranslatableComponent("tooltip.input.desc").withStyle(ChatFormatting.BLUE));
 			tooltip.add(new TranslatableComponent("tooltip.output.desc").withStyle(ChatFormatting.GOLD));
@@ -41,7 +40,7 @@ public abstract class InventoryHopperItem extends RotatableInventoryItem
 	}
 
 	@Override
-	public List<Icon> getRenderIcons(ItemStack stack, AbstractContainerScreen<?> gui, Slot slot, Inventory inv)
+	public List<Icon> getRenderIcons(ItemStack stack, AbstractContainerMenu container, Slot slot, Inventory inv)
 	{
 		List<Icon> icons = new ArrayList<>();
 		
@@ -80,14 +79,14 @@ public abstract class InventoryHopperItem extends RotatableInventoryItem
 		
 		if (extractX >= 0 && extractX < width && extractY >= 0 && extractY < height)
 		{
-			Slot extractSlot = findSlot(gui, slot, extractX + width * extractY);
+			Slot extractSlot = findSlot(container, slot, extractX + width * extractY);
 			icons.add(new Icon(extractSlot, face, 0x0099FF, true, false));
 		}
 		else icons.add(new Icon(null, face, 0x0099FF, true, true));
 		
 		if (insertX >= 0 && insertX < width && insertY >= 0 && insertY < height)
 		{
-			Slot fillSlot = findSlot(gui, slot, insertX + width * insertY);
+			Slot fillSlot = findSlot(container, slot, insertX + width * insertY);
 			icons.add(new Icon(fillSlot, face.getOpposite(), 0xFF7700, false, false));
 		}
 		else icons.add(new Icon(null, face.getOpposite(), 0xFF7700, false, true));

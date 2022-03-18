@@ -6,27 +6,23 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import fr.max2.factinventory.FactinventoryMod;
-import fr.max2.factinventory.client.gui.GuiRenderHandler.Icon;
-import fr.max2.factinventory.utils.StringUtils;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import fr.max2.factinventory.utils.ChatComponentUtils;
+import fr.max2.factinventory.utils.KeyModifierState;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.client.renderer.item.ItemPropertyFunction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
@@ -39,21 +35,6 @@ import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
 public class InventoryPumpItem extends RotatableInventoryItem
 {
 	public static final ResourceLocation FILL_GETTER_LOC = new ResourceLocation(FactinventoryMod.MOD_ID, "filled");
-	@OnlyIn(Dist.CLIENT)
-	public static final ItemPropertyFunction
-		FILL_GETTER = (stack, world, entity, seed) ->
-		{
-			IFluidHandlerItem contentCapa = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).orElse(null);
-			if (contentCapa == null) return 0;
-			
-			FluidStack fluid = contentCapa.drain(FluidAttributes.BUCKET_VOLUME, FluidAction.SIMULATE);
-			if (fluid.isEmpty()) return 0;
-			
-			int value = getTransferTime(stack);
-			if (value > 8) value = 8;
-			if (value < 0) value = 0;
-			return value;
-		};
 	
 	public InventoryPumpItem(Properties properties)
 	{
@@ -63,7 +44,8 @@ public class InventoryPumpItem extends RotatableInventoryItem
 	@Override
 	public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn)
 	{
-		if (Screen.hasShiftDown())
+		KeyModifierState keyModifiers = FactinventoryMod.proxy.getKeyModifierState();
+		if (keyModifiers.shift)
 		{
 			tooltip.add(new TranslatableComponent("tooltip.input.desc").withStyle(ChatFormatting.BLUE));
 			tooltip.add(new TranslatableComponent("tooltip.output.desc").withStyle(ChatFormatting.GOLD));
@@ -73,7 +55,7 @@ public class InventoryPumpItem extends RotatableInventoryItem
 			tooltip.add(new TranslatableComponent("tooltip.interaction_info_on_shift.desc"));
 		}
 		
-		if (Screen.hasControlDown())
+		if (keyModifiers.control)
 		{
 			FluidStack transferringItem = FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY);
 			if (transferringItem.isEmpty())
@@ -86,7 +68,7 @@ public class InventoryPumpItem extends RotatableInventoryItem
 			}
 			
 			
-			tooltip.add(new TranslatableComponent("tooltip.transfer_progress.desc", StringUtils.progress(8 - getTransferTime(stack), 8)));
+			tooltip.add(new TranslatableComponent("tooltip.transfer_progress.desc", ChatComponentUtils.progress(8 - getTransferTime(stack), 8)));
 		}
 		else
 		{
@@ -209,7 +191,7 @@ public class InventoryPumpItem extends RotatableInventoryItem
 	}
 
 	@Override
-	public List<Icon> getRenderIcons(ItemStack stack, AbstractContainerScreen<?> gui, Slot slot, Inventory inv)
+	public List<Icon> getRenderIcons(ItemStack stack, AbstractContainerMenu container, Slot slot, Inventory inv)
 	{
 		List<Icon> icons = new ArrayList<>();
 		
@@ -248,14 +230,14 @@ public class InventoryPumpItem extends RotatableInventoryItem
 		
 		if (extractX >= 0 && extractX < width && extractY >= 0 && extractY < height)
 		{
-			Slot extractSlot = findSlot(gui, slot, extractX + width * extractY);
+			Slot extractSlot = findSlot(container, slot, extractX + width * extractY);
 			icons.add(new Icon(extractSlot, face, 0x0099FF, true, false));
 		}
 		else icons.add(new Icon(null, face, 0x0099FF, true, true));
 		
 		if (insertX >= 0 && insertX < width && insertY >= 0 && insertY < height)
 		{
-			Slot fillSlot = findSlot(gui, slot, insertX + width * insertY);
+			Slot fillSlot = findSlot(container, slot, insertX + width * insertY);
 			icons.add(new Icon(fillSlot, face.getOpposite(), 0xFF7700, false, false));
 		}
 		else icons.add(new Icon(null, face.getOpposite(), 0xFF7700, false, true));

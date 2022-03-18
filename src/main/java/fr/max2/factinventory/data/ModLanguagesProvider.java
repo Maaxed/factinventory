@@ -54,6 +54,7 @@ public class ModLanguagesProvider implements DataProvider
     	add("tooltip.product_output.desc", "Product output", "Sortie des produits");
     	add("tooltip.progress_bar.full", "§2█§r", "§2█§r");
     	add("tooltip.progress_bar.empty", "§8█§r", "§8█§r");
+    	add("tooltip.progress_bar.combine", "%s%s", "%s%s");
     	
     	add("tooltip.smelting_info_on_ctrl.desc", "Hold §e§lCTRL§r for smelting details", "Maintenir §e§lCTRL§r pour afficher les détails de cuisson");
     	add("tooltip.not_smelting.desc", "Empty", "Vide");

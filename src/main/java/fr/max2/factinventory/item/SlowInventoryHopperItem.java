@@ -5,8 +5,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import fr.max2.factinventory.utils.InventoryUtils;
-import fr.max2.factinventory.utils.StringUtils;
-import net.minecraft.client.gui.screens.Screen;
+import fr.max2.factinventory.FactinventoryMod;
+import fr.max2.factinventory.utils.ChatComponentUtils;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
@@ -35,7 +35,7 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 	{
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		
-		if (Screen.hasControlDown())
+		if (FactinventoryMod.proxy.getKeyModifierState().control)
 		{
 			ItemStack transferringItem = getTransferringStack(stack);
 			if (transferringItem.isEmpty())
@@ -47,7 +47,7 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 				tooltip.add(new TranslatableComponent("tooltip.transferring_item.desc", transferringItem.getDisplayName()));
 			}
 			
-			tooltip.add(new TranslatableComponent("tooltip.transfer_progress.desc", StringUtils.progress(8 - getTransferTime(stack), 8)));
+			tooltip.add(new TranslatableComponent("tooltip.transfer_progress.desc", ChatComponentUtils.progress(8 - getTransferTime(stack), 8)));
 		}
 		else
 		{

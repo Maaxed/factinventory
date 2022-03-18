@@ -6,19 +6,17 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import fr.max2.factinventory.FactinventoryMod;
-import fr.max2.factinventory.client.gui.GuiRenderHandler.Icon;
 import fr.max2.factinventory.utils.InventoryUtils;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import fr.max2.factinventory.utils.KeyModifierState;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.FurnaceFuelSlot;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.client.renderer.item.ItemPropertyFunction;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -29,14 +27,12 @@ import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fmllegacy.hooks.BasicEventHooks;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -45,9 +41,6 @@ import net.minecraftforge.items.IItemHandler;
 public class InventoryFurnaceItem extends InventoryItem
 {
 	public static final ResourceLocation BURN_TIME_GETTER_LOC = new ResourceLocation(FactinventoryMod.MOD_ID, "burn_time");
-	@OnlyIn(Dist.CLIENT)
-	public static final ItemPropertyFunction
-		BURN_TIME_GETTER = (stack, worldIn, entityIn, seed) -> getStackBurnTime(stack);
 	
 	public InventoryFurnaceItem(Properties properties)
 	{
@@ -73,10 +66,10 @@ public class InventoryFurnaceItem extends InventoryItem
 	}
 	
 	@Override
-    @OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn)
 	{
-		if (Screen.hasShiftDown())
+		KeyModifierState keyModifiers = FactinventoryMod.proxy.getKeyModifierState();
+		if (keyModifiers.shift)
 		{
 			tooltip.add(new TranslatableComponent("tooltip.ingredient_input.desc").withStyle(ChatFormatting.BLUE));
 			tooltip.add(new TranslatableComponent("tooltip.fuel_input.desc").withStyle(ChatFormatting.DARK_PURPLE));
@@ -87,7 +80,7 @@ public class InventoryFurnaceItem extends InventoryItem
 			tooltip.add(new TranslatableComponent("tooltip.interaction_info_on_shift.desc"));
 		}
 		
-		if (Screen.hasControlDown())
+		if (keyModifiers.control)
 		{
 			ItemStack smeltingItem = getSmeltingStack(stack);
 			if (smeltingItem.isEmpty())
@@ -383,7 +376,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	}
 
 	@Override
-	public List<Icon> getRenderIcons(ItemStack stack, AbstractContainerScreen<?> gui, Slot slot, Inventory inv)
+	public List<Icon> getRenderIcons(ItemStack stack, AbstractContainerMenu container, Slot slot, Inventory inv)
 	{
 		List<Icon> icons = new ArrayList<>();
 		
@@ -418,14 +411,14 @@ public class InventoryFurnaceItem extends InventoryItem
 		
 		if (pullY >= 0 && pullY < height)
 		{
-			Slot extractSlot = findSlot(gui, slot, x + width * pullY);
+			Slot extractSlot = findSlot(container, slot, x + width * pullY);
 			icons.add(new Icon(extractSlot, Direction.NORTH, 0x0099FF, true, false));
 		}
 		else icons.add(new Icon(null, Direction.NORTH, 0x0099FF, true, true));
 		
 		if (pushY >= 0 && pushY < height)
 		{
-			Slot fillSlot = findSlot(gui, slot, x + width * pushY);
+			Slot fillSlot = findSlot(container, slot, x + width * pushY);
 			icons.add(new Icon(fillSlot, Direction.SOUTH, 0xFF7700, false, false));
 		}
 		else icons.add(new Icon(null, Direction.SOUTH, 0xFF7700, false, true));
@@ -435,14 +428,14 @@ public class InventoryFurnaceItem extends InventoryItem
 		
 		if (fuelX1 >= 0 && fuelX1 < width)
 		{
-			Slot fuelSlot = findSlot(gui, slot, fuelX1 + width * y);
+			Slot fuelSlot = findSlot(container, slot, fuelX1 + width * y);
 			icons.add(new Icon(fuelSlot, Direction.WEST, 0xAA00FF, true, false));
 		}
 		else icons.add(new Icon(null, Direction.WEST, 0xAA00FF, true, true));
 		
 		if (fuelX2 >= 0 && fuelX2 < width)
 		{
-			Slot fuelSlot = findSlot(gui, slot, fuelX2 + width * y);
+			Slot fuelSlot = findSlot(container, slot, fuelX2 + width * y);
 			icons.add(new Icon(fuelSlot, Direction.EAST, 0xAA00FF, true, false));
 		}
 		else icons.add(new Icon(null, Direction.EAST, 0xAA00FF, true, true));

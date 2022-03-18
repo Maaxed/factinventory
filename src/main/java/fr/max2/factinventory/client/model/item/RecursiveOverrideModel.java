@@ -26,11 +26,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.BakedModelWrapper;
 import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.IModelLoader;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.geometry.IModelGeometry;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 
+@EventBusSubscriber(bus = Bus.MOD, modid = FactinventoryMod.MOD_ID, value = Dist.CLIENT)
 public class RecursiveOverrideModel implements IModelGeometry<RecursiveOverrideModel>
 {
 	private final BlockModel baseModel;
@@ -50,6 +57,12 @@ public class RecursiveOverrideModel implements IModelGeometry<RecursiveOverrideM
 	public Collection<Material> getTextures(IModelConfiguration owner, Function<ResourceLocation, UnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors)
 	{
 		return this.baseModel.getMaterials(modelGetter, missingTextureErrors);
+	}
+
+	@SubscribeEvent
+	public static void registerModelLoader(ModelRegistryEvent event)
+	{
+		ModelLoaderRegistry.registerLoader(RecursiveOverrideModel.Loader.ID, RecursiveOverrideModel.Loader.INSTANCE);
 	}
 	
 	public static class CustomBakedModel extends BakedModelWrapper<BakedModel>

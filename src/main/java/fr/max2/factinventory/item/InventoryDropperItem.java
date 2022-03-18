@@ -4,8 +4,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import fr.max2.factinventory.FactinventoryMod;
 import fr.max2.factinventory.capability.StackItemHandlerProvider;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -34,7 +34,7 @@ public class InventoryDropperItem extends Item
 	@Override
 	public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn)
 	{
-		if (Screen.hasControlDown())
+		if (FactinventoryMod.proxy.getKeyModifierState().control)
 		{
 			ItemStack droppingItem = getContentStack(stack);
 			if (droppingItem.isEmpty())
