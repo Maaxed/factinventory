@@ -8,6 +8,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import fr.max2.factinventory.FactinventoryMod;
 import fr.max2.factinventory.item.InventoryItem;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.GameRenderer;
+
 import com.mojang.blaze3d.platform.Lighting;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -42,7 +44,7 @@ public class GuiRenderHandler
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
 				RenderSystem.enableDepthTest();
-				//RenderSystem.enableAlphaTest();
+				RenderSystem.depthMask(false);
 				
 				ItemStack stack = slot.getItem();
 				Inventory inv = (Inventory) slot.container;
@@ -68,13 +70,14 @@ public class GuiRenderHandler
 	
 	public static void drawIOIcon(AbstractContainerScreen<?> gui, PoseStack ms, int x, int y, Direction face, int color, boolean extract, boolean missing)
 	{
-		gui.getMinecraft().getTextureManager().bindForSetup(ICONS);
+		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+		RenderSystem.setShaderTexture(0, ICONS);
 		
 		int r = (color >> 16) & 255;
 		int g = (color >> 8) & 255;
 		int b = (color & 255);
 		
-		CustomGuiUtils.drawRectWithSizedTexture(ms, x + gui.getGuiLeft(), y + gui.getGuiTop(), 400.0f, 16 * ((1 - face.get2DDataValue()) % 3),
+		CustomGuiUtils.drawRectWithSizedTexture(ms, x + gui.getGuiLeft(), y + gui.getGuiTop(), 500.0f, 16 * ((1 - face.get2DDataValue()) % 3),
 			(extract ? 0 : 16) + (missing ? 32 : 0), 16, 16, 64, 64, r, g, b, 255);
 	}
 	
