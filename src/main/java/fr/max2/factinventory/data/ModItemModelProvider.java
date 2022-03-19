@@ -140,7 +140,7 @@ public class ModItemModelProvider extends ItemModelProvider
 			else
 			{
 				mainBase.override()
-					.predicate(RotatableInventoryItem.FACING_GETTER_LOC, dir.get3DDataValue() - 0.01f)
+					.predicate(RotatableInventoryItem.FACING_GETTER_LOC, dir.get2DDataValue() - 0.01f)
 					.model(rotatedModel)
 					.end();
 			}
