@@ -3,7 +3,7 @@ package fr.max2.factinventory.proxy;
 import fr.max2.factinventory.utils.KeyModifierState;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fmllegacy.server.ServerLifecycleHooks;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class ServerProxy implements ISidedProxy
 {

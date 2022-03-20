@@ -14,9 +14,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Item.Properties;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fmllegacy.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 @EventBusSubscriber(bus = Bus.MOD, modid = FactinventoryMod.MOD_ID)
 public class ModItems

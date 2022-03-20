@@ -15,11 +15,11 @@ apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.3'
+version = '1.4'
 group = 'fr.max2.factinventory' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'factinventory'
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(16)
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
     // The mappings can be changed at any time, and must be in the following format.
@@ -27,7 +27,7 @@ minecraft {
     // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'parchment', version: '2021.12.12-1.17.1'
+    mappings channel: 'parchment', version: '2022.03.13-1.18.2'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -45,6 +45,9 @@ minecraft {
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
+            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+            property 'forge.enabledGameTestNamespaces', 'factinventory'
+
             mods {
                 factinventory {
                     source sourceSets.main
@@ -61,6 +64,32 @@ minecraft {
 
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
+            
+            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+            property 'forge.enabledGameTestNamespaces', 'factinventory'
+
+            mods {
+                factinventory {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        // This run config launches GameTestServer and runs all registered gametests, then exits.
+        // By default, the server will crash when no gametests are provided.
+        // The gametest system is also enabled by default for other run configs under the /test command.
+        gameTestServer {
+            workingDirectory project.file('run/test')
+            taskName "$project.name-runTestServer"
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'REGISTRIES'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+            property 'forge.enabledGameTestNamespaces', 'factinventory'
 
             mods {
                 factinventory {
@@ -95,24 +124,18 @@ sourceSets.main.resources {
 }
 
 dependencies {
-    // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
-    // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
+    // Specify the version of Minecraft to use. If this is any group other than 'net.minecraft', it is assumed
+    // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.17.1-37.1.1'
+    minecraft 'net.minecraftforge:forge:1.18.2-40.0.19'
 
-    // You may put jars on which you depend on in ./libs or you may define them like so..
-    // compile "some.group:artifact:version:classifier"
-    // compile "some.group:artifact:version"
+    // Real mod deobf dependency examples - these get remapped to your current mappings
+    // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
+    // runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}") // Adds the full JEI mod as a runtime dependency
+    // implementation fg.deobf("com.tterrag.registrate:Registrate:MC${mc_version}-${registrate_version}") // Adds registrate as a dependency
 
-    // Real examples
-    // compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
-    // compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
-
-    // The 'provided' configuration is for optional dependencies that exist at compile-time but might not at runtime.
-    // provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-
-    // These dependencies get remapped to your current MCP mappings
-    // deobf 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+    // Examples using mod jars from ./libs
+    // implementation fg.deobf("blank:coolmod-${mc_version}:${coolmod_version}")
 
     // For more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
@@ -129,7 +152,7 @@ jar {
             "Specification-Version": "1", // We are version 1 of ourselves
             "Implementation-Title": project.name,
             "Implementation-Version": "${version}",
-            "Implementation-Vendor" :"LeBossMax2",
+            "Implementation-Vendor": "LeBossMax2",
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
@@ -153,4 +176,8 @@ publishing {
             url "file://${project.projectDir}/mcmodsrepo"
         }
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }

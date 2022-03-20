@@ -14,7 +14,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fml.util.thread.EffectiveSide;
-import net.minecraftforge.fmllegacy.server.ServerLifecycleHooks;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class SimpleTileEntityHandler implements ITileEntityHandler, INBTSerializable<CompoundTag>
 {

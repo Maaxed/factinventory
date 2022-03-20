@@ -34,7 +34,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.fmllegacy.hooks.BasicEventHooks;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
@@ -48,21 +48,22 @@ public class InventoryFurnaceItem extends InventoryItem
 	}
 	
 	@Override
-	public boolean showDurabilityBar(ItemStack stack)
+	public boolean isBarVisible(ItemStack pStack)
 	{
 		return true;
 	}
 	
 	@Override
-	public double getDurabilityForDisplay(ItemStack stack)
+	public int getBarWidth(ItemStack stack)
 	{
-		return 1 - (getCookTime(stack) / (double)getTotalCookTime(stack));
+		// Range: [0, 13]
+		return Math.round(13.0f - (getCookTime(stack) * 13.0f / getTotalCookTime(stack)));
 	}
 	
 	@Override
-	public int getRGBDurabilityForDisplay(ItemStack stack)
+	public int getBarColor(ItemStack stack)
 	{
-		return 0xFF0000 | (int)(getDurabilityForDisplay(stack) * 0xFF) << 8;
+		return 0xFF0000 | (int)((1.0 - (getCookTime(stack) / (double)getTotalCookTime(stack))) * 0xFF) << 8;
 	}
 	
 	@Override
@@ -119,17 +120,17 @@ public class InventoryFurnaceItem extends InventoryItem
 		int burnTime = getStackBurnTime(stack);
 		int cookTime = getCookTime(stack);
 		
-    	int totalCookTime = getTotalCookTime(stack);
-    	ItemStack smeltingStack = getSmeltingStack(stack);
+		int totalCookTime = getTotalCookTime(stack);
+		ItemStack smeltingStack = getSmeltingStack(stack);
 		
 		if (burnTime > 0)
 		{
 			burnTime--;
 			setBurnTime(stack, burnTime);
 		}
-        
+		
 		if (smeltingStack.isEmpty())
-        {
+		{
 			// Try pull a new item
 			
 			int inputX = x, inputY = y - 1;
@@ -148,70 +149,70 @@ public class InventoryFurnaceItem extends InventoryItem
 			if (inputY >= 0 && inputY < height && outputY >= 0 && outputY < height)
 			{
 				int inputSlot = inputX + width * inputY;
-	            ItemStack newInputStack = inv.getItem(inputSlot);
-	            
-	            if (!newInputStack.isEmpty())
-	            {
+				ItemStack newInputStack = inv.getItem(inputSlot);
+				
+				if (!newInputStack.isEmpty())
+				{
 					int outputSlot = outputX + width * outputY;
-	            	ItemStack outputStack = inv.getItem(outputSlot);
-            		IItemHandler inputCapa = newInputStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.SOUTH).orElse(null);
-	            	if (inputCapa != null)
-	            	{
-	            		int slots = inputCapa.getSlots();
-	            		for (int i = 0; i < slots && smeltingStack.isEmpty(); i++)
-	            		{
-	            			ItemStack currentSlot = inputCapa.extractItem(i, 1, true);
-	                        
-	            			Container slotInv = new SimpleContainer(currentSlot);
-	    	            	
-	    	            	SmeltingRecipe recipe = getSmeltingRecipe(player, slotInv);
-	    	            	if (recipe != null)
-	    	            	{
-		            			ItemStack result = recipe.assemble(slotInv);
-		            			if(!result.isEmpty() && canPush(result, outputStack, Direction.NORTH))
-		            			{
-		            				smeltingStack = inputCapa.extractItem(i, 1, false);
-		            				totalCookTime = recipe.getCookingTime();
-		            			}
-	    	            	}
-	            		}
-	            	}
-	            	else
-	            	{
-	            		Container slotInv = new SimpleContainer(newInputStack);
-    	            	
-    	            	SmeltingRecipe recipe = getSmeltingRecipe(player, slotInv);
-    	            	if (recipe != null)
-    	            	{
-                			ItemStack result = recipe.assemble(slotInv);
-    	        			if(!result.isEmpty() && canPush(result, outputStack, Direction.NORTH))
-    		            	{
-    		            		smeltingStack = newInputStack.copy();
-    		            		smeltingStack.setCount(1);
-    		            		
-    		            		newInputStack.shrink(1);
-    		            		if (newInputStack.isEmpty()) inv.setItem(inputSlot, ItemStack.EMPTY);
-                				totalCookTime = recipe.getCookingTime();
-    		            	}
-    	            	}
-	            	}
-	            	
-		            if (!smeltingStack.isEmpty())
-		            {
-		            	setSmeltingStack(stack, smeltingStack);
-		            	setTotalCookTime(stack, totalCookTime);
-		            }
-	            }
+					ItemStack outputStack = inv.getItem(outputSlot);
+					IItemHandler inputCapa = newInputStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.SOUTH).orElse(null);
+					if (inputCapa != null)
+					{
+						int slots = inputCapa.getSlots();
+						for (int i = 0; i < slots && smeltingStack.isEmpty(); i++)
+						{
+							ItemStack currentSlot = inputCapa.extractItem(i, 1, true);
+
+							Container slotInv = new SimpleContainer(currentSlot);
+
+							SmeltingRecipe recipe = getSmeltingRecipe(player, slotInv);
+							if (recipe != null)
+							{
+								ItemStack result = recipe.assemble(slotInv);
+								if(!result.isEmpty() && canPush(result, outputStack, Direction.NORTH))
+								{
+									smeltingStack = inputCapa.extractItem(i, 1, false);
+									totalCookTime = recipe.getCookingTime();
+								}
+							}
+						}
+					}
+					else
+					{
+						Container slotInv = new SimpleContainer(newInputStack);
+						
+						SmeltingRecipe recipe = getSmeltingRecipe(player, slotInv);
+						if (recipe != null)
+						{
+							ItemStack result = recipe.assemble(slotInv);
+							if(!result.isEmpty() && canPush(result, outputStack, Direction.NORTH))
+							{
+								smeltingStack = newInputStack.copy();
+								smeltingStack.setCount(1);
+
+								newInputStack.shrink(1);
+								if (newInputStack.isEmpty()) inv.setItem(inputSlot, ItemStack.EMPTY);
+								totalCookTime = recipe.getCookingTime();
+							}
+						}
+					}
+
+					if (!smeltingStack.isEmpty())
+					{
+						setSmeltingStack(stack, smeltingStack);
+						setTotalCookTime(stack, totalCookTime);
+					}
+				}
 			}
-        }
-		
+		}
+
 		if (burnTime == 0 && !smeltingStack.isEmpty())
-        {
+		{
 			// Try fill with fuel
 			for (Direction side : FUEL_SIDE)
 			{
 				int fuelX = x + side.getStepX(), fuelY = y;
-				
+
 				if (fuelX >= 0 && fuelX < width)
 				{
 					int fuelSlot = fuelX + width * fuelY;
@@ -220,25 +221,25 @@ public class InventoryFurnaceItem extends InventoryItem
 					IItemHandler fuelCapa = fuelItem.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side).orElse(null);
 					if (fuelCapa != null)
 					{
-						
+
 						int slots = fuelCapa.getSlots();
 						for (int i = 0; i < slots && burnTime == 0; i++)
 						{
 							ItemStack testStack = fuelCapa.extractItem(i, 1, true);
-							
+
 							if (AbstractFurnaceBlockEntity.isFuel(testStack) || FurnaceFuelSlot.isBucket(testStack) && testStack.getItem() != Items.BUCKET)
 							{
 								burnTime = ForgeHooks.getBurnTime(testStack, RecipeType.SMELTING);
-								
+
 								if (burnTime > 0)
 								{
 									Item item = fuelCapa.extractItem(i, 1, false).getItem();
-									
+
 									if (fuelCapa.getStackInSlot(i).isEmpty())
 									{
 										fuelCapa.insertItem(i, item.getContainerItem(testStack), false);
 									}
-									
+
 									setBurnTime(stack, burnTime);
 								}
 							}
@@ -253,7 +254,7 @@ public class InventoryFurnaceItem extends InventoryItem
 						{
 							Item item = fuelItem.getItem();
 							fuelItem.shrink(1);
-							
+
 							if (fuelItem.isEmpty())
 							{
 								inv.setItem(fuelSlot, item.getContainerItem(fuelItem));
@@ -263,116 +264,115 @@ public class InventoryFurnaceItem extends InventoryItem
 					}
 				}
 			}
-        }
-        
-        if (burnTime > 0)
-        {
-        	if (!smeltingStack.isEmpty())
-            {
-        		// Smelt
-        		
-                cookTime++;
-                if (cookTime < totalCookTime)
-                {
-                	setCookTime(stack, cookTime);
-                }
-                else
-                {
-                	// Smelt item
-                    
-                	int outputX = x, outputY = y + 1;
+		}
+		
+		if (burnTime > 0)
+		{
+			if (!smeltingStack.isEmpty())
+			{
+				// Smelt
 
-        			if (outputY == 0 && y != 0) outputY = height;
-        			else if (y == 0 && outputY == 1) outputY = -1;
-        			else if (y == 0 && outputY == -1) outputY = height - 1;
-        			else if (outputY == height) outputY = 0;
-        			
-        			if (outputY >= 0 && outputY < height)
-        			{
-    					int outputSlot = outputX + width * outputY;
-    	            	ItemStack outputStack = inv.getItem(outputSlot);
-    	                Container slotInv = new SimpleContainer(smeltingStack);
-    	            	
-    	            	SmeltingRecipe recipe = getSmeltingRecipe(player, slotInv);
-    	            	if (recipe != null)
-    	            	{
-		            		ItemStack result = recipe.assemble(inv);
-	
-		            		IItemHandler outputHandler = outputStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.SOUTH).orElse(null);
-	    	            	if (outputHandler != null)
-	    	        		{
-	    	            		if (canPush(result, outputHandler))
-	    	            		{
-	    	            			result.onCraftedBy(player.level, player, result.getCount());
-	    	            			BasicEventHooks.firePlayerSmeltedEvent(player, result);
-	    	            			push(result, outputHandler);
-	    	            			smeltingStack = ItemStack.EMPTY;
-	    	            		}
-	    	        		}
-	    	        		else
-	    	        		{
-	    	        			if (outputStack.isEmpty())
-	    	        			{
-	    	        				inv.setItem(outputSlot, result.copy());
-	    	            			smeltingStack = ItemStack.EMPTY;
-	    	        			}
-	    	        			else if (InventoryUtils.canCombine(result, outputStack) && outputStack.getCount() + result.getCount() <= outputStack.getMaxStackSize() && outputStack.getCount() + result.getCount() <= inv.getMaxStackSize())
-	    	        			{
-	    	        				outputStack.grow(result.getCount());
-	    	        				outputStack.onCraftedBy(player.level, player, result.getCount());
-	    	        				BasicEventHooks.firePlayerSmeltedEvent(player, outputStack);
-	    	            			smeltingStack = ItemStack.EMPTY;
-	    	        			}
-	    	        		}
-	    	            	
-	    		            if (smeltingStack.isEmpty())
-	    		            {
-			                    int i = result.getCount();
-			                    float f = recipe.getExperience();
-	
-			                    if (f == 0.0F)
-			                    {
-			                        i = 0;
-			                    }
-			                    else if (f < 1.0F)
-			                    {
-			                        int j = Mth.floor(i * f);
-	
-			                        if (j < Mth.ceil(i * f) && Math.random() < i * f - j)
-			                        {
-			                            ++j;
-			                        }
-	
-			                        i = j;
-			                    }
-			                    
-			                    while (i > 0)
-			                    {
-			                        int k = ExperienceOrb.getExperienceValue(i);
-			                        i -= k;
-			                        player.level.addFreshEntity(new ExperienceOrb(player.level, player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, k));
-			                    }
-	    		            	
-	    	                	setCookTime(stack, 0);
-	    		            	setSmeltingStack(stack, ItemStack.EMPTY);
-	    		            	setTotalCookTime(stack, 200);
-	    		            }
-    	            	}
-    	            }
-                	
-                }
-            }
-        }
-        else
-        {
-        	if (cookTime > 0)
-	        {
-	        	if (cookTime > totalCookTime) cookTime = totalCookTime;
-	        	cookTime = Math.min(0, cookTime - 2);
-	        	setCookTime(stack, cookTime);
-	        }
-        }
-        
+				cookTime++;
+				if (cookTime < totalCookTime)
+				{
+					setCookTime(stack, cookTime);
+				}
+				else
+				{
+					// Smelt item
+
+					int outputX = x, outputY = y + 1;
+				
+					if (outputY == 0 && y != 0) outputY = height;
+					else if (y == 0 && outputY == 1) outputY = -1;
+					else if (y == 0 && outputY == -1) outputY = height - 1;
+					else if (outputY == height) outputY = 0;
+					
+					if (outputY >= 0 && outputY < height)
+					{
+						int outputSlot = outputX + width * outputY;
+						ItemStack outputStack = inv.getItem(outputSlot);
+						Container slotInv = new SimpleContainer(smeltingStack);
+						
+						SmeltingRecipe recipe = getSmeltingRecipe(player, slotInv);
+						if (recipe != null)
+						{
+							ItemStack result = recipe.assemble(inv);
+
+							IItemHandler outputHandler = outputStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.SOUTH).orElse(null);
+							if (outputHandler != null)
+							{
+								if (canPush(result, outputHandler))
+								{
+									result.onCraftedBy(player.level, player, result.getCount());
+									ForgeEventFactory.firePlayerSmeltedEvent(player, result);
+									push(result, outputHandler);
+									smeltingStack = ItemStack.EMPTY;
+								}
+							}
+							else
+							{
+								if (outputStack.isEmpty())
+								{
+									inv.setItem(outputSlot, result.copy());
+									smeltingStack = ItemStack.EMPTY;
+								}
+								else if (InventoryUtils.canCombine(result, outputStack) && outputStack.getCount() + result.getCount() <= outputStack.getMaxStackSize() && outputStack.getCount() + result.getCount() <= inv.getMaxStackSize())
+								{
+									outputStack.grow(result.getCount());
+									outputStack.onCraftedBy(player.level, player, result.getCount());
+									ForgeEventFactory.firePlayerSmeltedEvent(player, outputStack);
+									smeltingStack = ItemStack.EMPTY;
+								}
+							}
+							
+							if (smeltingStack.isEmpty())
+							{
+								int i = result.getCount();
+								float f = recipe.getExperience();
+								
+								if (f == 0.0F)
+								{
+									i = 0;
+								}
+								else if (f < 1.0F)
+								{
+									int j = Mth.floor(i * f);
+									
+									if (j < Mth.ceil(i * f) && Math.random() < i * f - j)
+									{
+										++j;
+									}
+									
+									i = j;
+								}
+
+								while (i > 0)
+								{
+									int k = ExperienceOrb.getExperienceValue(i);
+									i -= k;
+									player.level.addFreshEntity(new ExperienceOrb(player.level, player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, k));
+								}
+
+								setCookTime(stack, 0);
+								setSmeltingStack(stack, ItemStack.EMPTY);
+								setTotalCookTime(stack, 200);
+							}
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			if (cookTime > 0)
+			{
+				if (cookTime > totalCookTime) cookTime = totalCookTime;
+				cookTime = Math.min(0, cookTime - 2);
+				setCookTime(stack, cookTime);
+			}
+		}
+		
 	}
 
 	@Override

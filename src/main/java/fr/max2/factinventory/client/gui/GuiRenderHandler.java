@@ -17,7 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
@@ -27,11 +27,11 @@ public class GuiRenderHandler
 {
 	
 	@SubscribeEvent
-	public static void onGuiRender(GuiScreenEvent.DrawScreenEvent.Post event)
+	public static void onGuiRender(ScreenEvent.DrawScreenEvent.Post event)
 	{
-		if (event.getGui() instanceof AbstractContainerScreen<?>)
+		if (event.getScreen() instanceof AbstractContainerScreen<?>)
 		{
-			AbstractContainerScreen<?> gui = (AbstractContainerScreen<?>) event.getGui();
+			AbstractContainerScreen<?> gui = (AbstractContainerScreen<?>) event.getScreen();
 			
 			Slot slot = gui.getSlotUnderMouse();
 			
@@ -46,7 +46,7 @@ public class GuiRenderHandler
 				
 				ItemStack stack = slot.getItem();
 				Inventory inv = (Inventory) slot.container;
-				PoseStack ms = event.getMatrixStack();
+				PoseStack ms = event.getPoseStack();
 				
 				List<InventoryItem.Icon> icons = ((InventoryItem)stack.getItem()).getRenderIcons(stack, gui.getMenu(), slot, inv);
 				
