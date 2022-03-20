@@ -1,6 +1,9 @@
 package fr.max2.factinventory.item;
 
+import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -31,6 +34,20 @@ public abstract class RotatableInventoryItem extends InventoryItem
 		rotate(stack);
 		
 		return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
+	}
+	
+	@Override
+	public boolean overrideOtherStackedOnMe(ItemStack pStack, ItemStack pOther, Slot pSlot, ClickAction pAction, Player pPlayer, SlotAccess pAccess)
+	{
+		if (pAction == ClickAction.SECONDARY && pSlot.allowModification(pPlayer))
+		{
+			if (pOther.isEmpty())
+			{
+				rotate(pStack);
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	
