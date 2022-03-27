@@ -52,24 +52,12 @@ public class ModLanguagesProvider implements DataProvider
     	add("tooltip.ingredient_input.desc", "Ingredient input", "Entrée des ingrédients");
     	add("tooltip.fuel_input.desc", "Fuel inputs", "Entrées de combustible");
     	add("tooltip.product_output.desc", "Product output", "Sortie des produits");
-    	add("tooltip.progress_bar.full", "§2█§r", "§2█§r");
-    	add("tooltip.progress_bar.empty", "§8█§r", "§8█§r");
-    	add("tooltip.progress_bar.combine", "%s%s", "%s%s");
-    	
-    	add("tooltip.smelting_info_on_ctrl.desc", "Hold §e§lCTRL§r for smelting details", "Maintenir §e§lCTRL§r pour afficher les détails de cuisson");
-    	add("tooltip.not_smelting.desc", "Empty", "Vide");
-    	add("tooltip.smelting_item.desc", "Smelting: %s", "En train de cuire : %s");
-    	add("tooltip.not_burning.desc", "Not burning", "Ne chauffe pas");
-    	add("tooltip.burning_time.desc", "Burn time remaining: %d ticks", "Brûle encore pendant : %d ticks");
     	
     	add("tooltip.transfer_info_on_ctrl.desc", "Hold §e§lCTRL§r for transfer details", "Maintenir §e§lCTRL§r pour afficher les détails de transfert");
     	add("tooltip.not_transferring.desc", "Empty", "Vide");
     	add("tooltip.transferring_item.desc", "Transferring: %s", "En train de transférer : %s");
-    	add("tooltip.transfer_progress.desc", "Transfer progress:  [%s]", "Progrès du transfert : [%s]");
     	
     	add("tooltip.drop_info_on_ctrl.desc", "Hold §e§lCTRL§r for inventory details", "Maintenir §e§lCTRL§r pour afficher les détails de l'inventaire");
-    	add("tooltip.not_dropping.desc", "Inventory: Empty", "Inventaire : Vide");
-    	add("tooltip.dropping_item.desc", "Inventory: %s x%d", "Inventaire : %s x%d");
     	add("tooltip.drop_time.desc", "Drop time remaining: %d ticks", "Durée de drop restante : %d ticks");
     	
     	add("tooltip.linked_tile.desc", "Linked to: %s", "Lié à : %s");

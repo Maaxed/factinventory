@@ -6,7 +6,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import fr.max2.factinventory.FactinventoryMod;
-import fr.max2.factinventory.utils.ChatComponentUtils;
 import fr.max2.factinventory.utils.KeyModifierState;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.entity.player.Player;
@@ -57,6 +56,7 @@ public class InventoryPumpItem extends RotatableInventoryItem
 		
 		if (keyModifiers.control)
 		{
+			// TODO create custom fluid tooltip gui 
 			FluidStack transferringItem = FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY);
 			if (transferringItem.isEmpty())
 			{
@@ -66,9 +66,6 @@ public class InventoryPumpItem extends RotatableInventoryItem
 			{
 				tooltip.add(new TranslatableComponent("tooltip.transferring_item.desc", transferringItem.getDisplayName()));
 			}
-			
-			
-			tooltip.add(new TranslatableComponent("tooltip.transfer_progress.desc", ChatComponentUtils.progress(8 - getTransferTime(stack), 8)));
 		}
 		else
 		{

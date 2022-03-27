@@ -2,6 +2,7 @@ package fr.max2.factinventory.item;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -17,6 +18,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.FurnaceFuelSlot;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -57,7 +59,7 @@ public class InventoryFurnaceItem extends InventoryItem
 	public int getBarWidth(ItemStack stack)
 	{
 		// Range: [0, 13]
-		return Math.round(13.0f - (getCookTime(stack) * 13.0f / getTotalCookTime(stack)));
+		return Math.round((getCookTime(stack) * 13.0f / getTotalCookTime(stack)));
 	}
 	
 	@Override
@@ -80,33 +82,12 @@ public class InventoryFurnaceItem extends InventoryItem
 		{
 			tooltip.add(new TranslatableComponent("tooltip.interaction_info_on_shift.desc"));
 		}
-		
-		if (keyModifiers.control)
-		{
-			ItemStack smeltingItem = getSmeltingStack(stack);
-			if (smeltingItem.isEmpty())
-			{
-				tooltip.add(new TranslatableComponent("tooltip.not_smelting.desc"));
-			}
-			else
-			{
-				tooltip.add(new TranslatableComponent("tooltip.smelting_item.desc", smeltingItem.getDisplayName()));
-			}
-			
-			int burnTime = getStackBurnTime(stack);
-			if (burnTime > 0)
-			{
-				tooltip.add(new TranslatableComponent("tooltip.burning_time.desc", burnTime));
-			}
-			else
-			{
-				tooltip.add(new TranslatableComponent("tooltip.not_burning.desc"));
-			}
-		}
-		else
-		{
-			tooltip.add(new TranslatableComponent("tooltip.smelting_info_on_ctrl.desc"));
-		}
+	}
+	
+	@Override
+	public Optional<TooltipComponent> getTooltipImage(ItemStack pStack)
+	{
+	      return Optional.of(new Tooltip(getSmeltingStack(pStack), getStackTotalBurnTime(pStack), getStackRemainingBurnTime(pStack)));
 	}
 	
 	@Override
@@ -117,7 +98,7 @@ public class InventoryFurnaceItem extends InventoryItem
 			x = itemSlot % width,
 			y = itemSlot / width;
 		
-		int burnTime = getStackBurnTime(stack);
+		int burnTime = getStackRemainingBurnTime(stack);
 		int cookTime = getCookTime(stack);
 		
 		int totalCookTime = getTotalCookTime(stack);
@@ -126,7 +107,11 @@ public class InventoryFurnaceItem extends InventoryItem
 		if (burnTime > 0)
 		{
 			burnTime--;
-			setBurnTime(stack, burnTime);
+			setRemainingBurnTime(stack, burnTime);
+			if (burnTime == 0)
+			{
+				setTotalBurnTime(stack, 0);
+			}
 		}
 		
 		if (smeltingStack.isEmpty())
@@ -240,7 +225,8 @@ public class InventoryFurnaceItem extends InventoryItem
 										fuelCapa.insertItem(i, item.getContainerItem(testStack), false);
 									}
 
-									setBurnTime(stack, burnTime);
+									setRemainingBurnTime(stack, burnTime);
+									setTotalBurnTime(stack, burnTime);
 								}
 							}
 						}
@@ -259,7 +245,8 @@ public class InventoryFurnaceItem extends InventoryItem
 							{
 								inv.setItem(fuelSlot, item.getContainerItem(fuelItem));
 							}
-							setBurnTime(stack, burnTime);
+							setRemainingBurnTime(stack, burnTime);
+							setTotalBurnTime(stack, burnTime);
 						}
 					}
 				}
@@ -450,22 +437,41 @@ public class InventoryFurnaceItem extends InventoryItem
 	}
 	
 	private static final Direction[] FUEL_SIDE = { Direction.EAST, Direction.WEST };
-
-	private static final String NBT_BURN_TIME = "BurnTime";
 	
-	public static int getStackBurnTime(ItemStack stack)
+
+	private static final String NBT_REMAINING_BURN_TIME = "BurnTime";
+	
+	public static int getStackRemainingBurnTime(ItemStack stack)
 	{
 		if (stack.hasTag())
 		{
 			CompoundTag tag = stack.getTag();
-			if (tag.contains(NBT_BURN_TIME, Tag.TAG_INT)) return tag.getInt(NBT_BURN_TIME);
+			if (tag.contains(NBT_REMAINING_BURN_TIME, Tag.TAG_INT)) return tag.getInt(NBT_REMAINING_BURN_TIME);
 		}
 		return 0;
 	}
 	
-	public static void setBurnTime(ItemStack stack, int burnTime)
+	public static void setRemainingBurnTime(ItemStack stack, int burnTime)
 	{
-		stack.addTagElement(NBT_BURN_TIME, IntTag.valueOf(burnTime));
+		stack.addTagElement(NBT_REMAINING_BURN_TIME, IntTag.valueOf(burnTime));
+	}
+	
+
+	private static final String NBT_TOTAL_BURN_TIME = "totalBurnTime";
+	
+	public static int getStackTotalBurnTime(ItemStack stack)
+	{
+		if (stack.hasTag())
+		{
+			CompoundTag tag = stack.getTag();
+			if (tag.contains(NBT_TOTAL_BURN_TIME, Tag.TAG_INT)) return tag.getInt(NBT_TOTAL_BURN_TIME);
+		}
+		return 0;
+	}
+	
+	public static void setTotalBurnTime(ItemStack stack, int burnTime)
+	{
+		stack.addTagElement(NBT_TOTAL_BURN_TIME, IntTag.valueOf(burnTime));
 	}
 	
 	
@@ -522,4 +528,32 @@ public class InventoryFurnaceItem extends InventoryItem
 		stack.addTagElement(NBT_ACTUAL_INPUT, smeltingStck.serializeNBT());
 	}
 	
+	public static class Tooltip implements TooltipComponent
+	{
+		private ItemStack smeltingStack;
+		private int totalBurnTime;
+		private int remainingBurnTime;
+
+		public Tooltip(ItemStack smeltingStack, int totalBurnTime, int remainingBurnTime)
+		{
+			this.smeltingStack = smeltingStack;
+			this.totalBurnTime = totalBurnTime;
+			this.remainingBurnTime = remainingBurnTime;
+		}
+
+		public ItemStack getSmeltingStack()
+		{
+			return this.smeltingStack;
+		}
+
+		public int getTotalBurnTime()
+		{
+			return this.totalBurnTime;
+		}
+
+		public int getRemainingBurnTime()
+		{
+			return this.remainingBurnTime;
+		}
+	}
 }

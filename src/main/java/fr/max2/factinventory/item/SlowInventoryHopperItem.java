@@ -1,23 +1,20 @@
 package fr.max2.factinventory.item;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
+import java.util.Optional;
 
 import fr.max2.factinventory.utils.InventoryUtils;
-import fr.max2.factinventory.FactinventoryMod;
-import fr.max2.factinventory.utils.ChatComponentUtils;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.level.Level;
+import net.minecraft.core.NonNullList;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -31,28 +28,74 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 	}
 	
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn)
+	public Optional<TooltipComponent> getTooltipImage(ItemStack pStack)
 	{
-		super.appendHoverText(stack, worldIn, tooltip, flagIn);
+	      NonNullList<ItemStack> items = NonNullList.create();
+	      items.add(getTransferringStack(pStack));
+	      return Optional.of(new SimpleItemTooltip(items));
+	}
+	
+	@Override
+	public boolean overrideStackedOnOther(ItemStack pStack, Slot targetSlot, ClickAction pAction, Player pPlayer)
+	{
+		if (pAction != ClickAction.SECONDARY)
+			return false;
 		
-		if (FactinventoryMod.proxy.getKeyModifierState().control)
+		ItemStack targetItem = targetSlot.getItem();
+		if (targetItem.isEmpty())
 		{
-			ItemStack transferringItem = getTransferringStack(stack);
-			if (transferringItem.isEmpty())
+			ItemStack content = getTransferringStack(pStack);
+			if (content.isEmpty())
+				return true;
+			playRemoveOneSound(pPlayer);
+			setTransferringStack(pStack, targetSlot.safeInsert(content));
+		}
+		else if (targetItem.getItem().canFitInsideContainerItems())
+		{
+			int maxCount = 1;
+			ItemStack content = getTransferringStack(pStack);
+			if (!content.isEmpty())
+				return true;
+			ItemStack toInsert = targetSlot.safeTake(targetItem.getCount(), maxCount, pPlayer);
+			if (toInsert.isEmpty())
+				return true;
+			setTransferringStack(pStack, toInsert);
+			playInsertSound(pPlayer);
+		}
+		
+		return true;
+	}
+	
+	@Override
+	public boolean overrideOtherStackedOnMe(ItemStack pStack, ItemStack carriedStack, Slot pSlot, ClickAction pAction, Player pPlayer, SlotAccess pAccess)
+	{
+		if (pAction != ClickAction.SECONDARY || !pSlot.allowModification(pPlayer))
+			return false;
+		
+		if (carriedStack.isEmpty())
+		{
+			ItemStack content = getTransferringStack(pStack);
+			if (content.isEmpty())
 			{
-				tooltip.add(new TranslatableComponent("tooltip.not_transferring.desc"));
+				return super.overrideOtherStackedOnMe(pStack, content, pSlot, pAction, pPlayer, pAccess);
 			}
-			else
+			if (pAccess.set(content))
 			{
-				tooltip.add(new TranslatableComponent("tooltip.transferring_item.desc", transferringItem.getDisplayName()));
+				setTransferringStack(pStack, ItemStack.EMPTY);
+				playRemoveOneSound(pPlayer);
 			}
-			
-			tooltip.add(new TranslatableComponent("tooltip.transfer_progress.desc", ChatComponentUtils.progress(8 - getTransferTime(stack), 8)));
 		}
 		else
 		{
-			tooltip.add(new TranslatableComponent("tooltip.transfer_info_on_ctrl.desc"));
+			ItemStack content = getTransferringStack(pStack);
+			if (!content.isEmpty())
+				return true;
+
+			setTransferringStack(pStack, carriedStack.split(1));
+			playInsertSound(pPlayer);
 		}
+		
+		return true;
 	}
 	
 	@Override

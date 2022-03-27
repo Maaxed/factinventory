@@ -110,7 +110,7 @@ public class RecursiveOverrideModel implements IModelGeometry<RecursiveOverrideM
 	public static enum Loader implements IModelLoader<RecursiveOverrideModel>
 	{
 		INSTANCE;
-		public static final ResourceLocation ID = FactinventoryMod.loc("recursive_overrides");
+		public static final ResourceLocation ID = new ResourceLocation(FactinventoryMod.MOD_ID, "recursive_overrides");
 
 		@Override
 		public void onResourceManagerReload(ResourceManager resourceManager)

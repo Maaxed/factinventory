@@ -11,6 +11,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -77,6 +78,16 @@ public abstract class InventoryItem extends Item
 	public static Slot findSlot(AbstractContainerMenu container, Slot original, int newIndex)
 	{
 		return container.slots.stream().filter(slot -> slot.isSameInventory(original) && slot.getSlotIndex() == newIndex).findAny().orElse(null);
+	}
+
+	public static void playRemoveOneSound(Entity target)
+	{
+		target.playSound(SoundEvents.BUNDLE_REMOVE_ONE, 0.8F, 0.8F + target.getLevel().getRandom().nextFloat() * 0.4F);
+	}
+	
+	public static void playInsertSound(Entity target)
+	{
+		target.playSound(SoundEvents.BUNDLE_INSERT, 0.8F, 0.8F + target.getLevel().getRandom().nextFloat() * 0.4F);
 	}
 	
 	public static class Icon

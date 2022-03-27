@@ -35,7 +35,7 @@ public class ModItemProperties
 	}
 
 	public static final ItemPropertyFunction
-		BURN_TIME_GETTER = (stack, worldIn, entityIn, seed) -> InventoryFurnaceItem.getStackBurnTime(stack),
+		BURN_TIME_GETTER = (stack, worldIn, entityIn, seed) -> InventoryFurnaceItem.getStackRemainingBurnTime(stack),
 		FACING_GETTER = (stack, worldIn, entityIn, seed) -> RotatableInventoryItem.getFacing(stack).get2DDataValue(),
 		FILL_GETTER = (stack, world, entity, seed) ->
 		{

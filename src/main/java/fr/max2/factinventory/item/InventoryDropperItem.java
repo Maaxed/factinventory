@@ -1,24 +1,25 @@
 package fr.max2.factinventory.item;
 
-import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-import fr.max2.factinventory.FactinventoryMod;
 import fr.max2.factinventory.capability.StackItemHandlerProvider;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -32,26 +33,75 @@ public class InventoryDropperItem extends Item
 	}
 	
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn)
+	public Optional<TooltipComponent> getTooltipImage(ItemStack pStack)
 	{
-		if (FactinventoryMod.proxy.getKeyModifierState().control)
+	      NonNullList<ItemStack> items = NonNullList.create();
+	      items.add(getContentStack(pStack));
+	      return Optional.of(new SimpleItemTooltip(items));
+	}
+	
+	@Override
+	public boolean overrideStackedOnOther(ItemStack pStack, Slot targetSlot, ClickAction pAction, Player pPlayer)
+	{
+		if (pAction != ClickAction.SECONDARY)
+			return false;
+		
+		pStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(inventory ->
 		{
-			ItemStack droppingItem = getContentStack(stack);
-			if (droppingItem.isEmpty())
+			ItemStack targetItem = targetSlot.getItem();
+			if (targetItem.isEmpty())
 			{
-				tooltip.add(new TranslatableComponent("tooltip.not_dropping.desc"));
+				ItemStack content = inventory.extractItem(0, inventory.getSlotLimit(0), false);
+				if (content.isEmpty())
+					return;
+				InventoryItem.playRemoveOneSound(pPlayer);
+				inventory.insertItem(0, targetSlot.safeInsert(content), false);
+			}
+			else if (targetItem.getItem().canFitInsideContainerItems())
+			{
+				int maxCount = Math.min(targetItem.getMaxStackSize(), inventory.getSlotLimit(0));
+				int spaceRemaining = maxCount - inventory.extractItem(0, maxCount, true).getCount();
+				if (spaceRemaining <= 0)
+					return;
+				ItemStack toInsert = targetSlot.safeTake(targetItem.getCount(), spaceRemaining, pPlayer);
+				if (toInsert.isEmpty())
+					return;
+				inventory.insertItem(0, toInsert, false);
+				InventoryItem.playInsertSound(pPlayer);
+			}
+		});
+		
+		return true;
+	}
+	
+	@Override
+	public boolean overrideOtherStackedOnMe(ItemStack pStack, ItemStack carriedStack, Slot pSlot, ClickAction pAction, Player pPlayer, SlotAccess pAccess)
+	{
+		if (pAction != ClickAction.SECONDARY || !pSlot.allowModification(pPlayer))
+			return false;
+		
+		pStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(inventory ->
+		{
+			if (carriedStack.isEmpty())
+			{
+				ItemStack content = inventory.extractItem(0, inventory.getSlotLimit(0), false);
+				if (content.isEmpty())
+					return;
+				InventoryItem.playRemoveOneSound(pPlayer);
+				pAccess.set(content);
 			}
 			else
 			{
-				tooltip.add(new TranslatableComponent("tooltip.dropping_item.desc", droppingItem.getDisplayName(), droppingItem.getCount()));
+				ItemStack remaining = inventory.insertItem(0, carriedStack, false);
+				if (remaining.getCount() != carriedStack.getCount())
+				{
+					InventoryItem.playInsertSound(pPlayer);
+					pAccess.set(remaining);
+				}
 			}
-			
-			tooltip.add(new TranslatableComponent("tooltip.drop_time.desc", getDropTime(stack)));
-		}
-		else
-		{
-			tooltip.add(new TranslatableComponent("tooltip.drop_info_on_ctrl.desc"));
-		}
+		});
+		
+		return true;
 	}
 	
 	@Override
@@ -152,6 +202,5 @@ public class InventoryDropperItem extends Item
             return worldIn.addFreshEntity(entityitem);
     	}
     }
-	
 	
 }
