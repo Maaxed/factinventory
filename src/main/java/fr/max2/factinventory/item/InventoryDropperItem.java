@@ -22,6 +22,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.items.CapabilityItemHandler;
 
 public class InventoryDropperItem extends Item
@@ -146,6 +147,56 @@ public class InventoryDropperItem extends Item
 	public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt)
 	{
 		return new StackItemHandlerProvider();
+	}
+
+	private static final String NBT_TAGS = "Tags";
+	private static final String NBT_INVENTORY = "Content";
+	
+	@Override
+	public CompoundTag getShareTag(ItemStack stack)
+	{
+		CompoundTag nbt = new CompoundTag();
+		
+		CompoundTag tags = super.getShareTag(stack);
+		if (tags != null)
+		{
+			nbt.put(NBT_TAGS, tags);
+		}
+		
+		stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(inventory ->
+		{
+			if (inventory instanceof INBTSerializable<?> serializableInv)
+			{
+				nbt.put(NBT_INVENTORY, serializableInv.serializeNBT());
+			}
+		});
+		
+		return nbt;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public void readShareTag(ItemStack stack, CompoundTag nbt)
+	{
+		if (nbt != null && nbt.contains(NBT_TAGS, Tag.TAG_COMPOUND))
+		{
+			super.readShareTag(stack, nbt.getCompound(NBT_TAGS));
+		}
+		else
+		{
+			super.readShareTag(stack, null);
+		}
+		
+		if (nbt != null && nbt.contains(NBT_INVENTORY, Tag.TAG_COMPOUND))
+		{
+			stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(inventory ->
+			{
+				if (inventory instanceof INBTSerializable<?> serializableInv)
+				{
+					((INBTSerializable<Tag>)serializableInv).deserializeNBT(nbt.getCompound(NBT_INVENTORY));
+				}
+			});
+		}
 	}
 	
 	public static ItemStack getContentStack(ItemStack stack)
