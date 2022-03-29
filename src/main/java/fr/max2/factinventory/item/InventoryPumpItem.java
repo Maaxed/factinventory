@@ -228,16 +228,16 @@ public class InventoryPumpItem extends RotatableInventoryItem
 		if (extractX >= 0 && extractX < width && extractY >= 0 && extractY < height)
 		{
 			Slot extractSlot = findSlot(container, slot, extractX + width * extractY);
-			icons.add(new Icon(extractSlot, face, 0x0099FF, true, false));
+			icons.add(new Icon(extractSlot, face, true, false));
 		}
-		else icons.add(new Icon(null, face, 0x0099FF, true, true));
+		else icons.add(new Icon(null, face, true, false));
 		
 		if (insertX >= 0 && insertX < width && insertY >= 0 && insertY < height)
 		{
 			Slot fillSlot = findSlot(container, slot, insertX + width * insertY);
-			icons.add(new Icon(fillSlot, face.getOpposite(), 0xFF7700, false, false));
+			icons.add(new Icon(fillSlot, face.getOpposite(), false, false));
 		}
-		else icons.add(new Icon(null, face.getOpposite(), 0xFF7700, false, true));
+		else icons.add(new Icon(null, face.getOpposite(), false, false));
 		
 		return icons;
 	}

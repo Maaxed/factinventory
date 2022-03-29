@@ -399,16 +399,16 @@ public class InventoryFurnaceItem extends InventoryItem
 		if (pullY >= 0 && pullY < height)
 		{
 			Slot extractSlot = findSlot(container, slot, x + width * pullY);
-			icons.add(new Icon(extractSlot, Direction.NORTH, 0x0099FF, true, false));
+			icons.add(new Icon(extractSlot, Direction.NORTH, true, false));
 		}
-		else icons.add(new Icon(null, Direction.NORTH, 0x0099FF, true, true));
+		else icons.add(new Icon(null, Direction.NORTH, true, false));
 		
 		if (pushY >= 0 && pushY < height)
 		{
 			Slot fillSlot = findSlot(container, slot, x + width * pushY);
-			icons.add(new Icon(fillSlot, Direction.SOUTH, 0xFF7700, false, false));
+			icons.add(new Icon(fillSlot, Direction.SOUTH, false, false));
 		}
-		else icons.add(new Icon(null, Direction.SOUTH, 0xFF7700, false, true));
+		else icons.add(new Icon(null, Direction.SOUTH, false, false));
 		
 		int fuelX1 = x - 1,
 			fuelX2 = x + 1;
@@ -416,16 +416,16 @@ public class InventoryFurnaceItem extends InventoryItem
 		if (fuelX1 >= 0 && fuelX1 < width)
 		{
 			Slot fuelSlot = findSlot(container, slot, fuelX1 + width * y);
-			icons.add(new Icon(fuelSlot, Direction.WEST, 0xAA00FF, true, false));
+			icons.add(new Icon(fuelSlot, Direction.WEST, true, true));
 		}
-		else icons.add(new Icon(null, Direction.WEST, 0xAA00FF, true, true));
+		else icons.add(new Icon(null, Direction.WEST, true, true));
 		
 		if (fuelX2 >= 0 && fuelX2 < width)
 		{
 			Slot fuelSlot = findSlot(container, slot, fuelX2 + width * y);
-			icons.add(new Icon(fuelSlot, Direction.EAST, 0xAA00FF, true, false));
+			icons.add(new Icon(fuelSlot, Direction.EAST, true, true));
 		}
-		else icons.add(new Icon(null, Direction.EAST, 0xAA00FF, true, true));
+		else icons.add(new Icon(null, Direction.EAST, true, true));
 		
 		
 		return icons;

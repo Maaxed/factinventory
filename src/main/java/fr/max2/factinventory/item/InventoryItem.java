@@ -94,16 +94,17 @@ public abstract class InventoryItem extends Item
 	{
 		public final Slot slot;
 		public final Direction face;
-		public final int color;
-		public final boolean extract, missing;
+		public final boolean altColor;
+		public final boolean extract;
+		public final boolean missing;
 		
-		public Icon(Slot slot, Direction face, int color, boolean extract, boolean missing)
+		public Icon(Slot slot, Direction face, boolean extract, boolean altColor)
 		{
 			this.slot = slot;
 			this.face = face;
-			this.color = color;
+			this.altColor = altColor;
 			this.extract = extract;
-			this.missing = missing;
+			this.missing = slot == null;
 		}
 	}
 	
