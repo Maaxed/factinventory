@@ -13,7 +13,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.Level;
 
@@ -30,8 +29,8 @@ public abstract class InventoryHopperItem extends RotatableInventoryItem
 	{
 		if (FactinventoryMod.proxy.getKeyModifierState().shift)
 		{
-			tooltip.add(new TranslatableComponent("tooltip.input.desc").withStyle(ChatFormatting.BLUE));
-			tooltip.add(new TranslatableComponent("tooltip.output.desc").withStyle(ChatFormatting.GOLD));
+			tooltip.add(new TranslatableComponent("tooltip.input.desc").setStyle(INPUT_STYLE));
+			tooltip.add(new TranslatableComponent("tooltip.output.desc").setStyle(OUTPUT_STYLE));
 		}
 		else
 		{

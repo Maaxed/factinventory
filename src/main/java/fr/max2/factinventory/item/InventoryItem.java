@@ -11,6 +11,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Style;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -18,6 +19,9 @@ import net.minecraftforge.items.IItemHandler;
 
 public abstract class InventoryItem extends Item
 {
+	public static final Style INPUT_STYLE = Style.EMPTY.withColor(0x0099FF);
+	public static final Style ALT_INPUT_STYLE = Style.EMPTY.withColor(0xAA00FF);
+	public static final Style OUTPUT_STYLE = Style.EMPTY.withColor(0xFF7F00);
 	
 	public InventoryItem(Properties properties)
 	{

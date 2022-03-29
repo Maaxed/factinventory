@@ -31,7 +31,6 @@ import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.network.chat.Component;
-import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -74,9 +73,9 @@ public class InventoryFurnaceItem extends InventoryItem
 		KeyModifierState keyModifiers = FactinventoryMod.proxy.getKeyModifierState();
 		if (keyModifiers.shift)
 		{
-			tooltip.add(new TranslatableComponent("tooltip.ingredient_input.desc").withStyle(ChatFormatting.BLUE));
-			tooltip.add(new TranslatableComponent("tooltip.fuel_input.desc").withStyle(ChatFormatting.DARK_PURPLE));
-			tooltip.add(new TranslatableComponent("tooltip.product_output.desc").withStyle(ChatFormatting.GOLD));
+			tooltip.add(new TranslatableComponent("tooltip.ingredient_input.desc").setStyle(INPUT_STYLE));
+			tooltip.add(new TranslatableComponent("tooltip.fuel_input.desc").setStyle(ALT_INPUT_STYLE));
+			tooltip.add(new TranslatableComponent("tooltip.product_output.desc").setStyle(OUTPUT_STYLE));
 		}
 		else
 		{
