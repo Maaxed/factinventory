@@ -85,7 +85,7 @@ public class SlowInventoryHopperItem extends InventoryHopperItem
 				playRemoveOneSound(pPlayer);
 			}
 		}
-		else
+		else if (carriedStack.getItem().canFitInsideContainerItems())
 		{
 			ItemStack content = getTransferringStack(pStack);
 			if (!content.isEmpty())

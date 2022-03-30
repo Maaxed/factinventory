@@ -4,8 +4,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import fr.max2.factinventory.utils.InventoryUtils;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -206,7 +204,7 @@ public class ItemTileEntityWrapperHandler implements IItemHandlerModifiable, ICa
 		@Override
 		public boolean isItemValid(int slot, @Nonnull ItemStack stack)
 		{
-			return !(Block.byItem(stack.getItem()) instanceof ShulkerBoxBlock);
+			return stack.getItem().canFitInsideContainerItems();
 		}
 		
 	}

@@ -91,7 +91,7 @@ public class InventoryDropperItem extends Item
 				InventoryItem.playRemoveOneSound(pPlayer);
 				pAccess.set(content);
 			}
-			else
+			else if (carriedStack.getItem().canFitInsideContainerItems())
 			{
 				ItemStack remaining = inventory.insertItem(0, carriedStack, false);
 				if (remaining.getCount() != carriedStack.getCount())
