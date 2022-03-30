@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import fr.max2.factinventory.FactinventoryMod;
+import fr.max2.factinventory.init.ModTexts;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -29,12 +30,12 @@ public abstract class InventoryHopperItem extends RotatableInventoryItem
 	{
 		if (FactinventoryMod.proxy.getKeyModifierState().shift)
 		{
-			tooltip.add(new TranslatableComponent("tooltip.input.desc").setStyle(INPUT_STYLE));
-			tooltip.add(new TranslatableComponent("tooltip.output.desc").setStyle(OUTPUT_STYLE));
+			tooltip.add(new TranslatableComponent(ModTexts.Tooltip.INPUT).setStyle(INPUT_STYLE));
+			tooltip.add(new TranslatableComponent(ModTexts.Tooltip.OUTPUT).setStyle(OUTPUT_STYLE));
 		}
 		else
 		{
-			tooltip.add(new TranslatableComponent("tooltip.interaction_info_on_shift.desc"));
+			tooltip.add(new TranslatableComponent(ModTexts.Tooltip.INTERACTION_INFO));
 		}
 	}
 

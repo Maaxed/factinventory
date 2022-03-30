@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import fr.max2.factinventory.capability.CapabilityTileEntityHandler;
 import fr.max2.factinventory.capability.ITileEntityHandler;
 import fr.max2.factinventory.capability.InventoryLinkerHandler;
+import fr.max2.factinventory.init.ModTexts;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.MenuProvider;
@@ -45,21 +46,21 @@ public class InventoryLinkerItem extends Item
 				{
 					if (worldIn != null && worldIn.hasChunkAt(handler.getTilePos()))
 					{
-						tooltip.add(new TranslatableComponent("tooltip.linked_missing.desc"));
+						tooltip.add(new TranslatableComponent(ModTexts.Tooltip.LINKED_MISSING));
 					}
-					else tooltip.add(new TranslatableComponent("tooltip.linked_unloaded.desc"));
+					else tooltip.add(new TranslatableComponent(ModTexts.Tooltip.LINKED_UNLOADED));
 				}
-				else tooltip.add(new TranslatableComponent("tooltip.linked_other_dimension.desc"));
+				else tooltip.add(new TranslatableComponent(ModTexts.Tooltip.LINKED_DIMENSION));
 			}
 			else
 			{
 				Component name = null;
 				if (te instanceof MenuProvider) name = ((MenuProvider)te).getDisplayName();
 				if (name == null) name = te.getBlockState().getBlock().getName();
-				tooltip.add(new TranslatableComponent("tooltip.linked_tile.desc", name));
+				tooltip.add(new TranslatableComponent(ModTexts.Tooltip.LINKED_TILE, name));
 			}
 		}
-		else tooltip.add(new TranslatableComponent("tooltip.not_linked.desc"));
+		else tooltip.add(new TranslatableComponent(ModTexts.Tooltip.NOT_LINKED));
 	}
 	
 	@Override

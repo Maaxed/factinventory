@@ -7,6 +7,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 import fr.max2.factinventory.FactinventoryMod;
+import fr.max2.factinventory.init.ModTexts;
 import fr.max2.factinventory.utils.InventoryUtils;
 import fr.max2.factinventory.utils.KeyModifierState;
 import net.minecraft.world.item.TooltipFlag;
@@ -73,13 +74,13 @@ public class InventoryFurnaceItem extends InventoryItem
 		KeyModifierState keyModifiers = FactinventoryMod.proxy.getKeyModifierState();
 		if (keyModifiers.shift)
 		{
-			tooltip.add(new TranslatableComponent("tooltip.ingredient_input.desc").setStyle(INPUT_STYLE));
-			tooltip.add(new TranslatableComponent("tooltip.fuel_input.desc").setStyle(ALT_INPUT_STYLE));
-			tooltip.add(new TranslatableComponent("tooltip.product_output.desc").setStyle(OUTPUT_STYLE));
+			tooltip.add(new TranslatableComponent(ModTexts.Tooltip.INGREDIENT_INPUT).setStyle(INPUT_STYLE));
+			tooltip.add(new TranslatableComponent(ModTexts.Tooltip.FUEL_INPUT).setStyle(ALT_INPUT_STYLE));
+			tooltip.add(new TranslatableComponent(ModTexts.Tooltip.PRODUCT_OUTPUT).setStyle(OUTPUT_STYLE));
 		}
 		else
 		{
-			tooltip.add(new TranslatableComponent("tooltip.interaction_info_on_shift.desc"));
+			tooltip.add(new TranslatableComponent(ModTexts.Tooltip.INTERACTION_INFO));
 		}
 	}
 	

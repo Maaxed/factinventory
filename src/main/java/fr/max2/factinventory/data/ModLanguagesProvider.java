@@ -8,8 +8,10 @@ import java.util.function.Supplier;
 import fr.max2.factinventory.FactinventoryMod;
 import fr.max2.factinventory.init.ModItemGroups;
 import fr.max2.factinventory.init.ModItems;
+import fr.max2.factinventory.init.ModTexts.Tooltip;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.HashCache;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.data.DataProvider;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.CreativeModeTab;
@@ -46,25 +48,22 @@ public class ModLanguagesProvider implements DataProvider
     	// ItemGroups
     	add(ModItemGroups.ITEM_TAB, "Inventory Items", "Items d'inventaire");
     	
-    	add("tooltip.interaction_info_on_shift.desc", "Hold §e§lSHIFT§r for input/output details", "Maintenir §e§lMaj§r pour afficher les détails d'entrée/surtie");
-    	add("tooltip.input.desc", "Input", "Entrée");
-    	add("tooltip.output.desc", "Output", "Sortie");
-    	add("tooltip.ingredient_input.desc", "Ingredient input", "Entrée des ingrédients");
-    	add("tooltip.fuel_input.desc", "Fuel inputs", "Entrées de combustible");
-    	add("tooltip.product_output.desc", "Product output", "Sortie des produits");
+    	add(Tooltip.INTERACTION_INFO, "Hold §e§lSHIFT§r for input/output details", "Maintenir §e§lMaj§r pour afficher les détails d'entrée/surtie");
+    	add(Tooltip.INPUT, "Input", "Entrée");
+    	add(Tooltip.OUTPUT, "Output", "Sortie");
+    	add(Tooltip.INGREDIENT_INPUT, "Ingredient input", "Entrée des ingrédients");
+    	add(Tooltip.FUEL_INPUT, "Fuel inputs", "Entrées de combustible");
+    	add(Tooltip.PRODUCT_OUTPUT, "Product output", "Sortie des produits");
     	
-    	add("tooltip.transfer_info_on_ctrl.desc", "Hold §e§lCTRL§r for transfer details", "Maintenir §e§lCTRL§r pour afficher les détails de transfert");
-    	add("tooltip.not_transferring.desc", "Empty", "Vide");
-    	add("tooltip.transferring_item.desc", "Transferring: %s", "En train de transférer : %s");
+    	add(Tooltip.TRANSFER_INFO, "Hold §e§lCTRL§r for transfer details", "Maintenir §e§lCTRL§r pour afficher les détails de transfert");
+    	add(Tooltip.NOT_TRANSFERRING, "Empty", "Vide");
+    	add(Tooltip.TRANSFERRING, "Transferring: %s", "En train de transférer : %s");
     	
-    	add("tooltip.drop_info_on_ctrl.desc", "Hold §e§lCTRL§r for inventory details", "Maintenir §e§lCTRL§r pour afficher les détails de l'inventaire");
-    	add("tooltip.drop_time.desc", "Drop time remaining: %d ticks", "Durée de drop restante : %d ticks");
-    	
-    	add("tooltip.linked_tile.desc", "Linked to: %s", "Lié à : %s");
-    	add("tooltip.linked_other_dimension.desc", "Linked to: another dimension", "Lié à : une autre dimension");
-    	add("tooltip.linked_unloaded.desc", "Linked to: unloaded block", "Lié à : bloc non chargé");
-    	add("tooltip.linked_missing.desc", "Not linked: missing block", "Non lié : bloc manquant");
-    	add("tooltip.not_linked.desc", "Not linked", "Non lié");
+    	add(Tooltip.LINKED_TILE, "Linked to: %s", "Lié à : %s");
+    	add(Tooltip.LINKED_DIMENSION, "Linked to: another dimension", "Lié à : une autre dimension");
+    	add(Tooltip.LINKED_UNLOADED, "Linked to: unloaded block", "Lié à : bloc non chargé");
+    	add(Tooltip.LINKED_MISSING, "Not linked: missing block", "Non lié : bloc manquant");
+    	add(Tooltip.NOT_LINKED, "Not linked", "Non lié");
     }
 	
 	@Override
@@ -84,7 +83,8 @@ public class ModLanguagesProvider implements DataProvider
 	
 	protected void add(CreativeModeTab key, String... names)
 	{
-		add("itemGroup." + key.getRecipeFolderName(), names);
+		TranslatableComponent comp = (TranslatableComponent)key.getDisplayName();
+		add(comp.getKey(), names);
 	}
 	
 	protected void add(String key, String... values)
