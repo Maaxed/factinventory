@@ -66,7 +66,10 @@ public class GuiRenderHandler
 			}
 			drawIOSlotBackground(screen, ms, slotX, slotY, screen.getBlitOffset() + 1, icon.face, icon.extract, icon.missing, icon.altColor);
 		}
-		
+
+		RenderSystem.depthMask(true);
+		RenderSystem.disableDepthTest();
+		RenderSystem.disableBlend();
 		Lighting.setupFor3DItems();
 	}
 	
@@ -114,7 +117,9 @@ public class GuiRenderHandler
 			}
 			drawIOSlotOverlay(screen, ms, slotX, slotY, screen.getBlitOffset() + 500, icon.face, icon.extract, icon.missing, icon.altColor);
 		}
-		
+
+		RenderSystem.depthMask(true);
+		RenderSystem.disableBlend();
 		Lighting.setupFor3DItems();
 	}
 	
