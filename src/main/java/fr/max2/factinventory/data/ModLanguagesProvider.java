@@ -9,9 +9,9 @@ import fr.max2.factinventory.FactinventoryMod;
 import fr.max2.factinventory.init.ModItemGroups;
 import fr.max2.factinventory.init.ModItems;
 import fr.max2.factinventory.init.ModTexts.Tooltip;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.HashCache;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.data.DataProvider;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.CreativeModeTab;
@@ -67,7 +67,7 @@ public class ModLanguagesProvider implements DataProvider
     }
 	
 	@Override
-	public void run(HashCache cache) throws IOException
+	public void run(CachedOutput cache) throws IOException
 	{
 		this.addTranslations();
 		for (LanguageProvider language : this.languages)
@@ -83,8 +83,8 @@ public class ModLanguagesProvider implements DataProvider
 	
 	protected void add(CreativeModeTab key, String... names)
 	{
-		TranslatableComponent comp = (TranslatableComponent)key.getDisplayName();
-		add(comp.getKey(), names);
+		TranslatableContents contents = (TranslatableContents)key.getDisplayName().getContents();
+		add(contents.getKey(), names);
 	}
 	
 	protected void add(String key, String... values)

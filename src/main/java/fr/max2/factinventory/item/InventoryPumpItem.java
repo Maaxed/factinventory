@@ -19,7 +19,6 @@ import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -46,12 +45,12 @@ public class InventoryPumpItem extends RotatableInventoryItem
 		KeyModifierState keyModifiers = FactinventoryMod.proxy.getKeyModifierState();
 		if (keyModifiers.shift)
 		{
-			tooltip.add(new TranslatableComponent(ModTexts.Tooltip.INPUT).setStyle(INPUT_STYLE));
-			tooltip.add(new TranslatableComponent(ModTexts.Tooltip.OUTPUT).setStyle(OUTPUT_STYLE));
+			tooltip.add(Component.translatable(ModTexts.Tooltip.INPUT).setStyle(INPUT_STYLE));
+			tooltip.add(Component.translatable(ModTexts.Tooltip.OUTPUT).setStyle(OUTPUT_STYLE));
 		}
 		else
 		{
-			tooltip.add(new TranslatableComponent(ModTexts.Tooltip.INTERACTION_INFO));
+			tooltip.add(Component.translatable(ModTexts.Tooltip.INTERACTION_INFO));
 		}
 		
 		if (keyModifiers.control)
@@ -60,16 +59,16 @@ public class InventoryPumpItem extends RotatableInventoryItem
 			FluidStack transferringItem = FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY);
 			if (transferringItem.isEmpty())
 			{
-				tooltip.add(new TranslatableComponent(ModTexts.Tooltip.NOT_TRANSFERRING));
+				tooltip.add(Component.translatable(ModTexts.Tooltip.NOT_TRANSFERRING));
 			}
 			else
 			{
-				tooltip.add(new TranslatableComponent(ModTexts.Tooltip.TRANSFERRING, transferringItem.getDisplayName()));
+				tooltip.add(Component.translatable(ModTexts.Tooltip.TRANSFERRING, transferringItem.getDisplayName()));
 			}
 		}
 		else
 		{
-			tooltip.add(new TranslatableComponent(ModTexts.Tooltip.TRANSFER_INFO));
+			tooltip.add(Component.translatable(ModTexts.Tooltip.TRANSFER_INFO));
 		}
 	}
 	

@@ -32,7 +32,6 @@ import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeHooks;
@@ -43,53 +42,53 @@ import net.minecraftforge.items.IItemHandler;
 public class InventoryFurnaceItem extends InventoryItem
 {
 	public static final ResourceLocation BURN_TIME_GETTER_LOC = new ResourceLocation(FactinventoryMod.MOD_ID, "burn_time");
-	
+
 	public InventoryFurnaceItem(Properties properties)
 	{
 		super(properties);
 	}
-	
+
 	@Override
 	public boolean isBarVisible(ItemStack pStack)
 	{
 		return true;
 	}
-	
+
 	@Override
 	public int getBarWidth(ItemStack stack)
 	{
 		// Range: [0, 13]
 		return Math.round((getCookTime(stack) * 13.0f / getTotalCookTime(stack)));
 	}
-	
+
 	@Override
 	public int getBarColor(ItemStack stack)
 	{
 		return 0xFF0000 | (int)((1.0 - (getCookTime(stack) / (double)getTotalCookTime(stack))) * 0xFF) << 8;
 	}
-	
+
 	@Override
 	public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn)
 	{
 		KeyModifierState keyModifiers = FactinventoryMod.proxy.getKeyModifierState();
 		if (keyModifiers.shift)
 		{
-			tooltip.add(new TranslatableComponent(ModTexts.Tooltip.INGREDIENT_INPUT).setStyle(INPUT_STYLE));
-			tooltip.add(new TranslatableComponent(ModTexts.Tooltip.FUEL_INPUT).setStyle(ALT_INPUT_STYLE));
-			tooltip.add(new TranslatableComponent(ModTexts.Tooltip.PRODUCT_OUTPUT).setStyle(OUTPUT_STYLE));
+			tooltip.add(Component.translatable(ModTexts.Tooltip.INGREDIENT_INPUT).setStyle(INPUT_STYLE));
+			tooltip.add(Component.translatable(ModTexts.Tooltip.FUEL_INPUT).setStyle(ALT_INPUT_STYLE));
+			tooltip.add(Component.translatable(ModTexts.Tooltip.PRODUCT_OUTPUT).setStyle(OUTPUT_STYLE));
 		}
 		else
 		{
-			tooltip.add(new TranslatableComponent(ModTexts.Tooltip.INTERACTION_INFO));
+			tooltip.add(Component.translatable(ModTexts.Tooltip.INTERACTION_INFO));
 		}
 	}
-	
+
 	@Override
 	public Optional<TooltipComponent> getTooltipImage(ItemStack pStack)
 	{
 	      return Optional.of(new Tooltip(getSmeltingStack(pStack), getStackTotalBurnTime(pStack), getStackRemainingBurnTime(pStack)));
 	}
-	
+
 	@Override
 	protected void update(ItemStack stack, Inventory inv, Player player, int itemSlot)
 	{
@@ -97,13 +96,13 @@ public class InventoryFurnaceItem extends InventoryItem
 			height = inv.items.size() / width,
 			x = itemSlot % width,
 			y = itemSlot / width;
-		
+
 		int burnTime = getStackRemainingBurnTime(stack);
 		int cookTime = getCookTime(stack);
-		
+
 		int totalCookTime = getTotalCookTime(stack);
 		ItemStack smeltingStack = getSmeltingStack(stack);
-		
+
 		if (burnTime > 0)
 		{
 			burnTime--;
@@ -113,11 +112,11 @@ public class InventoryFurnaceItem extends InventoryItem
 				setTotalBurnTime(stack, 0);
 			}
 		}
-		
+
 		if (smeltingStack.isEmpty())
 		{
 			// Try pull a new item
-			
+
 			int inputX = x, inputY = y - 1;
 			int outputX = x, outputY = y + 1;
 
@@ -130,12 +129,12 @@ public class InventoryFurnaceItem extends InventoryItem
 			else if (y == 0 && outputY == 1) outputY = -1;
 			else if (y == 0 && outputY == -1) outputY = height - 1;
 			else if (outputY == height) outputY = 0;
-			
+
 			if (inputY >= 0 && inputY < height && outputY >= 0 && outputY < height)
 			{
 				int inputSlot = inputX + width * inputY;
 				ItemStack newInputStack = inv.getItem(inputSlot);
-				
+
 				if (!newInputStack.isEmpty())
 				{
 					int outputSlot = outputX + width * outputY;
@@ -165,7 +164,7 @@ public class InventoryFurnaceItem extends InventoryItem
 					else
 					{
 						Container slotInv = new SimpleContainer(newInputStack);
-						
+
 						SmeltingRecipe recipe = getSmeltingRecipe(player, slotInv);
 						if (recipe != null)
 						{
@@ -235,7 +234,7 @@ public class InventoryFurnaceItem extends InventoryItem
 					else if (AbstractFurnaceBlockEntity.isFuel(fuelItem) || FurnaceFuelSlot.isBucket(fuelItem) && fuelItem.getItem() != Items.BUCKET)
 					{
 						burnTime = ForgeHooks.getBurnTime(fuelItem, RecipeType.SMELTING);
-						
+
 						if (burnTime > 0)
 						{
 							Item item = fuelItem.getItem();
@@ -252,7 +251,7 @@ public class InventoryFurnaceItem extends InventoryItem
 				}
 			}
 		}
-		
+
 		if (burnTime > 0)
 		{
 			if (!smeltingStack.isEmpty())
@@ -269,18 +268,18 @@ public class InventoryFurnaceItem extends InventoryItem
 					// Smelt item
 
 					int outputX = x, outputY = y + 1;
-				
+
 					if (outputY == 0 && y != 0) outputY = height;
 					else if (y == 0 && outputY == 1) outputY = -1;
 					else if (y == 0 && outputY == -1) outputY = height - 1;
 					else if (outputY == height) outputY = 0;
-					
+
 					if (outputY >= 0 && outputY < height)
 					{
 						int outputSlot = outputX + width * outputY;
 						ItemStack outputStack = inv.getItem(outputSlot);
 						Container slotInv = new SimpleContainer(smeltingStack);
-						
+
 						SmeltingRecipe recipe = getSmeltingRecipe(player, slotInv);
 						if (recipe != null)
 						{
@@ -312,12 +311,12 @@ public class InventoryFurnaceItem extends InventoryItem
 									smeltingStack = ItemStack.EMPTY;
 								}
 							}
-							
+
 							if (smeltingStack.isEmpty())
 							{
 								int i = result.getCount();
 								float f = recipe.getExperience();
-								
+
 								if (f == 0.0F)
 								{
 									i = 0;
@@ -325,12 +324,12 @@ public class InventoryFurnaceItem extends InventoryItem
 								else if (f < 1.0F)
 								{
 									int j = Mth.floor(i * f);
-									
+
 									if (j < Mth.ceil(i * f) && Math.random() < i * f - j)
 									{
 										++j;
 									}
-									
+
 									i = j;
 								}
 
@@ -359,25 +358,25 @@ public class InventoryFurnaceItem extends InventoryItem
 				setCookTime(stack, cookTime);
 			}
 		}
-		
+
 	}
 
 	@Override
 	public List<Icon> getRenderIcons(ItemStack stack, AbstractContainerMenu container, Slot slot, Inventory inv)
 	{
 		List<Icon> icons = new ArrayList<>();
-		
+
 		int itemSlot = slot.getSlotIndex(),
 			width = Inventory.getSelectionSize(),
 			height = inv.items.size() / width;
-		
+
 		if (itemSlot >= width * height) return icons;
-		
+
 		int x = itemSlot % width,
 			y = itemSlot / width,
 			pullY = y - 1,
 			pushY = y + 1;
-		
+
 		if (pullY == 0 && y != 0)
 			pullY = height;
 		else if (y == 0 && pullY == 1)
@@ -386,7 +385,7 @@ public class InventoryFurnaceItem extends InventoryItem
 			pullY = height - 1;
 		else if (pullY == height)
 			pullY = 0;
-		
+
 		if (pushY == 0 && y != 0)
 			pushY = height;
 		else if (y == 0 && pushY == 1)
@@ -395,52 +394,52 @@ public class InventoryFurnaceItem extends InventoryItem
 			pushY = height - 1;
 		else if (pushY == height)
 			pushY = 0;
-		
+
 		if (pullY >= 0 && pullY < height)
 		{
 			Slot extractSlot = findSlot(container, slot, x + width * pullY);
 			icons.add(new Icon(extractSlot, Direction.NORTH, true, false));
 		}
 		else icons.add(new Icon(null, Direction.NORTH, true, false));
-		
+
 		if (pushY >= 0 && pushY < height)
 		{
 			Slot fillSlot = findSlot(container, slot, x + width * pushY);
 			icons.add(new Icon(fillSlot, Direction.SOUTH, false, false));
 		}
 		else icons.add(new Icon(null, Direction.SOUTH, false, false));
-		
+
 		int fuelX1 = x - 1,
 			fuelX2 = x + 1;
-		
+
 		if (fuelX1 >= 0 && fuelX1 < width)
 		{
 			Slot fuelSlot = findSlot(container, slot, fuelX1 + width * y);
 			icons.add(new Icon(fuelSlot, Direction.WEST, true, true));
 		}
 		else icons.add(new Icon(null, Direction.WEST, true, true));
-		
+
 		if (fuelX2 >= 0 && fuelX2 < width)
 		{
 			Slot fuelSlot = findSlot(container, slot, fuelX2 + width * y);
 			icons.add(new Icon(fuelSlot, Direction.EAST, true, true));
 		}
 		else icons.add(new Icon(null, Direction.EAST, true, true));
-		
-		
+
+
 		return icons;
 	}
-	
+
 	private static SmeltingRecipe getSmeltingRecipe(Player player, Container inv)
 	{
 		return player.level.getRecipeManager().getRecipeFor(RecipeType.SMELTING, inv, player.level).orElse(null);
 	}
-	
+
 	private static final Direction[] FUEL_SIDE = { Direction.EAST, Direction.WEST };
-	
+
 
 	private static final String NBT_REMAINING_BURN_TIME = "BurnTime";
-	
+
 	public static int getStackRemainingBurnTime(ItemStack stack)
 	{
 		if (stack.hasTag())
@@ -450,15 +449,15 @@ public class InventoryFurnaceItem extends InventoryItem
 		}
 		return 0;
 	}
-	
+
 	public static void setRemainingBurnTime(ItemStack stack, int burnTime)
 	{
 		stack.addTagElement(NBT_REMAINING_BURN_TIME, IntTag.valueOf(burnTime));
 	}
-	
+
 
 	private static final String NBT_TOTAL_BURN_TIME = "totalBurnTime";
-	
+
 	public static int getStackTotalBurnTime(ItemStack stack)
 	{
 		if (stack.hasTag())
@@ -468,15 +467,15 @@ public class InventoryFurnaceItem extends InventoryItem
 		}
 		return 0;
 	}
-	
+
 	public static void setTotalBurnTime(ItemStack stack, int burnTime)
 	{
 		stack.addTagElement(NBT_TOTAL_BURN_TIME, IntTag.valueOf(burnTime));
 	}
-	
-	
+
+
 	private static final String NBT_COOK_TIME = "CookTime";
-	
+
 	public static int getCookTime(ItemStack stack)
 	{
 		if (stack.hasTag())
@@ -486,15 +485,15 @@ public class InventoryFurnaceItem extends InventoryItem
 		}
 		return 0;
 	}
-	
+
 	public static void setCookTime(ItemStack stack, int cookTime)
 	{
 		stack.addTagElement(NBT_COOK_TIME, IntTag.valueOf(cookTime));
 	}
-	
-	
+
+
 	private static final String NBT_TOTAL_COOK_TIME = "TotalCookTime";
-	
+
 	public static int getTotalCookTime(ItemStack stack)
 	{
 		if (stack.hasTag())
@@ -504,15 +503,15 @@ public class InventoryFurnaceItem extends InventoryItem
 		}
 		return 0;
 	}
-	
+
 	public static void setTotalCookTime(ItemStack stack, int cookTime)
 	{
 		stack.addTagElement(NBT_TOTAL_COOK_TIME, IntTag.valueOf(cookTime));
 	}
-	
-	
+
+
 	private static final String NBT_ACTUAL_INPUT = "SmeltingItem";
-	
+
 	public static ItemStack getSmeltingStack(ItemStack stack)
 	{
 		if (stack.hasTag())
@@ -522,12 +521,12 @@ public class InventoryFurnaceItem extends InventoryItem
 		}
 		return ItemStack.EMPTY;
 	}
-	
+
 	public static void setSmeltingStack(ItemStack stack, ItemStack smeltingStck)
 	{
 		stack.addTagElement(NBT_ACTUAL_INPUT, smeltingStck.serializeNBT());
 	}
-	
+
 	public static class Tooltip implements TooltipComponent
 	{
 		private ItemStack smeltingStack;

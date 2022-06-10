@@ -7,18 +7,19 @@ import fr.max2.factinventory.init.ModItems;
 import fr.max2.factinventory.item.InventoryFurnaceItem;
 import fr.max2.factinventory.item.InventoryPumpItem;
 import fr.max2.factinventory.item.RotatableInventoryItem;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.client.model.generators.loaders.DynamicBucketModelBuilder;
-import net.minecraftforge.client.model.generators.ModelBuilder.Perspective;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
 public class ModItemModelProvider extends ItemModelProvider
 {
@@ -80,7 +81,7 @@ public class ModItemModelProvider extends ItemModelProvider
 		}
 	}
 	
-	protected ItemModelBuilder simpleItem(IForgeRegistryEntry<?> entry)
+	protected ItemModelBuilder simpleItem(ItemLike entry)
 	{
 		return singleTexture(name(entry), mcLoc("item/generated"), "layer0", itemTexture(entry));
 	}
@@ -110,17 +111,17 @@ public class ModItemModelProvider extends ItemModelProvider
 			ItemModelBuilder rotatedBase = nested()
 				.parent(baseModel)
 				.transforms()
-					.transform(Perspective.GUI)
+					.transform(TransformType.GUI)
 						.rotation(0, 0, 180 - dir.toYRot())
 						.translation(0, 0, 0)
 						.scale(1)
 						.end()
-					.transform(Perspective.FIRSTPERSON_RIGHT)
+					.transform(TransformType.FIRST_PERSON_RIGHT_HAND)
 						.rotation(0, -90, 205 - dir.toYRot())
 						.translation(1.13f, 3.2f, 1.13f)
 						.scale(0.68f)
 						.end()
-					.transform(Perspective.FIRSTPERSON_LEFT)
+					.transform(TransformType.FIRST_PERSON_LEFT_HAND)
 						.rotation(0, -90,  -155 + dir.toYRot())
 						.translation(1.13f, 3.2f, 1.13f)
 						.scale(0.68f)
@@ -149,15 +150,15 @@ public class ModItemModelProvider extends ItemModelProvider
 		return mainModel;
 	}
 
-    protected ResourceLocation itemTexture(IForgeRegistryEntry<?> entry)
+    protected ResourceLocation itemTexture(ItemLike entry)
     {
-        ResourceLocation name = entry.getRegistryName();
+        ResourceLocation name = ForgeRegistries.ITEMS.getKey(entry.asItem());
         return new ResourceLocation(name.getNamespace(), (entry instanceof Block ? BLOCK_FOLDER : ITEM_FOLDER) + "/" + name.getPath());
     }
 
-    protected String name(IForgeRegistryEntry<?> entry)
+    protected String name(ItemLike entry)
     {
-        return entry.getRegistryName().getPath();
+        return ForgeRegistries.ITEMS.getKey(entry.asItem()).getPath();
     }
 	
 	private static ResourceLocation extend(ResourceLocation rl, String suffix)

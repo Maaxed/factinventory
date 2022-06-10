@@ -19,23 +19,17 @@ public class ModDataProviders
         DataGenerator gen = event.getGenerator();
     	ExistingFileHelper files = event.getExistingFileHelper();
 
-        if (event.includeServer())
-        {
-        	BlockTagsProvider blockTags = new BlockTagsProvider(gen, FactinventoryMod.MOD_ID, files)
-    		{
-        		@Override
-        		protected void addTags()
-        		{ }
-    		};
-            gen.addProvider(new ModItemTagsProvider(gen, blockTags, files));
-            gen.addProvider(new ModRecipeProvider(gen));
-        }
-        
-        if (event.includeClient())
-        {
-            gen.addProvider(new ModItemModelProvider(gen, files));
-            gen.addProvider(new ModLanguagesProvider(gen));
-        }
+    	BlockTagsProvider blockTags = new BlockTagsProvider(gen, FactinventoryMod.MOD_ID, files)
+		{
+    		@Override
+    		protected void addTags()
+    		{ }
+		};
+        gen.addProvider(event.includeServer(), new ModItemTagsProvider(gen, blockTags, files));
+        gen.addProvider(event.includeServer(), new ModRecipeProvider(gen));
+
+        gen.addProvider(event.includeClient(), new ModItemModelProvider(gen, files));
+        gen.addProvider(event.includeClient(), new ModLanguagesProvider(gen));
     }
 	
 }
